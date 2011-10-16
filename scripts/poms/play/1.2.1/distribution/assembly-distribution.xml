@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+-->
+
+<assembly>
+    <id>distribution</id>
+
+    <formats>
+        <format>zip</format>
+    </formats>
+
+    <includeSiteDirectory>false</includeSiteDirectory>
+
+    <files>
+        <file>
+            <source>${basedir}/../play.bat</source>
+            <fileMode>0777</fileMode>
+            <lineEnding>windows</lineEnding>
+        </file>
+        <file>
+            <source>${basedir}/../play</source>
+            <fileMode>0777</fileMode>
+            <lineEnding>unix</lineEnding>
+        </file>
+    </files>
+
+    <dependencySets>
+        <dependencySet>
+            <includes>
+                <include>com.google.code.maven-play-plugin.org.playframework:play:zip:framework:${project.version}</include>
+            </includes>
+            <unpack>true</unpack>
+            <unpackOptions>
+                <excludes>
+                    <exclude>play</exclude>
+                    <exclude>play.bat</exclude>
+                </excludes>
+            </unpackOptions>
+            <useProjectArtifact>false</useProjectArtifact>
+        </dependencySet>
+
+        <dependencySet>
+            <outputDirectory>modules/crud</outputDirectory>
+            <includes>
+                <include>com.google.code.maven-play-plugin.org.playframework.modules:play-crud:zip:module:${project.version}</include>
+            </includes>
+            <unpack>true</unpack>
+            <useProjectArtifact>false</useProjectArtifact>
+        </dependencySet>
+
+        <dependencySet>
+            <outputDirectory>modules/docviewer</outputDirectory>
+            <includes>
+                <include>com.google.code.maven-play-plugin.org.playframework.modules:play-docviewer:zip:module:${project.version}</include>
+            </includes>
+            <unpack>true</unpack>
+            <useProjectArtifact>false</useProjectArtifact>
+        </dependencySet>
+
+        <dependencySet>
+            <outputDirectory>modules/grizzly</outputDirectory>
+            <includes>
+                <include>com.google.code.maven-play-plugin.org.playframework.modules:play-grizzly:zip:module:${project.version}</include>
+            </includes>
+            <unpack>true</unpack>
+            <useProjectArtifact>false</useProjectArtifact>
+        </dependencySet>
+
+        <dependencySet>
+            <outputDirectory>modules/secure</outputDirectory>
+            <includes>
+                <include>com.google.code.maven-play-plugin.org.playframework.modules:play-secure:zip:module:${project.version}</include>
+            </includes>
+            <unpack>true</unpack>
+            <useProjectArtifact>false</useProjectArtifact>
+        </dependencySet>
+
+        <dependencySet>
+            <outputDirectory>modules/testrunner</outputDirectory>
+            <includes>
+                <include>com.google.code.maven-play-plugin.org.playframework.modules:play-testrunner:zip:module:${project.version}</include>
+            </includes>
+            <unpack>true</unpack>
+            <useProjectArtifact>false</useProjectArtifact>
+        </dependencySet>
+    </dependencySets>
+</assembly>

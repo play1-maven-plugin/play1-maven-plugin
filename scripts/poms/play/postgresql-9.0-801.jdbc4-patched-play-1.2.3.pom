@@ -1,0 +1,21 @@
+<project>
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.google.code.maven-play-plugin.postgresql</groupId>
+    <artifactId>postgresql</artifactId>
+    <packaging>jar</packaging>
+    <name>PostgreSQL JDBC4 Driver</name>
+    <version>9.0-801.jdbc4-patched-play-1.2.3</version>
+    <url>http://jdbc.postgresql.org/</url>
+    <description>The PostgreSQL JDBC4 Driver for PostgreSQL 7.2 and later databases (for Java 1.4 and later)</description>
+    <licenses>
+        <license>
+            <name>BSD License</name>
+            <url>http://jdbc.postgresql.org/license.html</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+    <scm>
+        <url>scm:cvs:pserver:anoncvs@anoncvs.postgresql.org:/projects/cvsroot</url>
+    </scm>
+</project>
+

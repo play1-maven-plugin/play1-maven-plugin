@@ -9,4 +9,4 @@ set REPO_URL=https://maven-play-plugin.googlecode.com/svn/mavenrepo/releases
 @rem set REPO_URL=https://maven-play-plugin.googlecode.com/svn/mavenrepo/snapshots
 
 call mvn clean package --file %SRC_DIR%/pom-build-dist.xml
-call mvn deploy:deploy-file -Dfile=%SRC_DIR%/pom.xml -DgroupId=%GROUP_ID% -DartifactId=%ARTIFACT_ID% -Dpackaging=pom -Dversion=%VERSION% -DgeneratePom=false -Dfiles=%SRC_DIR%/target/%ARTIFACT_ID%-%VERSION%-module.zip,%SRC_DIR%/target/%ARTIFACT_ID%-%VERSION%-module-resources.zip -Dtypes=zip,zip -Dclassifiers=module,module-resources -DrepositoryId=%REPO_ID% -Durl=dav:%REPO_URL% -e
+call mvn deploy:deploy-file -Dfile=%SRC_DIR%/pom.xml -DgroupId=%GROUP_ID% -DartifactId=%ARTIFACT_ID% -Dpackaging=pom -Dversion=%VERSION% -DgeneratePom=false -Dfiles=%SRC_DIR%/target/%ARTIFACT_ID%-%VERSION%-module.zip,%SRC_DIR%/target/%ARTIFACT_ID%-%VERSION%-module-min.zip -Dtypes=zip,zip -Dclassifiers=module,module-min -DrepositoryId=%REPO_ID% -Durl=dav:%REPO_URL% -e

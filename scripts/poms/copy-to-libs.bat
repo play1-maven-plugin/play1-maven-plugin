@@ -15,7 +15,7 @@ call copy-framework.bat play\1.2 %PLAY_HOME%
 call ..\set-play-home-1.2.1.bat
 call copy-framework.bat play\1.2.1 %PLAY_HOME%
 
-call ..\set-play-home-1.2.1.bat
+call ..\set-play-home-1.2.1.1.bat
 call copy-framework.bat play\1.2.1.1 %PLAY_HOME%
 
 call ..\set-play-home-1.2.2.bat

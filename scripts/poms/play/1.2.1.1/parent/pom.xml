@@ -101,7 +101,7 @@ under the License.
                     <configuration>
                         <author>false</author>
                         <bottom><![CDATA[<a href="http://guillaume.bort.fr">Guillaume Bort</a> &amp; <a href="http://www.zenexity.fr">zenexity</a> - Distributed under <a href="http://www.apache.org/licenses/LICENSE-2.0.html">Apache 2 licence</a>, without any warrantly]]></bottom>
-                        <detectJavaApiLink>false</detectJavaApiLink> <!-- for compatibility with Ant build only -->
+                        <detectJavaApiLink>false</detectJavaApiLink>
                         <doctitle><![CDATA[<h1>Play! ${project.version}</h1>]]></doctitle>
                         <groups>
                             <group>
@@ -109,14 +109,6 @@ under the License.
                                 <packages>play.libs.*</packages>
                             </group>
                         </groups>
-                        <links>
-                            <link>http://java.sun.com/javaee/5/docs/api</link>
-                            <link>http://commons.apache.org/fileupload/apidocs</link>
-                            <link>http://google-gson.googlecode.com/svn/tags/1.2.3/docs/javadocs</link>
-                            <link>https://www.hibernate.org/hib_docs/v3/api</link>
-                            <link>http://www.mchange.com/projects/c3p0/apidocs</link>
-                        </links>
-                        <!--<sourcepath>${basedir}/src</sourcepath>--> <!--do I need it?-->
                         <tags>
                             <tag>
                                 <name>todo</name>

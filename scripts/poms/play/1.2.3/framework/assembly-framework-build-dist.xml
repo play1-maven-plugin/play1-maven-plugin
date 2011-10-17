@@ -34,6 +34,7 @@ under the License.
             <directory>${basedir}</directory>
             <outputDirectory>framework</outputDirectory>
             <includes>
+                <include>lib/*.docurl</include>
                 <include>patches/**</include>
                 <include>src/**</include>
                 <include>templates/**</include>

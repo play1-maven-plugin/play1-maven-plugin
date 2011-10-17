@@ -570,6 +570,13 @@ under the License.
                                 </goals>
                                 <phase>prepare-package</phase>
                                 <configuration>
+                                    <links>
+                                        <link>http://download.oracle.com/javase/6/docs/api/</link>
+                                        <link>http://commons.apache.org/fileupload/apidocs/</link>
+                                        <link>http://google-gson.googlecode.com/svn/tags/1.6/docs/javadocs/</link>
+                                        <link>http://docs.jboss.org/hibernate/core/3.6/javadocs/</link>
+                                        <link>http://www.mchange.com/projects/c3p0/apidocs/</link>
+                                    </links>
                                     <reportOutputDirectory>${project.build.directory}/apidocs</reportOutputDirectory>
                                 </configuration>
                             </execution>

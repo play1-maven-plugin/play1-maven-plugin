@@ -100,6 +100,17 @@ under the License.
                     </execution>
                 </executions>
             </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <configuration>
+                    <links>
+                        <link>http://download.oracle.com/javase/6/docs/api/</link>
+                        <link>http://www.playframework.org/documentation/api/1.2.1/</link> <!-- 1.2.1.1 not published -->
+                    </links>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 

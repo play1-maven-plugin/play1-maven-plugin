@@ -40,12 +40,18 @@ under the License.
             <groupId>com.google.code.maven-play-plugin.org.playframework</groupId>
             <artifactId>play</artifactId>
             <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.google.code.maven-play-plugin.org.playframework</groupId>
+            <artifactId>play</artifactId>
+            <version>${project.version}</version>
             <classifier>framework</classifier>
             <type>zip</type>
         </dependency>
 
         <dependency>
-            <groupId>com.google.code.maven-play-plugin.org.playframework.modules</groupId>
+            <groupId>com.google.code.maven-play-plugin.org.playframework.modules.crud</groupId>
             <artifactId>play-crud</artifactId>
             <version>${project.version}</version>
             <classifier>module</classifier>
@@ -53,7 +59,7 @@ under the License.
         </dependency>
 
         <dependency>
-            <groupId>com.google.code.maven-play-plugin.org.playframework.modules</groupId>
+            <groupId>com.google.code.maven-play-plugin.org.playframework.modules.docviewer</groupId>
             <artifactId>play-docviewer</artifactId>
             <version>${project.version}</version>
             <classifier>module</classifier>
@@ -61,7 +67,13 @@ under the License.
         </dependency>
 
         <dependency>
-            <groupId>com.google.code.maven-play-plugin.org.playframework.modules</groupId>
+            <groupId>com.google.code.maven-play-plugin.org.playframework.modules.grizzly</groupId>
+            <artifactId>play-grizzly</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.google.code.maven-play-plugin.org.playframework.modules.grizzly</groupId>
             <artifactId>play-grizzly</artifactId>
             <version>${project.version}</version>
             <classifier>module</classifier>
@@ -69,7 +81,7 @@ under the License.
         </dependency>
 
         <dependency>
-            <groupId>com.google.code.maven-play-plugin.org.playframework.modules</groupId>
+            <groupId>com.google.code.maven-play-plugin.org.playframework.modules.secure</groupId>
             <artifactId>play-secure</artifactId>
             <version>${project.version}</version>
             <classifier>module</classifier>
@@ -77,7 +89,13 @@ under the License.
         </dependency>
 
         <dependency>
-            <groupId>com.google.code.maven-play-plugin.org.playframework.modules</groupId>
+            <groupId>com.google.code.maven-play-plugin.org.playframework.modules.testrunner</groupId>
+            <artifactId>play-testrunner</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.google.code.maven-play-plugin.org.playframework.modules.testrunner</groupId>
             <artifactId>play-testrunner</artifactId>
             <version>${project.version}</version>
             <classifier>module</classifier>

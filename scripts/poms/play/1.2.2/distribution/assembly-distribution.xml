@@ -28,38 +28,40 @@ under the License.
 
     <includeSiteDirectory>false</includeSiteDirectory>
 
-    <files>
-        <file>
-            <source>${basedir}/../play.bat</source>
-            <fileMode>0777</fileMode>
-            <lineEnding>windows</lineEnding>
-        </file>
-        <file>
-            <source>${basedir}/../play</source>
-            <fileMode>0777</fileMode>
-            <lineEnding>unix</lineEnding>
-        </file>
-    </files>
-
     <dependencySets>
         <dependencySet>
             <includes>
-                <include>com.google.code.maven-play-plugin.org.playframework:play:zip:framework:${project.version}</include>
+                <include>com.google.code.maven-play-plugin.org.playframework:play:zip:framework</include>
             </includes>
             <unpack>true</unpack>
-            <unpackOptions>
-                <excludes>
-                    <exclude>play</exclude>
-                    <exclude>play.bat</exclude>
-                </excludes>
-            </unpackOptions>
+            <useProjectArtifact>false</useProjectArtifact>
+        </dependencySet>
+
+        <dependencySet>
+            <outputDirectory>framework</outputDirectory>
+            <includes>
+                <include>com.google.code.maven-play-plugin.org.playframework:play:jar</include>
+            </includes>
+            <useProjectArtifact>false</useProjectArtifact>
+        </dependencySet>
+
+        <dependencySet>
+            <outputDirectory>framework/lib</outputDirectory>
+            <includes>
+                <include>*:*:jar</include>
+            </includes>
+            <excludes>
+                <exclude>com.google.code.maven-play-plugin.org.playframework:play:jar</exclude>
+                <exclude>com.google.code.maven-play-plugin.org.playframework.modules.grizzly:play-grizzly:jar</exclude>
+                <exclude>com.google.code.maven-play-plugin.org.playframework.modules.testrunner:play-testrunner:jar</exclude>
+            </excludes>
             <useProjectArtifact>false</useProjectArtifact>
         </dependencySet>
 
         <dependencySet>
             <outputDirectory>modules/crud</outputDirectory>
             <includes>
-                <include>com.google.code.maven-play-plugin.org.playframework.modules:play-crud:zip:module:${project.version}</include>
+                <include>com.google.code.maven-play-plugin.org.playframework.modules.crud:play-crud:zip:module</include>
             </includes>
             <unpack>true</unpack>
             <useProjectArtifact>false</useProjectArtifact>
@@ -68,7 +70,7 @@ under the License.
         <dependencySet>
             <outputDirectory>modules/docviewer</outputDirectory>
             <includes>
-                <include>com.google.code.maven-play-plugin.org.playframework.modules:play-docviewer:zip:module:${project.version}</include>
+                <include>com.google.code.maven-play-plugin.org.playframework.modules.docviewer:play-docviewer:zip:module</include>
             </includes>
             <unpack>true</unpack>
             <useProjectArtifact>false</useProjectArtifact>
@@ -77,16 +79,25 @@ under the License.
         <dependencySet>
             <outputDirectory>modules/grizzly</outputDirectory>
             <includes>
-                <include>com.google.code.maven-play-plugin.org.playframework.modules:play-grizzly:zip:module:${project.version}</include>
+                <include>com.google.code.maven-play-plugin.org.playframework.modules.grizzly:play-grizzly:zip:module</include>
             </includes>
             <unpack>true</unpack>
             <useProjectArtifact>false</useProjectArtifact>
         </dependencySet>
 
         <dependencySet>
+            <outputDirectory>modules/grizzly/lib</outputDirectory>
+            <includes>
+                <include>com.google.code.maven-play-plugin.org.playframework.modules.grizzly:play-grizzly:jar</include>
+            </includes>
+            <useProjectArtifact>false</useProjectArtifact>
+            <useTransitiveFiltering>true</useTransitiveFiltering>
+        </dependencySet>
+
+        <dependencySet>
             <outputDirectory>modules/secure</outputDirectory>
             <includes>
-                <include>com.google.code.maven-play-plugin.org.playframework.modules:play-secure:zip:module:${project.version}</include>
+                <include>com.google.code.maven-play-plugin.org.playframework.modules.secure:play-secure:zip:module</include>
             </includes>
             <unpack>true</unpack>
             <useProjectArtifact>false</useProjectArtifact>
@@ -95,10 +106,19 @@ under the License.
         <dependencySet>
             <outputDirectory>modules/testrunner</outputDirectory>
             <includes>
-                <include>com.google.code.maven-play-plugin.org.playframework.modules:play-testrunner:zip:module:${project.version}</include>
+                <include>com.google.code.maven-play-plugin.org.playframework.modules.testrunner:play-testrunner:zip:module</include>
             </includes>
             <unpack>true</unpack>
             <useProjectArtifact>false</useProjectArtifact>
+        </dependencySet>
+
+        <dependencySet>
+            <outputDirectory>modules/testrunner/lib</outputDirectory>
+            <includes>
+                <include>com.google.code.maven-play-plugin.org.playframework.modules.testrunner:play-testrunner:jar</include>
+            </includes>
+            <useProjectArtifact>false</useProjectArtifact>
+            <useTransitiveFiltering>true</useTransitiveFiltering>
         </dependencySet>
     </dependencySets>
 </assembly>

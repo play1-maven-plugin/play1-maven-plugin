@@ -40,7 +40,7 @@ under the License.
                 <include>templates/**</include>
                 <include>test-src/**</include>
                 <!--<include>assembly-framework.xml</include>-->
-                <!--<include>assembly-framework-resources.xml</include>-->
+                <!--<include>assembly-framework-min.xml</include>-->
                 <include>build.xml</include>
                 <include>dependencies.yml</include>
                 <!--<include>pom.xml</include>-->

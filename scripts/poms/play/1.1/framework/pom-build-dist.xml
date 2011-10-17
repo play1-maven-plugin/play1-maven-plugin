@@ -415,7 +415,7 @@ under the License.
                         <configuration>
                             <descriptors>
                                 <descriptor>${basedir}/assembly-framework-build-dist.xml</descriptor>
-                                <descriptor>${basedir}/assembly-framework-resources.xml</descriptor>
+                                <descriptor>${basedir}/assembly-framework-min.xml</descriptor>
                             </descriptors>
                         </configuration>
                     </execution>

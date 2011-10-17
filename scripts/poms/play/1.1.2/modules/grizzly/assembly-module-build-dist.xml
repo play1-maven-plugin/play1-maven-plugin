@@ -35,7 +35,7 @@ under the License.
             <includes>
                 <include>src/**</include>
                 <!--<include>assembly-module.xml</include>-->
-                <!--<include>assembly-module-resources.xml</include>-->
+                <!--<include>assembly-module-min.xml</include>-->
                 <include>build.xml</include>
                 <!--<include>pom.xml</include>-->
             </includes>

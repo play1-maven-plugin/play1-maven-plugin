@@ -29,7 +29,7 @@ under the License.
 
     <name>Maven Parent</name>
     <inceptionYear>2010</inceptionYear>
-    <url>http://maven-play-plugin.googlecode.com/svn/mavensite/${project.version}</url>
+    <url>http://maven-play-plugin.googlecode.com/svn/mavensite/plugin-parent/${project.version}</url>
 
     <repositories>
         <repository>

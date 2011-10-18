@@ -36,13 +36,10 @@ under the License.
 
     <modules>
         <module>maven-plugin</module>
-        <module>play-app-default-parent</module>
-        <module>play-module-default-parent</module>
         <module>play-selenium-junit4</module>
         <module>play-server-booter</module>
         <module>play12-extensions</module>
         <module>surefire-play-junit4</module>
-        <module>test-projects</module>
     </modules>
 
     <build>
@@ -59,7 +56,6 @@ under the License.
                 </plugin>
             </plugins>
         </pluginManagement>
-        </plugins>
     </build>
 
 </project>

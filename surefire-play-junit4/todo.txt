@@ -1,0 +1,3 @@
+- popr. skaner, zeby przyjmowal tylko klasy UnitTest
+- dodac dependency com.google.code.maven-play-plugin.org.playframework:play-testrunner:runtime do provider'a?
+- od jakiej wersji surefire powinny byc zaleznosci

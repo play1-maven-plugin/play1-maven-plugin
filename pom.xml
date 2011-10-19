@@ -34,7 +34,7 @@ under the License.
     <packaging>pom</packaging>
 
     <name>Maven Plugin for Play! Framework Parent</name>
-    <url>http://maven-play-plugin.googlecode.com/svn/mavensite/plugin/${project.version}</url>
+    <url>http://maven-play-plugin.googlecode.com/svn/mavensite/${project.version}</url>
 
     <repositories>
         <repository>
@@ -59,7 +59,7 @@ under the License.
         <site>
             <id>com.google.code.maven-play-plugin-sites</id>
             <name>Maven Play Plugin - sites</name>
-            <url>dav:https://maven-play-plugin.googlecode.com/svn/mavensite/plugin/${project.version}</url>
+            <url>dav:https://maven-play-plugin.googlecode.com/svn/mavensite/${project.version}</url>
         </site>
     </distributionManagement>
 

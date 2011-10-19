@@ -25,7 +25,6 @@ under the License.
         <groupId>com.google.code.maven-play-plugin</groupId>
         <artifactId>plugin-parent</artifactId>
         <version>1.0.0-alpha3-SNAPSHOT</version>
-        <relativePath>../plugin-parent</relativePath>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>

@@ -21,17 +21,47 @@ under the License.
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
+    <parent>
+        <groupId>com.google.code.maven-play-plugin</groupId>
+        <artifactId>maven-parent</artifactId>
+        <version>1.0.0-alpha3-SNAPSHOT</version>
+    </parent>
+
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.google.code.maven-play-plugin</groupId>
     <artifactId>plugin-aggregator</artifactId>
-    <version>1.0.0-alpha3-SNAPSHOT</version>
     <packaging>pom</packaging>
 
-    <name>Maven Aggregator</name>
+    <name>Maven Plugin for Play! Framework Parent</name>
+
+    <repositories>
+        <repository>
+            <id>com.google.code.maven-play-plugin</id>
+            <name>Maven Play Plugin - releases</name>
+            <url>https://maven-play-plugin.googlecode.com/svn/mavenrepo/releases</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>com.google.code.maven-play-plugin-snapshots</id>
+            <name>Maven Play Plugin - snapshots</name>
+            <url>https://maven-play-plugin.googlecode.com/svn/mavenrepo/snapshots</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+        </repository>
+    </repositories>
+
+    <distributionManagement>
+        <site>
+            <id>com.google.code.maven-play-plugin-sites</id>
+            <name>Maven Play Plugin - sites</name>
+            <url>dav:https://maven-play-plugin.googlecode.com/svn/mavensite/plugin/${project.version}</url>
+        </site>
+    </distributionManagement>
 
     <modules>
-        <module>plugin-parent</module>
-
         <module>maven-plugin</module>
         <module>play-selenium-junit4</module>
         <module>play-server-booter</module>

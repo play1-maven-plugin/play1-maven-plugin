@@ -29,7 +29,7 @@ under the License.
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.google.code.maven-play-plugin</groupId>
-    <artifactId>plugin-aggregator</artifactId>
+    <artifactId>plugin-parent</artifactId>
     <packaging>pom</packaging>
 
     <name>Maven Plugin for Play! Framework Parent</name>

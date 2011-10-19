@@ -35,7 +35,6 @@ under the License.
     <description>
         Maven Plugin for Play! Framework for integration of these two very different worlds
     </description>
-    <url>http://maven-play-plugin.googlecode.com/svn/mavensite/play-maven-plugin/${project.version}</url>
 
     <prerequisites>
         <maven>2.0.3</maven> <!-- check -->

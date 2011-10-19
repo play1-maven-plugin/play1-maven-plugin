@@ -32,7 +32,6 @@ under the License.
     <packaging>jar</packaging>
 
     <name>Play! 1.2 Specific Extensions</name>
-    <url>http://maven-play-plugin.googlecode.com/svn/mavensite/play12-extensions/${project.version}</url>
 
     <dependencies>
         <dependency>

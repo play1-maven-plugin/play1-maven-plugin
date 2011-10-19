@@ -32,7 +32,6 @@ under the License.
     <packaging>jar</packaging>
 
     <name>Play! Selenium Test Base</name>
-    <url>http://maven-play-plugin.googlecode.com/svn/mavensite/play-selenium-junit4/${project.version}</url>
 
     <dependencies>
         <dependency>

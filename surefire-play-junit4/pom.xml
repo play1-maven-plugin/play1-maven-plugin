@@ -32,7 +32,6 @@ under the License.
     <packaging>jar</packaging>
 
     <name>SureFire Play!-JUnit4 Runner</name>
-    <url>http://maven-play-plugin.googlecode.com/svn/mavensite/surefire-play-junit4/${project.version}</url>
 
     <dependencies>
         <dependency>

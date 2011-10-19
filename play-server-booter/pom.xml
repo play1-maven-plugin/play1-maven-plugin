@@ -32,7 +32,6 @@ under the License.
     <packaging>jar</packaging>
 
     <name>Play! Server Booter</name>
-    <url>http://maven-play-plugin.googlecode.com/svn/mavensite/play-server-booter/${project.version}</url>
 
     <dependencies>
         <dependency>

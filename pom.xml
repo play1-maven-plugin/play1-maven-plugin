@@ -23,7 +23,7 @@ under the License.
 
     <parent>
         <groupId>com.google.code.maven-play-plugin</groupId>
-        <artifactId>maven-parent</artifactId>
+        <artifactId>plugin</artifactId>
         <version>1.0.0-alpha3-SNAPSHOT</version>
     </parent>
 
@@ -33,6 +33,7 @@ under the License.
     <packaging>pom</packaging>
 
     <name>Maven Plugin for Play! Framework Parent</name>
+    <url>http://maven-play-plugin.googlecode.com/svn/mavensite/plugin/${project.version}</url>
 
     <repositories>
         <repository>
@@ -61,6 +62,12 @@ under the License.
         </site>
     </distributionManagement>
 
+    <scm>
+        <connection>scm:svn:http://maven-play-plugin.googlecode.com/svn/trunk/plugin/</connection>
+        <developerConnection>scm:svn:https://maven-play-plugin.googlecode.com/svn/trunk/plugin/</developerConnection>
+        <url>http://code.google.com/p/maven-play-plugin/source/browse/</url>
+    </scm>
+
     <modules>
         <module>maven-plugin</module>
         <module>play-selenium-junit4</module>
@@ -68,19 +75,5 @@ under the License.
         <module>play12-extensions</module>
         <module>surefire-play-junit4</module>
     </modules>
-
-    <build>
-        <pluginManagement>
-            <plugins>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-release-plugin</artifactId>
-                    <configuration>
-                        <tagNameFormat>plugin-@{project.version}</tagNameFormat>
-                    </configuration>
-                </plugin>
-            </plugins>
-        </pluginManagement>
-    </build>
 
 </project>

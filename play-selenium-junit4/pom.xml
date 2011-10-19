@@ -23,7 +23,7 @@ under the License.
 
     <parent>
         <groupId>com.google.code.maven-play-plugin</groupId>
-        <artifactId>plugin-parent</artifactId>
+        <artifactId>plugin</artifactId>
         <version>1.0.0-alpha3-SNAPSHOT</version>
     </parent>
 

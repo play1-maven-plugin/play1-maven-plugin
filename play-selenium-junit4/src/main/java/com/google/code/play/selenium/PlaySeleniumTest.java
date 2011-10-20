@@ -232,6 +232,10 @@ public abstract class PlaySeleniumTest
                 {
                     cmd = new EchoStep( storedVars, param1 );
                 }
+                else if ( "pause".equals( command ) )
+                {
+                    cmd = new PauseStep( storedVars, param1 );
+                }
                 else if ( command.endsWith( "AndWait" ) )
                 {
                     String innerCmd = command.substring( 0, command.indexOf( "AndWait" ) );

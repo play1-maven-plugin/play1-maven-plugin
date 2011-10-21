@@ -4,6 +4,6 @@ set ARTIFACT_ID=play-%MODULE_NAME%
 set SRC_DIR=%PLAY_HOME%/modules/%MODULE_NAME%
 
 call mvn clean package --file %SRC_DIR%/pom-build-dist.xml
-call mvn install:install-file -Dfile=%SRC_DIR%/pom.xml -DgroupId=%GROUP_ID% -DartifactId=%ARTIFACT_ID% -Dpackaging=pom -Dversion=%VERSION% -DgeneratePom=false
+call mvn install:install-file -Dfile=%SRC_DIR%/pom-dist.xml -DgroupId=%GROUP_ID% -DartifactId=%ARTIFACT_ID% -Dpackaging=pom -Dversion=%VERSION% -DgeneratePom=false
 call mvn install:install-file -Dfile=%SRC_DIR%/target/%ARTIFACT_ID%-%VERSION%-module.zip -DgroupId=%GROUP_ID% -DartifactId=%ARTIFACT_ID% -Dpackaging=zip -Dversion=%VERSION% -Dclassifier=module -DgeneratePom=false
 call mvn install:install-file -Dfile=%SRC_DIR%/target/%ARTIFACT_ID%-%VERSION%-module-min.zip -DgroupId=%GROUP_ID% -DartifactId=%ARTIFACT_ID% -Dpackaging=zip -Dversion=%VERSION% -Dclassifier=module-min -DgeneratePom=false

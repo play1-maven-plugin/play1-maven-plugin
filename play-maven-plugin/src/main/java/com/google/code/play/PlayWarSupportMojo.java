@@ -19,11 +19,8 @@
 
 package com.google.code.play;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
-//import java.util.Map;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -74,102 +71,9 @@ public class PlayWarSupportMojo
          */// filterApplicationConf( new File( baseDir, "conf/application.conf" ), modules );
 
         File buildDirectory = new File( project.getBuild().getDirectory() );
-        File outputDirectory = new File( buildDirectory, "play/tmp" );
-        /* File filteredWebXml = */filterWebXml( new File( playHome, "resources/war/web.xml" ), outputDirectory,
-                                                 configParser.getApplicationName() );
+        File tmpDirectory = new File( buildDirectory, "play/tmp" );
+        /* File filteredWebXml = */filterWebXml( new File( playHome, "resources/war/web.xml" ), tmpDirectory,
+                                                 configParser.getApplicationName(), playWarId );
     }
-
-    private File filterWebXml( File webXml, File outputDirectory, String applicationName )
-        throws IOException
-    {
-        if ( !outputDirectory.exists() )
-        {
-            if ( !outputDirectory.mkdirs() )
-            {
-                throw new IOException( String.format( "Cannot create \"%s\" directory",
-                                                      outputDirectory.getCanonicalPath() ) );
-            }
-        }
-        File result = new File( outputDirectory, "filtered-web.xml" );
-        BufferedReader reader = createBufferedFileReader( webXml, "UTF-8" );
-        try
-        {
-            BufferedWriter writer = createBufferedFileWriter( result, "UTF-8" );
-            try
-            {
-                getLog().debug( "web.xml file:" );
-                String line = reader.readLine();
-                while ( line != null )
-                {
-                    getLog().debug( "  " + line );
-                    if ( line.indexOf( "%APPLICATION_NAME%" ) >= 0 )
-                    {
-                        line =
-                            line.replace( "%APPLICATION_NAME%", applicationName/* configParser.getApplicationName() */);
-                    }
-                    if ( line.indexOf( "%PLAY_ID%" ) >= 0 )
-                    {
-                        line = line.replace( "%PLAY_ID%", playWarId );
-                    }
-                    writer.write( line );
-                    writer.newLine();
-                    line = reader.readLine();
-                }
-            }
-            finally
-            {
-                writer.close();
-            }
-        }
-        finally
-        {
-            reader.close();
-        }
-        return result;
-    }
-
-/* not needed
-    private File filterApplicationConf( File applicationConf, Map<String, File> modules )
-        throws IOException
-    {
-        if ( !outputDirectory.exists() )
-        {
-            if ( !outputDirectory.mkdirs() )
-            {
-                throw new IOException( String.format( "Cannot create \"%s\" directory",
-                                                      outputDirectory.getCanonicalPath() ) );
-            }
-        }
-        File result = new File( outputDirectory, "filtered-application.conf" );
-        BufferedReader reader = createBufferedFileReader( applicationConf, "UTF-8" );
-        try
-        {
-            BufferedWriter writer = createBufferedFileWriter( result, "UTF-8" );
-            try
-            {
-                String line = reader.readLine();
-                while ( line != null )
-                {
-                    if ( !line.trim().startsWith( "#" ) && line.contains( "${play.path}" ) )
-                    {
-                        line = line.replace( "${play.path}", ".." );
-                    }
-                    writer.write( line );
-                    writer.newLine();
-                    line = reader.readLine();
-                }
-            }
-            finally
-            {
-                writer.close();
-            }
-        }
-        finally
-        {
-            reader.close();
-        }
-        return result;
-    }
-*/
 
 }

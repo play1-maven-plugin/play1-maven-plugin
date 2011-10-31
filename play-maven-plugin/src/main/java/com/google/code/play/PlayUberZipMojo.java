@@ -21,14 +21,18 @@ package com.google.code.play;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 
+import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 
 import org.codehaus.plexus.archiver.Archiver;
 import org.codehaus.plexus.archiver.ArchiverException;
-import org.codehaus.plexus.archiver.zip.ZipArchiver;
+import org.codehaus.plexus.archiver.manager.ArchiverManager;
+import org.codehaus.plexus.archiver.manager.NoSuchArchiverException;
 
 /**
  * Packages Play! framework and Play! application as one ZIP achive (standalone distribution).
@@ -37,6 +41,7 @@ import org.codehaus.plexus.archiver.zip.ZipArchiver;
  * @author <a href="mailto:gslowikowski@gmail.com">Grzegorz Slowikowski</a>
  * @goal uberzip
  * @phase package
+ * @requiresDependencyResolution test
  */
 public class PlayUberZipMojo
     extends AbstractPlayMojo
@@ -94,6 +99,30 @@ public class PlayUberZipMojo
      */
     private String uberzipClassifier;
 
+    /**
+     * Application resources include filter
+     * 
+     * @parameter expression="${play.uberzipIncludes}" default-value="app/**,conf/**,public/**,tags/**,test/**"
+     * @since 1.0.0
+     */
+    private String uberzipIncludes;
+
+    /**
+     * Application resources exclude filter.
+     * 
+     * @parameter expression="${play.uberzipExcludes}" default-value=""
+     * @since 1.0.0
+     */
+    private String uberzipExcludes;
+
+    /**
+     * To look up Archiver/UnArchiver implementations.
+     * 
+     * @component role="org.codehaus.plexus.archiver.manager.ArchiverManager"
+     * @required
+     */
+    private ArchiverManager archiverManager;
+
     protected void internalExecute()
         throws MojoExecutionException, MojoFailureException, IOException
     {
@@ -102,7 +131,9 @@ public class PlayUberZipMojo
             File baseDir = project.getBasedir();
             File destFile = new File( uberzipOutputDirectory, getDestinationFileName() );
 
-            ConfigurationParser configParser = new ConfigurationParser( new File( baseDir, "conf" ), playId );
+            File confDir = new File( baseDir, "conf" );
+            File configurationFile = new File( confDir, "application.conf" );
+            ConfigurationParser configParser = new ConfigurationParser( configurationFile, playId );
             configParser.parse();
             Map<String, String> modules = configParser.getModules();
             //TODO-create method in a base class (create base class for uberzip i war mojos)?
@@ -115,56 +146,86 @@ public class PlayUberZipMojo
                 }
             }
 
-            ZipArchiver zipArchiver = new ZipArchiver();
+            Archiver zipArchiver = archiverManager.getArchiver( "zip" );
             zipArchiver.setDuplicateBehavior( Archiver.DUPLICATES_FAIL );// Just in case
             zipArchiver.setDestFile( destFile );
 
             // APPLICATION
-            // app
-            zipArchiver.addDirectory( new File( baseDir, "app" ), "app/", null, null );
-            // conf
-            zipArchiver.addDirectory( new File( baseDir, "conf" ), "conf/", null, null );
-            // lib
-            zipArchiver.addDirectory( new File( baseDir, "lib" ), "lib/", null, null/* or: libIncludes, libExcludes */);// TODO-without subdirectories
-            // public
-            zipArchiver.addDirectory( new File( baseDir, "public" ), "public/", null, null );
-            // tags
-            if ( new File( baseDir, "tags" ).isDirectory() )
+            getLog().debug( "UberZip includes: " + uberzipIncludes );
+            getLog().debug( "UberZip excludes: " + uberzipExcludes );
+            String[] includes = ( uberzipIncludes != null ? uberzipIncludes.split( "," ) : null );
+            String[] excludes = ( uberzipExcludes != null ? uberzipExcludes.split( "," ) : null );
+            zipArchiver.addDirectory( baseDir, "application/", includes, excludes );
+
+            //framework zip dependency
+            Artifact frameworkArtifact = findFrameworkArtifact( false ); // TODO if ${play.path} defined use it instead of this dependency
+            File frameworkZipFile = frameworkArtifact.getFile();
+            zipArchiver.addArchivedFileSet( frameworkZipFile );
+
+            //module zip dependencies
+            Map<String, Artifact> moduleArtifacts = findAllModuleArtifacts( false );
+            for ( Map.Entry<String, Artifact> moduleArtifactEntry : moduleArtifacts.entrySet() )
             {
-                zipArchiver.addDirectory( new File( baseDir, "tags" ), "tags/", null, null );
+                String moduleName = moduleArtifactEntry.getKey();
+                Artifact moduleArtifact = moduleArtifactEntry.getValue();
+
+                File moduleZipFile = moduleArtifact.getFile();
+                String moduleSubDir = String.format( "application/modules/%s-%s/", moduleName, moduleArtifact.getVersion() );
+                if ( Artifact.SCOPE_PROVIDED.equals( moduleArtifact.getScope() ) )
+                {
+                    moduleSubDir = String.format( "modules/%s/", moduleName/*, moduleArtifact.getVersion()*/ );
+                }
+                zipArchiver.addArchivedFileSet( moduleZipFile, moduleSubDir );
             }
 
-            // PLAY! FRAMEWORK
-            // framework
-            zipArchiver.addFile( new File( playHome, "framework/play.jar" ), "framework/play.jar" );
-            zipArchiver.addDirectory( new File( playHome, "framework/lib" ), "framework/lib/", null, null/*
-                                                                                                          * or:
-                                                                                                          * libIncludes,
-                                                                                                          * libExcludes
-                                                                                                          */);// TODO-without subdirectories
-            zipArchiver.addDirectory( new File( playHome, "framework/pym" ), "framework/pym/", null, null );
-            zipArchiver.addDirectory( new File( playHome, "framework/templates" ), "framework/templates/", null, null );
-            // modules
-            for ( String moduleName : modules.keySet() )
+            Set<?> artifacts = project.getArtifacts();
+            for ( Iterator<?> iter = artifacts.iterator(); iter.hasNext(); )
             {
-                String modulePath = modules.get( moduleName );
-                modulePath = modulePath.replace( "${play.path}", playHome.getPath() );
-                File moduleDir = new File( modulePath );
-
-                zipArchiver.addDirectory( moduleDir, "modules/" + moduleDir.getName() + "/", null, new String[] {
-                    "documentation/**", "nbproject/**", "src/**", "build.xml", "commands.py" } );
+                Artifact artifact = (Artifact) iter.next();
+                if ( "jar".equals( artifact.getType() ) )
+                {
+                    File jarFile = artifact.getFile();
+                    String destinationFileName = "application/lib/" + jarFile.getName();
+                    // Play! Framework's library
+                    if ( Artifact.SCOPE_PROVIDED.equals( artifact.getScope() ) )
+                    {
+                        // check if there is module zip dependency
+                        String moduleName = artifact.getArtifactId();
+                        if ( artifact.getArtifactId().startsWith( "play-" ) )
+                        {
+                            moduleName = moduleName.substring( "play-".length() );
+                        }
+                        if ( moduleArtifacts.containsKey( moduleName ))
+                        {
+                            destinationFileName =
+                                            String.format( "modules/%s/lib/%s", moduleName, jarFile.getName() );
+                        }
+                        else
+                        {
+                            destinationFileName = "framework/lib/" + jarFile.getName();
+                            if ( "play".equals( artifact.getArtifactId() ) ) // ???
+                            {
+                                destinationFileName = "framework/" + jarFile.getName();
+                                String playVersion = artifact.getVersion();
+                                if ( "1.2".compareTo( playVersion ) > 0 )
+                                {
+                                    // Play 1.1.x
+                                    destinationFileName = "framework/play.jar";
+                                }
+                            }
+                        }
+                    }
+                    zipArchiver.addFile( jarFile, destinationFileName );
+                }
             }
-            // python
-            zipArchiver.addDirectory( new File( playHome, "python" ), "python/", null, null );
-            // resources
-            zipArchiver.addFile( new File( playHome, "resources/messages" ), "resources/messages" );
-            // other
-            zipArchiver.addDirectory( playHome, "", new String[] { "COPYING", "play", "play.bat", "repositories" },
-                                      null );
 
             zipArchiver.createArchive();
         }
         catch ( ArchiverException e )
+        {
+            throw new MojoExecutionException( "?", e );
+        }
+        catch ( NoSuchArchiverException e )
         {
             throw new MojoExecutionException( "?", e );
         }
@@ -182,7 +243,7 @@ public class PlayUberZipMojo
             }
             buf.append( uberzipClassifier );
         }
-        buf.append( ".war" );
+        buf.append( ".zip" );
         return buf.toString();
     }
 

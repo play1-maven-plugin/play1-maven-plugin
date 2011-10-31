@@ -19,18 +19,21 @@
 
 package com.google.code.play;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 
+import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 
 import org.codehaus.plexus.archiver.Archiver;
 import org.codehaus.plexus.archiver.ArchiverException;
+import org.codehaus.plexus.archiver.manager.ArchiverManager;
+import org.codehaus.plexus.archiver.manager.NoSuchArchiverException;
 import org.codehaus.plexus.archiver.war.WarArchiver;
 
 /**
@@ -40,22 +43,23 @@ import org.codehaus.plexus.archiver.war.WarArchiver;
  * @author <a href="mailto:gslowikowski@gmail.com">Grzegorz Slowikowski</a>
  * @goal war
  * @phase package
+ * @requiresDependencyResolution test
  */
 public class PlayWarMojo
     extends AbstractPlayMojo
 {
 
-    private final static String[] libIncludes = new String[] { "*.jar" };
+//    private final static String[] libIncludes = new String[] { "*.jar" };
 
-    private final static String[] libExcludes = new String[] { "provided-*.jar" };
+//    private final static String[] libExcludes = new String[] { "provided-*.jar" };
 
     private final static String[] confIncludes =
         new String[] { "application.conf", "messages", "messages.*", "routes" };
 
     // private final static String[] confIncludes = new String[]{"messages", "messages.*", "routes"};
 
-    private final static String[] moduleExcludes = new String[] { "dist/**", "documentation/**", "lib/**",
-        "nbproject/**", "samples-and-tests/**", "src/**", "build.xml", "commands.py" };
+//    private final static String[] moduleExcludes = new String[] { "dist/**", "documentation/**", "lib/**",
+//        "nbproject/**", "samples-and-tests/**", "src/**", "build.xml", "commands.py" };
 
     /**
      * The directory with Play! distribution.
@@ -99,15 +103,54 @@ public class PlayWarMojo
      */
     private String warClassifier;
 
+    /**
+     * Application resources include filter
+     * 
+     * @parameter expression="${play.warIncludes}" default-value="app/**,conf/**,precompiled/**,public/**,tags/**,test/**"
+     * @since 1.0.0
+     */
+    private String warIncludes;
+
+    /**
+     * Application resources exclude filter.
+     * 
+     * @parameter expression="${play.warExcludes}" default-value=""
+     * @since 1.0.0
+     */
+    private String warExcludes;
+
+    /**
+     * To look up Archiver/UnArchiver implementations.
+     * 
+     * @component role="org.codehaus.plexus.archiver.manager.ArchiverManager"
+     * @required
+     */
+    private ArchiverManager archiverManager;
+
     protected void internalExecute()
         throws MojoExecutionException, MojoFailureException, IOException
     {
         try
         {
             File baseDir = project.getBasedir();
+            
+            File precompiledDir = new File( baseDir, "precompiled" );
+            if ( !precompiledDir.exists() )
+            {
+                throw new MojoExecutionException( String.format( "\"precompiled\" directory %s does not exist", precompiledDir.getCanonicalPath() ) );
+            }
+            if ( !precompiledDir.isDirectory() )
+            {
+                throw new MojoExecutionException( String.format( "\"precompiled\" directory %s is not a directory", precompiledDir.getCanonicalPath() ) );
+            }
+            
+            File buildDirectory = new File( project.getBuild().getDirectory() );
+
             File destFile = new File( warOutputDirectory, getDestinationFileName() );
 
-            ConfigurationParser configParser = new ConfigurationParser( new File( baseDir, "conf" ), playWarId );
+            File confDir = new File( baseDir, "conf" );
+            File configurationFile = new File( confDir, "application.conf" );
+            ConfigurationParser configParser = new ConfigurationParser( configurationFile, playWarId );
             configParser.parse();
             Map<String, String> modules = configParser.getModules();
             //TODO-create method in a base class (create base class for uberzip i war mojos)?
@@ -120,59 +163,71 @@ public class PlayWarMojo
                 }
             }
 
-
-            // getLog().debug("1" );
-
-            WarArchiver warArchiver = new WarArchiver();
-            warArchiver.setDuplicateBehavior( Archiver.DUPLICATES_ADD );
+            WarArchiver warArchiver = (WarArchiver)archiverManager.getArchiver( "war" );
+            warArchiver.setDuplicateBehavior( Archiver.DUPLICATES_FAIL );// Just in case
             warArchiver.setDestFile( destFile );
 
-            // app
-            warArchiver.addDirectory( new File( baseDir, "app" ), "WEB-INF/application/app/", null, null );
-            // public
-            warArchiver.addDirectory( new File( baseDir, "public" ), "WEB-INF/application/public/", null, null );
-            // conf
-            //File filteredApplicationConf =
-            //    filterApplicationConf( new File( baseDir, "conf/application.conf" ), modules );
-            //warArchiver.addFile( filteredApplicationConf, "WEB-INF/application/conf/application.conf" );
-            warArchiver.addFile( new File( baseDir, "conf/application.conf" ), "WEB-INF/application/conf/application.conf" );
-            warArchiver.addDirectory( new File( baseDir, "conf" ), "WEB-INF/application/conf/",
-                                      subtract( confIncludes, new String[] { "application.conf" } ), null );
-            // warArchiver.addClasses(new File(baseDir, "conf"), null, confIncludes);
-            warArchiver.addClasses( new File( baseDir, "conf" ), null, confIncludes );
-            // framework
-            warArchiver.addDirectory( new File( playHome, "framework/templates" ), "WEB-INF/framework/templates/",
-                                      null, null );
-            // lib
-            warArchiver.addLib( new File( playHome, "framework/play.jar" ) );
-            warArchiver.addLibs( new File( playHome, "framework/lib" ), libIncludes, libExcludes );
-            warArchiver.addLibs( new File( baseDir, "lib" ), libIncludes, libExcludes );
-            // modules
-            for ( String moduleName : modules.keySet() )
-            {
-                String modulePath = modules.get( moduleName );
-                modulePath = modulePath.replace( "${play.path}", playHome.getPath() );
-                File moduleDir = new File( modulePath );
+            // APPLICATION
+            getLog().debug( "War includes: " + warIncludes );
+            getLog().debug( "War excludes: " + warExcludes );
+            String[] includes = ( warIncludes != null ? warIncludes.split( "," ) : null );
+            String[] excludes = ( warExcludes != null ? warExcludes.split( "," ) : null );
+            warArchiver.addDirectory( baseDir, "WEB-INF/application/", includes, excludes );
 
-                warArchiver.addDirectory( moduleDir, "WEB-INF/modules/" + moduleDir.getName() + "/", null,
-                                          moduleExcludes );
-                if ( new File( modulePath, "lib" ).isDirectory() )
+            warArchiver.addClasses( new File( baseDir, "conf" ), confIncludes, null );
+
+            File tmpDirectory = new File( buildDirectory, "play/tmp" );
+            /* File filteredWebXml = */filterWebXml( new File( playHome, "resources/war/web.xml" ), tmpDirectory,
+                                                     configParser.getApplicationName(), playWarId );
+            File filteredWebXmlFile = new File( tmpDirectory, "filtered-web.xml" );
+            warArchiver.setWebxml( filteredWebXmlFile );
+
+            //framework zip dependency
+            Artifact frameworkArtifact = findFrameworkArtifact( false ); // TODO if ${play.path} defined use it instead of this dependency
+            File frameworkZipFile = frameworkArtifact.getFile();
+            warArchiver.addArchivedFileSet( frameworkZipFile, "WEB-INF/", "framework/templates/**,resources/messages".split( "," ), null );
+
+            //module zip dependencies
+            Map<String, Artifact> moduleArtifacts = findAllModuleArtifacts( false );
+            for ( Map.Entry<String, Artifact> moduleArtifactEntry : moduleArtifacts.entrySet() )
+            {
+                String moduleName = moduleArtifactEntry.getKey();
+                Artifact moduleArtifact = moduleArtifactEntry.getValue();
+
+                File moduleZipFile = moduleArtifact.getFile();
+                String moduleSubDir = String.format( "WEB-INF/application/modules/%s-%s/", moduleName, moduleArtifact.getVersion() );
+                if ( Artifact.SCOPE_PROVIDED.equals( moduleArtifact.getScope() ) )
                 {
-                    warArchiver.addLibs( new File( modulePath, "lib" ), libIncludes, libExcludes );
+                    moduleSubDir = String.format( "WEB-INF/modules/%s/", moduleName/*, moduleArtifact.getVersion()*/ );
+                }
+                warArchiver.addArchivedFileSet( moduleZipFile, moduleSubDir );
+            }
+
+            Set<?> artifacts = project.getArtifacts();
+            for ( Iterator<?> iter = artifacts.iterator(); iter.hasNext(); )
+            {
+                Artifact artifact = (Artifact) iter.next();
+                if ( "jar".equals( artifact.getType() ) )
+                {
+                    //TODO-exclude test-scoped dependencies? (some of them - for sure, for example com.google.code.maven-play-plugin:play-selenium-junit4 and it's dependencies: net.sourceforge.nekohtml:nekohtml xerces:xercesImpl
+                    File jarFile = artifact.getFile();
+                    warArchiver.addLib( jarFile );
                 }
             }
-            // resources
-            File filteredWebXml = filterWebXml( new File( playHome, "resources/war/web.xml" ), configParser );
-            warArchiver.setWebxml( filteredWebXml );
-            warArchiver.addFile( new File( playHome, "resources/messages" ), "WEB-INF/resources/messages" );
-            if ( new File( baseDir, "war" ).isDirectory() )
+
+            File warDir = new File( baseDir, "war" );
+            if ( warDir.isDirectory() )
             {
-                warArchiver.addDirectory( new File( baseDir, "war" ), "", null, null );
+                warArchiver.addDirectory( warDir );
             }
 
             warArchiver.createArchive();
         }
         catch ( ArchiverException e )
+        {
+            throw new MojoExecutionException( "?", e );
+        }
+        catch ( NoSuchArchiverException e )
         {
             throw new MojoExecutionException( "?", e );
         }
@@ -204,88 +259,6 @@ public class PlayWarMojo
         buf.append( ".war" );
         return buf.toString();
     }
-
-    private File filterWebXml( File webXml, ConfigurationParser configParser )
-        throws java.io.IOException
-    {
-        File resultDir = new File( project.getBuild().getDirectory(), "play/tmp" );
-        if ( !resultDir.exists() )
-        {
-            resultDir.mkdirs();
-        }
-        File result = new File( resultDir, "filtered-web.xml" );
-        BufferedReader reader = createBufferedFileReader( webXml, "UTF-8" );
-        try
-        {
-            BufferedWriter writer = createBufferedFileWriter( result, "UTF-8" );
-            try
-            {
-                String line = reader.readLine();
-                while ( line != null )
-                {
-                    if ( line.indexOf( "%APPLICATION_NAME%" ) >= 0 )
-                    {
-                        line = line.replace( "%APPLICATION_NAME%", configParser.getApplicationName() );
-                    }
-                    if ( line.indexOf( "%PLAY_ID%" ) >= 0 )
-                    {
-                        line = line.replace( "%PLAY_ID%", playWarId );
-                    }
-                    writer.write( line );
-                    writer.newLine();
-                    line = reader.readLine();
-                }
-            }
-            finally
-            {
-                writer.close();
-            }
-        }
-        finally
-        {
-            reader.close();
-        }
-        return result;
-    }
-
-/*    private File filterApplicationConf( File applicationConf, Map<String, File> modules )
-        throws IOException
-    {
-        File resultDir = new File( project.getBuild().getDirectory(), "play/tmp" );
-        if ( !resultDir.exists() )
-        {
-            resultDir.mkdirs();
-        }
-        File result = new File( resultDir, "filtered-application.conf" );
-        BufferedReader reader = createBufferedFileReader( applicationConf, "UTF-8" );
-        try
-        {
-            BufferedWriter writer = createBufferedFileWriter( result, "UTF-8" );
-            try
-            {
-                String line = reader.readLine();
-                while ( line != null )
-                {
-                    if ( !line.trim().startsWith( "#" ) && line.contains( "${play.path}" ) )
-                    {
-                        line = line.replace( "${play.path}", ".." );
-                    }
-                    writer.write( line );
-                    writer.newLine();
-                    line = reader.readLine();
-                }
-            }
-            finally
-            {
-                writer.close();
-            }
-        }
-        finally
-        {
-            reader.close();
-        }
-        return result;
-    }*/
 
     protected String[] concatenate( String[] array1, String[] array2 )
     {

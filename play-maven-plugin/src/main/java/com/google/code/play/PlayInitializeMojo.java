@@ -228,14 +228,14 @@ public class PlayInitializeMojo
     {
         if ( playHome == null )
         {
-            Artifact frameworkArtifact = findFrameworkArtifact();
-            Map<String, Artifact> providedModuleArtifacts = findAllProvidedModuleArtifacts();
+            Artifact frameworkArtifact = findFrameworkArtifact( true );
+            Map<String, Artifact> moduleArtifacts = findAllModuleArtifacts( true );
 
             if ( frameworkArtifact != null )
             {
                 try
                 {
-                    decompressFrameworkAndSetPlayHome( frameworkArtifact, providedModuleArtifacts, playDependencyVersion );
+                    decompressFrameworkAndSetPlayHome( frameworkArtifact, moduleArtifacts, playDependencyVersion );
                 }
                 catch ( ArchiverException e )
                 {
@@ -306,6 +306,7 @@ public class PlayInitializeMojo
         }
     }
 
+    /* moved to AbstractPlayMojo
     private Artifact findFrameworkArtifact()
     {
         Artifact result = null;
@@ -334,8 +335,9 @@ public class PlayInitializeMojo
             }
         }
         return result;
-    }
+    }*/
 
+    /* moved to AbstractPlayMojo
     private Map<String, Artifact> findAllProvidedModuleArtifacts()
     {
         Map<String, Artifact> result = new HashMap<String, Artifact>();
@@ -375,10 +377,10 @@ public class PlayInitializeMojo
             }
         }
         return result;
-    }
+    }*/
 
     private void decompressFrameworkAndSetPlayHome( Artifact frameworkAtifact,
-                                                    Map<String, Artifact> providedModuleArtifacts, String playDependencyVersion )
+                                                    Map<String, Artifact> moduleArtifacts, String playDependencyVersion )
         throws ArchiverException, NoSuchArchiverException, IOException
     {
         File targetDir = new File( project.getBuild().getDirectory() );
@@ -404,18 +406,21 @@ public class PlayInitializeMojo
             
             // decompress provided-scoped modules
             File modulesDirectory = new File( playHomeDirectory, "modules" );
-            for ( Map.Entry<String, Artifact> providedModuleArtifactEntry : providedModuleArtifacts.entrySet() )
+            for ( Map.Entry<String, Artifact> moduleArtifactEntry : moduleArtifacts.entrySet() )
             {
-                String moduleName = providedModuleArtifactEntry.getKey();
-                Artifact moduleArtifact = providedModuleArtifactEntry.getValue();
+                String moduleName = moduleArtifactEntry.getKey();
+                Artifact moduleArtifact = moduleArtifactEntry.getValue();
 
-                File moduleDirectory = new File( modulesDirectory, moduleName );
-                createDir( moduleDirectory );
-                // can I reuse? UnArchiver zipUnArchiver = archiverManager.getUnArchiver( "zip" );
-                zipUnArchiver.setSourceFile( moduleArtifact.getFile() );
-                zipUnArchiver.setDestDirectory( moduleDirectory );
-                zipUnArchiver.setOverwrite( false/* ??true */);
-                zipUnArchiver.extract();
+                if ( Artifact.SCOPE_PROVIDED.equals( moduleArtifact.getScope() ) )
+                {
+                    File moduleDirectory = new File( modulesDirectory, moduleName );
+                    createDir( moduleDirectory );
+                    // can I reuse? UnArchiver zipUnArchiver = archiverManager.getUnArchiver( "zip" );
+                    zipUnArchiver.setSourceFile( moduleArtifact.getFile() );
+                    zipUnArchiver.setDestDirectory( moduleDirectory );
+                    zipUnArchiver.setOverwrite( false/* ??true */);
+                    zipUnArchiver.extract();
+                }
             }
         }
 

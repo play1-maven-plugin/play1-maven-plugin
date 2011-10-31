@@ -29,7 +29,12 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 
+import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -75,7 +80,7 @@ public abstract class AbstractPlayMojo
     }
 
     protected void checkPlayHome( File playHome )
-        throws MojoExecutionException
+        throws IOException, MojoExecutionException
     {
         if ( playHome == null )
         {
@@ -84,11 +89,11 @@ public abstract class AbstractPlayMojo
         }
         if ( !playHome.exists() )
         {
-            throw new MojoExecutionException( "Play! home directory " + playHome + " does not exist" );
+            throw new MojoExecutionException( String.format( "Play! home directory %s does not exist", playHome.getCanonicalPath() ) );
         }
         if ( !playHome.isDirectory() )
         {
-            throw new MojoExecutionException( "Play! home directory " + playHome + " is not a directory" );
+            throw new MojoExecutionException( String.format( "Play! home directory %s is not a directory", playHome.getCanonicalPath() ) );
         }
     }
 
@@ -126,7 +131,7 @@ public abstract class AbstractPlayMojo
             File idFile = new File( playHome, "id" );
             if ( idFile.isFile() )
             {
-                result = readFileFirstLine(idFile);
+                result = readFileFirstLine( idFile );
             }
         }
         return result;
@@ -162,5 +167,183 @@ public abstract class AbstractPlayMojo
             writer.close();
         }
     }
+
+    // used by "initialize", "uberzip" and "war" mojos
+    protected Artifact findFrameworkArtifact( boolean minVersionWins )
+    {
+        Artifact result = null;
+
+        Set<?> artifacts = project.getArtifacts();
+        for ( Iterator<?> iter = artifacts.iterator(); iter.hasNext(); )
+        {
+            Artifact artifact = (Artifact) iter.next();
+            if ( "zip".equals( artifact.getType() ) )
+            {
+                if ( "framework".equals( artifact.getClassifier() ) )
+                {
+                    result = artifact;
+                    if ( !minVersionWins )
+                    {
+                        break;
+                    }
+                    // System.out.println( "added framework: " + artifact.getGroupId() + ":" + artifact.getArtifactId()
+                    // );
+                    // don't break, maybe there is "framework-min" artifact too
+                }
+                // "module-min" overrides "module" (if present)
+                else if ( "framework-min".equals( artifact.getClassifier() ) )
+                {
+                    result = artifact;
+                    // System.out.println( "added framework-min: " + artifact.getGroupId() + ":"
+                    // + artifact.getArtifactId() );
+                    if ( minVersionWins )
+                    {
+                        break;
+                    }
+                }
+            }
+        }
+        return result;
+    }
+
+    protected Map<String, Artifact> findAllModuleArtifacts( boolean minVersionWins )
+    {
+        Map<String, Artifact> result = new HashMap<String, Artifact>();
+
+        Set<?> artifacts = project.getArtifacts();
+        for ( Iterator<?> iter = artifacts.iterator(); iter.hasNext(); )
+        {
+            Artifact artifact = (Artifact) iter.next();
+            if ( "zip".equals( artifact.getType() ) )
+            {
+                if ( "module".equals( artifact.getClassifier() ) || "module-min".equals( artifact.getClassifier() ) )
+                {
+                    String moduleName = artifact.getArtifactId();
+                    if ( moduleName.startsWith( "play-" ) )
+                    {
+                        moduleName = moduleName.substring( "play-".length() );
+                    }
+
+                    if ( "module".equals( artifact.getClassifier() ) )
+                    {
+                        if ( !minVersionWins || result.get( moduleName ) == null )
+                        {
+                            result.put( moduleName, artifact );
+                            // System.out.println("added module: " + artifact.getGroupId() + ":" +
+                            // artifact.getArtifactId());
+                        }
+                    }
+                    else
+                    // "module-min"
+                    {
+                        if ( minVersionWins || result.get( moduleName ) == null )
+                        {
+                            result.put( moduleName, artifact );
+                            // System.out.println("added module-min: " + artifact.getGroupId() + ":" +
+                            // artifact.getArtifactId());
+                        }
+                    }
+                }
+            }
+            else if ( "play".equals( artifact.getType() ) )
+            {
+                String moduleName = artifact.getArtifactId();
+                result.put( moduleName, artifact );
+            }
+        }
+        return result;
+    }
+
+    // used by "war" and "war-support" mojos
+    protected File filterWebXml( File webXml, File outputDirectory, String applicationName, String playWarId )
+        throws IOException
+    {
+        if ( !outputDirectory.exists() )
+        {
+            if ( !outputDirectory.mkdirs() )
+            {
+                throw new IOException( String.format( "Cannot create \"%s\" directory",
+                                                      outputDirectory.getCanonicalPath() ) );
+            }
+        }
+        File result = new File( outputDirectory, "filtered-web.xml" );
+        BufferedReader reader = createBufferedFileReader( webXml, "UTF-8" );
+        try
+        {
+            BufferedWriter writer = createBufferedFileWriter( result, "UTF-8" );
+            try
+            {
+                getLog().debug( "web.xml file:" );
+                String line = reader.readLine();
+                while ( line != null )
+                {
+                    getLog().debug( "  " + line );
+                    if ( line.indexOf( "%APPLICATION_NAME%" ) >= 0 )
+                    {
+                        line =
+                            line.replace( "%APPLICATION_NAME%", applicationName/* configParser.getApplicationName() */ );
+                    }
+                    if ( line.indexOf( "%PLAY_ID%" ) >= 0 )
+                    {
+                        line = line.replace( "%PLAY_ID%", playWarId );
+                    }
+                    writer.write( line );
+                    writer.newLine();
+                    line = reader.readLine();
+                }
+            }
+            finally
+            {
+                writer.close();
+            }
+        }
+        finally
+        {
+            reader.close();
+        }
+        return result;
+    }
+
+/*not used
+    // used by "war" and "war-support" mojos
+    protected File filterApplicationConf( File applicationConf, Map<String, File> modules )
+        throws IOException
+    {
+        File resultDir = new File( project.getBuild().getDirectory(), "play/tmp" );
+        if ( !resultDir.exists() )
+        {
+            resultDir.mkdirs();
+        }
+        File result = new File( resultDir, "filtered-application.conf" );
+        BufferedReader reader = createBufferedFileReader( applicationConf, "UTF-8" );
+        try
+        {
+            BufferedWriter writer = createBufferedFileWriter( result, "UTF-8" );
+            try
+            {
+                String line = reader.readLine();
+                while ( line != null )
+                {
+                    if ( !line.trim().startsWith( "#" ) && line.contains( "${play.path}" ) )
+                    {
+                        line = line.replace( "${play.path}", ".." );
+                    }
+                    writer.write( line );
+                    writer.newLine();
+                    line = reader.readLine();
+                }
+            }
+            finally
+            {
+                writer.close();
+            }
+        }
+        finally
+        {
+            reader.close();
+        }
+        return result;
+    }
+*/
 
 }

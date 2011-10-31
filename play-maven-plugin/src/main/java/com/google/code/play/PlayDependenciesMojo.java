@@ -51,6 +51,22 @@ public class PlayDependenciesMojo
 {
 
     /**
+     * Should project's "lib" and "modules" subdirectories be cleaned before dependency resolution
+     * 
+     * @parameter expression="${play.dependenciesClean}" default-value="false"
+     * @since 1.0.0
+     */
+    private boolean dependenciesClean = false;
+
+    /**
+     * Should existing dependencies be overwritten.
+     * 
+     * @parameter expression="${play.dependenciesOverride}" default-value="false"
+     * @since 1.0.0
+     */
+    private boolean dependenciesOverride = false;
+
+    /**
      * To look up Archiver/UnArchiver implementations.
      * 
      * @component role="org.codehaus.plexus.archiver.manager.ArchiverManager"
@@ -63,6 +79,13 @@ public class PlayDependenciesMojo
     {
         try
         {
+            if ( dependenciesClean )
+            {
+                File baseDir = project.getBasedir();
+                FileUtils.deleteDirectory( new File( baseDir, "lib" ) );
+                FileUtils.deleteDirectory( new File( baseDir, "modules" ) );
+            }
+
             Map<Artifact, File> moduleTypeArtifacts = processModuleDependencies();
             processJarDependencies( moduleTypeArtifacts );
         }
@@ -81,57 +104,11 @@ public class PlayDependenciesMojo
     private Map<Artifact, File> processModuleDependencies()
         throws ArchiverException, NoSuchArchiverException, IOException
     {
-        Map<String, Artifact> moduleArtifacts = findAllModuleArtifacts();
+        Map<String, Artifact> moduleArtifacts = findAllModuleArtifacts( true );
         Map<Artifact, File> moduleTypeArtifacts = decompressModuleDependencies( moduleArtifacts );
         return moduleTypeArtifacts;
     }
     
-    private Map<String, Artifact> findAllModuleArtifacts()
-    {
-        Map<String, Artifact> result = new HashMap<String, Artifact>();
-
-        Set<?> artifacts = project.getArtifacts();
-        for ( Iterator<?> iter = artifacts.iterator(); iter.hasNext(); )
-        {
-            Artifact artifact = (Artifact) iter.next();
-            if ( "zip".equals( artifact.getType() ) )
-            {
-                if ( "module".equals( artifact.getClassifier() ) || "module-min".equals( artifact.getClassifier() ) )
-                {
-                    String moduleName = artifact.getArtifactId();
-                    if ( moduleName.startsWith( "play-" ) )
-                    {
-                        moduleName = moduleName.substring( "play-".length() );
-                    }
-
-                    if ( "module".equals( artifact.getClassifier() ) )
-                    {
-                        if ( result.get( moduleName ) == null ) // if "module-min" already in map, don't use
-                                                                // "module" artifact
-                        {
-                            result.put( moduleName, artifact );
-                            // System.out.println("added module: " + artifact.getGroupId() + ":" +
-                            // artifact.getArtifactId());
-                        }
-                    }
-                    else
-                    // "module-min" overrides "module" (if present)
-                    {
-                        result.put( moduleName, artifact );
-                        // System.out.println("added module-min: " + artifact.getGroupId() + ":" +
-                        // artifact.getArtifactId());
-                    }
-                }
-            }
-            else if ( "play".equals( artifact.getType() ) )
-            {
-                String moduleName = artifact.getArtifactId();
-                result.put( moduleName, artifact );
-            }
-        }
-        return result;
-    }
-
     private Map<Artifact, File> decompressModuleDependencies( Map<String, Artifact> moduleArtifacts )
         throws ArchiverException, NoSuchArchiverException, IOException
     {
@@ -145,17 +122,20 @@ public class PlayDependenciesMojo
             String moduleName = moduleArtifactEntry.getKey();
             Artifact moduleArtifact = moduleArtifactEntry.getValue();
 
-            File zipFile = moduleArtifact.getFile();
-            String moduleSubDir = String.format( "%s-%s", moduleName, moduleArtifact.getVersion() );
-            File toDirectory = new File( modulesDirectory, moduleSubDir );
-            createDir( toDirectory );
-            UnArchiver zipUnArchiver = archiverManager.getUnArchiver( "zip" );
-            zipUnArchiver.setSourceFile( zipFile );
-            zipUnArchiver.setDestDirectory( toDirectory );
-            zipUnArchiver.setOverwrite( false/* ??true */);
-            zipUnArchiver.extract();
+            //if ( !Artifact.SCOPE_PROVIDED.equals( moduleArtifact.getScope() ) )
+            //{
+                File zipFile = moduleArtifact.getFile();
+                String moduleSubDir = String.format( "%s-%s", moduleName, moduleArtifact.getVersion() );
+                File toDirectory = new File( modulesDirectory, moduleSubDir );
+                createDir( toDirectory );
+                UnArchiver zipUnArchiver = archiverManager.getUnArchiver( "zip" );
+                zipUnArchiver.setSourceFile( zipFile );
+                zipUnArchiver.setDestDirectory( toDirectory );
+                zipUnArchiver.setOverwrite( false/* ??true */);
+                zipUnArchiver.extract();
 
-            result.put( moduleArtifact, toDirectory );
+                result.put( moduleArtifact, toDirectory );
+            //}
         }
         return result;
     }
@@ -171,27 +151,38 @@ public class PlayDependenciesMojo
             Artifact artifact = (Artifact) iter.next();
             if ( "jar".equals( artifact.getType() ) )
             {
-                // System.out.println("jar: " + artifact.getGroupId() + ":" + artifact.getArtifactId());
-                File jarFile = artifact.getFile();
-                File libDir = new File( baseDir, "lib" );
-                for ( Map.Entry<Artifact, File> moduleTypeArtifactEntry : moduleTypeArtifacts.entrySet() )
-                {
-                    Artifact moduleArtifact = moduleTypeArtifactEntry.getKey();
-                    // System.out.println("checking module: " + moduleArtifact.getGroupId() + ":" +
-                    // moduleArtifact.getArtifactId());
-                    if ( artifact.getGroupId().equals( moduleArtifact.getGroupId() )
-                        && artifact.getArtifactId().equals( moduleArtifact.getArtifactId() ) )
+                //if ( !Artifact.SCOPE_PROVIDED.equals( artifact.getScope() ) )
+                //{
+                    File libDir = new File( baseDir, "lib" );
+                    // System.out.println("jar: " + artifact.getGroupId() + ":" + artifact.getArtifactId());
+                    File jarFile = artifact.getFile();
+                    for ( Map.Entry<Artifact, File> moduleTypeArtifactEntry : moduleTypeArtifacts.entrySet() )
                     {
-                        File modulePath = moduleTypeArtifactEntry.getValue();
-                        libDir = new File( modulePath, "lib" );
-                        // System.out.println("checked ok - lib is " + libDir.getCanonicalPath());
-                        break;
+                        Artifact moduleArtifact = moduleTypeArtifactEntry.getKey();
+                        // System.out.println("checking module: " + moduleArtifact.getGroupId() + ":" +
+                        // moduleArtifact.getArtifactId());
+                        if ( artifact.getGroupId().equals( moduleArtifact.getGroupId() )
+                            && artifact.getArtifactId().equals( moduleArtifact.getArtifactId() ) )
+                        {
+                            File modulePath = moduleTypeArtifactEntry.getValue();
+                            libDir = new File( modulePath, "lib" );
+                            // System.out.println("checked ok - lib is " + libDir.getCanonicalPath());
+                            break;
+                        }
                     }
-                }
-                // System.out.println("jar: " + artifact.getGroupId() + ":" + artifact.getArtifactId() + " added to " +
-                // libDir);
-                createDir( libDir );
-                FileUtils.copyFileToDirectoryIfModified( jarFile, libDir );
+                    // System.out.println("jar: " + artifact.getGroupId() + ":" + artifact.getArtifactId() +
+                    // " added to " +
+                    // libDir);
+                    createDir( libDir );
+                    if ( dependenciesOverride )
+                    {
+                        FileUtils.copyFileToDirectory( jarFile, libDir );
+                    }
+                    else
+                    {
+                        FileUtils.copyFileToDirectoryIfModified( jarFile, libDir );
+                    }
+                //}
             }
         }
     }
@@ -199,6 +190,21 @@ public class PlayDependenciesMojo
     private void createDir( File directory )
         throws IOException
     {
+        if ( dependenciesOverride && directory.exists() )
+        {
+            if (directory.isDirectory())
+            {
+                FileUtils.cleanDirectory( directory );
+            }
+            else // is file
+            {
+                if ( !directory.delete() )
+                {
+                    throw new IOException( String.format( "Cannot delete \"%s\" file", directory.getCanonicalPath() ) );
+                }
+            }
+        }
+
         if ( directory.isFile() )
         {
             getLog().info( String.format( "Deleting \"%s\" file", directory ) );// TODO-more descriptive message
@@ -220,6 +226,3 @@ public class PlayDependenciesMojo
 
 // TODO
 // 1. Add name conflict detection for modules and jars
-// 2. For now I use "runtime". Ideally I would need ALL dependencies except "provided" jars
-//    ("provided" zips still needed). "requiresDependencyResolution" is to week for my needs.
-//    I must use another mechanism (like in maven-dependency-plugin).

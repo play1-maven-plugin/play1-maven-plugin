@@ -1,7 +1,7 @@
 set GROUP_ID=com.google.code.maven-play-plugin
 set ARTIFACT_ID=play-app-default-parent
 set VERSION=1.0.0-alpha3
-set SRC_DIR=../../../tags/%ARTIFACT_ID%-%VERSION%
+set SRC_DIR=../../../tags/play-default-parents-%VERSION%/%ARTIFACT_ID%
 
 set REPO_ID=com.google.code.maven-play-plugin
 set REPO_URL=https://maven-play-plugin.googlecode.com/svn/mavenrepo/releases

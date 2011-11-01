@@ -38,7 +38,7 @@ import org.codehaus.plexus.archiver.war.WarArchiver;
 
 /**
  * Package Play! framework and Play! application as a WAR achive.
- * WARNING: NOT READY YET! DON'T USE IT!
+ * 
  * 
  * @author <a href="mailto:gslowikowski@gmail.com">Grzegorz Slowikowski</a>
  * @goal war

@@ -1,0 +1,27 @@
+<project>
+
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.google.code.maven-play-plugin.com.github.greenlaw110.org.mongodb</groupId>
+  <artifactId>mongo-java-driver</artifactId>
+  <packaging>jar</packaging>
+  <name>MongoDB Java Driver</name>
+  <version>2.6.5a</version>
+  <description>Java Driver for MongoDB</description>
+  <url>http://mongodb.org/</url>
+
+  <licenses>
+    <license>
+      <name>The Apache Software License, Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+
+  <scm>
+    <url>http://github.com/greenlaw110/mongo-java-driver</url>
+  </scm>
+  
+  <dependencies>
+  </dependencies>
+
+</project>

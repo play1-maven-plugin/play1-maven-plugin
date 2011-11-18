@@ -36,7 +36,6 @@ import org.codehaus.plexus.archiver.manager.NoSuchArchiverException;
 
 /**
  * Packages Play! framework and Play! application as one ZIP achive (standalone distribution).
- * WARNING: NOT READY YET! DON'T USE IT!
  * 
  * @author <a href="mailto:gslowikowski@gmail.com">Grzegorz Slowikowski</a>
  * @goal uberzip

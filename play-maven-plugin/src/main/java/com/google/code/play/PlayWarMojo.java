@@ -38,7 +38,6 @@ import org.codehaus.plexus.archiver.war.WarArchiver;
 
 /**
  * Package Play! framework and Play! application as a WAR achive.
- * WARNING: NOT READY YET! DON'T USE IT!
  * 
  * @author <a href="mailto:gslowikowski@gmail.com">Grzegorz Slowikowski</a>
  * @goal war
@@ -183,7 +182,7 @@ public class PlayWarMojo
             warArchiver.setWebxml( filteredWebXmlFile );
 
             //framework zip dependency
-            Artifact frameworkArtifact = findFrameworkArtifact( false ); // TODO if ${play.path} defined use it instead of this dependency
+            Artifact frameworkArtifact = findFrameworkArtifact( true ); // TODO if ${play.path} defined use it instead of this dependency
             File frameworkZipFile = frameworkArtifact.getFile();
             warArchiver.addArchivedFileSet( frameworkZipFile, "WEB-INF/", "framework/templates/**,resources/messages".split( "," ), null );
 

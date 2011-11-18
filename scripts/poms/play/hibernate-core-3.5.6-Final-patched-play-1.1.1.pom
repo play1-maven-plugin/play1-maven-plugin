@@ -10,7 +10,7 @@
         <relativePath>../parent/pom.xml</relativePath>
     </parent>
 
-    <groupId>com.google.code.maven-play-plugin.org.playframework.org.hibernate</groupId>
+    <groupId>com.google.code.maven-play-plugin.org.hibernate</groupId>
     <artifactId>hibernate-core</artifactId>
     <version>3.5.6-Final-patched-play-1.1.1</version>
     <packaging>jar</packaging>

@@ -51,7 +51,8 @@ public class PlayDependenciesMojo
 {
 
     /**
-     * Should project's "lib" and "modules" subdirectories be cleaned before dependency resolution
+     * Should project's "lib" and "modules" subdirectories be cleaned before dependency resolution.
+     * If true, dependenciesOverwrite is meaningless.
      * 
      * @parameter expression="${play.dependenciesClean}" default-value="false"
      * @since 1.0.0
@@ -61,10 +62,10 @@ public class PlayDependenciesMojo
     /**
      * Should existing dependencies be overwritten.
      * 
-     * @parameter expression="${play.dependenciesOverride}" default-value="false"
+     * @parameter expression="${play.dependenciesOverwrite}" default-value="false"
      * @since 1.0.0
      */
-    private boolean dependenciesOverride = false;
+    private boolean dependenciesOverwrite = false;
 
     /**
      * To look up Archiver/UnArchiver implementations.
@@ -174,7 +175,7 @@ public class PlayDependenciesMojo
                     // " added to " +
                     // libDir);
                     createDir( libDir );
-                    if ( dependenciesOverride )
+                    if ( dependenciesOverwrite )
                     {
                         FileUtils.copyFileToDirectory( jarFile, libDir );
                     }
@@ -190,7 +191,7 @@ public class PlayDependenciesMojo
     private void createDir( File directory )
         throws IOException
     {
-        if ( dependenciesOverride && directory.exists() )
+        if ( dependenciesOverwrite && directory.exists() )
         {
             if (directory.isDirectory())
             {

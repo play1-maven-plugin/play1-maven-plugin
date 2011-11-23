@@ -88,17 +88,17 @@ public class PlayJUnit4Provider
         checkPath(this.applicationPath);
 
         this.testClassLoader = booterParameters.getTestClassLoader();
+        this.consoleLogger = booterParameters.getConsoleLogger();
         DirectoryScannerParameters directoryScannerParameters = booterParameters.getDirectoryScannerParameters();
         this.directoryScanner = new PlayDirectoryScanner(new File(new File(applicationPath), "test"),
                                                          directoryScannerParameters.getIncludes(),
                                                          directoryScannerParameters.getExcludes(),
-                                                         directoryScannerParameters.getRunOrder());
+                                                         directoryScannerParameters.getRunOrder(),
+                                                         consoleLogger);
         customRunListeners =
             JUnit4RunListenerFactory.createCustomListeners( booterParameters.getProviderProperties().getProperty( "listener" ) );
         jUnit4TestChecker = new JUnit4TestChecker( testClassLoader );
         requestedTestMethod = booterParameters.getTestRequest().getRequestedTestMethod();
-
-        consoleLogger = booterParameters.getConsoleLogger();
     }
 
     // TODO-what exception classes should I throw?

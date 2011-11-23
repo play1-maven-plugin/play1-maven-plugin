@@ -26,6 +26,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import org.apache.maven.surefire.report.ConsoleLogger;
 import org.apache.maven.surefire.util.DirectoryScanner;
 import org.apache.maven.surefire.util.NestedRuntimeException;
 import org.apache.maven.surefire.util.ScannerFilter;
@@ -60,14 +61,17 @@ public class PlayDirectoryScanner
 
     private final String runOrder;
 
+    private final ConsoleLogger consoleLogger;
 
-    public PlayDirectoryScanner( File basedir, List<String> includes, List<String> excludes, String runOrder )
+
+    public PlayDirectoryScanner( File basedir, List<String> includes, List<String> excludes, String runOrder, ConsoleLogger consoleLogger )
     {
         this.basedir = basedir;
         this.includes = includes;
         this.excludes = excludes;
         this.runOrder = runOrder;
         this.sortOrder = getSortOrderComparator( runOrder );
+        this.consoleLogger = consoleLogger;
     }
 
     public TestsToRun locateTestClasses( ClassLoader classLoader, ScannerFilter scannerFilter )
@@ -78,13 +82,14 @@ public class PlayDirectoryScanner
         for ( int i = 0; i < testClassNames.length; i++ )
         {
             String className = testClassNames[i];
-//System.out.println("testclass:" + className);
             Class<?> testClass = loadClass( classLoader, className );
-//System.out.println("testClass.classloader = "+testClass.getClassLoader());
-//TODO-maybe some check here if class'es classloaded is Play's classloader
-
             if ( scannerFilter == null || scannerFilter.accept( testClass ) )
             {
+                if ( testClass.getClassLoader() != classLoader )
+                {
+                    consoleLogger.info( String.format( "WARNING: Test class %s not loaded by Play.classloader. This may cause unexpected problems.\n",
+                                                       testClass.getName() ) );
+                }
                 result.add( testClass );
             }
             else

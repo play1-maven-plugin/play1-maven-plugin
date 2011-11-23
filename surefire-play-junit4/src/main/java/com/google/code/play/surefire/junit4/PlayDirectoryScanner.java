@@ -80,6 +80,8 @@ public class PlayDirectoryScanner
             String className = testClassNames[i];
 //System.out.println("testclass:" + className);
             Class<?> testClass = loadClass( classLoader, className );
+//System.out.println("testClass.classloader = "+testClass.getClassLoader());
+//TODO-maybe some check here if class'es classloaded is Play's classloader
 
             if ( scannerFilter == null || scannerFilter.accept( testClass ) )
             {

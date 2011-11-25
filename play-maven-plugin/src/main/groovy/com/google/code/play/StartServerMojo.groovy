@@ -21,7 +21,6 @@ package com.google.code.play
 
 import org.apache.maven.project.MavenProject
 
-import org.codehaus.gmaven.mojo.GroovyMojo
 import org.codehaus.gmaven.mojo.support.ProcessLauncher
 
 /**
@@ -33,13 +32,12 @@ import org.codehaus.gmaven.mojo.support.ProcessLauncher
  * @requiresDependencyResolution test
  */
 class StartServerMojo
-    extends GroovyMojo
+    extends AbstractPlayGroovyMojo
 {
     /**
      * ...
      *
      * @parameter expression="${play.home}"
-     * @required
      * @since 1.0.0
      */
     String playHome
@@ -128,6 +126,8 @@ class StartServerMojo
             log.info('Skipping startup')
             return
         }
+        
+        playHome = checkPlayHome(playHome);
         
         def applicationPath = project.basedir;
         

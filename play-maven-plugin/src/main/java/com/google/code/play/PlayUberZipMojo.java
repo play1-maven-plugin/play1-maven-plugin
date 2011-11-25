@@ -140,7 +140,7 @@ public class PlayUberZipMojo
             {
                 if (modulePath.contains( "${play.path}" ))
                 {
-                    checkPlayHome(playHome);
+                    playHome = checkPlayHome(playHome);
                     break;
                 }
             }

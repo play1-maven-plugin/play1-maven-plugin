@@ -381,31 +381,59 @@ public class PlayInitializeMojo
 
     private void decompressFrameworkAndSetPlayHome( Artifact frameworkAtifact,
                                                     Map<String, Artifact> moduleArtifacts, String playDependencyVersion )
-        throws ArchiverException, NoSuchArchiverException, IOException
+        throws ArchiverException, MojoExecutionException, NoSuchArchiverException, IOException
     {
         File targetDir = new File( project.getBuild().getDirectory() );
         File playTmpDir = new File( targetDir, "play" );
+        File playTmpHomeDir = new File( playTmpDir, "home" );
+        File warningFile = new File( playTmpHomeDir, "WARNING.txt" );
 
-        File playHomeDirectory = new File( playTmpDir, "home" );
-        if ( !playHomeDirectory.isDirectory() )
+        if ( playTmpHomeDir.exists() )
+        {
+            if ( playTmpHomeDir.isDirectory() )
+            {
+                // Additional check whether the temporary Play! home directory is created by this plugin
+                if ( warningFile.exists() )
+                {
+                    if ( !warningFile.isFile() )
+                    {
+                        throw new MojoExecutionException(
+                                                          String.format( "Temporary Play! home directory warning file \"%s\" is not a file",
+                                                                         warningFile.getCanonicalPath() ) );
+                    }
+                }
+                else
+                {
+                    throw new MojoExecutionException(
+                                                      String.format( "Temporary Play! home directory warning file \"%s\" does not exist",
+                                                                     warningFile.getCanonicalPath() ) );
+                }
+            }
+            else
+            {
+                throw new MojoExecutionException( String.format( "Temporary Play! home directory \"%s\" is not a directory",
+                                                      playTmpHomeDir.getCanonicalPath() ) );
+            }
+        }
+        else // !playTmpHomeDir.exists()
         {
             // decompress framework
-            createDir( playHomeDirectory );
+            createDir( playTmpHomeDir );
 
-            writeToFile( new File( playHomeDirectory, "WARNING.txt" ), "This directory is generated automatically. Don't change its content." );
+            writeToFile( new File( playTmpHomeDir, "WARNING.txt" ), "This directory is generated automatically. Don't change its content." );
 
             UnArchiver zipUnArchiver = archiverManager.getUnArchiver( "zip" );
             zipUnArchiver.setSourceFile( frameworkAtifact.getFile() );
-            zipUnArchiver.setDestDirectory( playHomeDirectory );
+            zipUnArchiver.setDestDirectory( playTmpHomeDir );
             zipUnArchiver.setOverwrite( false/* ??true */);
             zipUnArchiver.extract();
 
-            File playFrameworkVersionFile = new File( playHomeDirectory, playFrameworkVersionFilePath );
+            File playFrameworkVersionFile = new File( playTmpHomeDir, playFrameworkVersionFilePath );
             createDir( playFrameworkVersionFile.getParentFile() );
             writeToFile( playFrameworkVersionFile, playDependencyVersion );
             
             // decompress provided-scoped modules
-            File modulesDirectory = new File( playHomeDirectory, "modules" );
+            File modulesDirectory = new File( playTmpHomeDir, "modules" );
             for ( Map.Entry<String, Artifact> moduleArtifactEntry : moduleArtifacts.entrySet() )
             {
                 String moduleName = moduleArtifactEntry.getKey();
@@ -424,8 +452,7 @@ public class PlayInitializeMojo
             }
         }
 
-        playHome = playHomeDirectory;
-        project.getProperties().setProperty( "play.home", playHome.getCanonicalPath() );
+        playHome = playTmpHomeDir;
     }
 
     private void createDir( File directory )

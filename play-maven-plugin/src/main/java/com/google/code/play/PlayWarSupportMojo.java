@@ -56,7 +56,7 @@ public class PlayWarSupportMojo
     protected void internalExecute()
         throws MojoExecutionException, MojoFailureException, IOException
     {
-        checkPlayHome( playHome );
+        playHome = checkPlayHome( playHome );
 
         File baseDir = project.getBasedir();
         File confDir = new File( baseDir, "conf" );

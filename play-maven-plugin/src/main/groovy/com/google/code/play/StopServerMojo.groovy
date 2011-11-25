@@ -21,8 +21,6 @@ package com.google.code.play
 
 import org.apache.maven.project.MavenProject
 
-import org.codehaus.gmaven.mojo.GroovyMojo
-
 /**
  * Stop Play! server.
  * Based on <a href="http://mojo.codehaus.org/selenium-maven-plugin/stop-server-mojo.html">selenium:stop-server mojo</a>
@@ -31,7 +29,7 @@ import org.codehaus.gmaven.mojo.GroovyMojo
  * @goal stop-server
  */
 class StopServerMojo
-    extends GroovyMojo
+    extends AbstractPlayGroovyMojo
 {
     /**
      * The port number of the server to connect to.

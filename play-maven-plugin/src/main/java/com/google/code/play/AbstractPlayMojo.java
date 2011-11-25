@@ -79,22 +79,42 @@ public abstract class AbstractPlayMojo
         }
     }
 
-    protected void checkPlayHome( File playHome )
+    protected File checkPlayHome( File playHome )
         throws IOException, MojoExecutionException
     {
+        File result = playHome;
+        
         if ( playHome == null )
         {
-            throw new MojoExecutionException(
-                                              "Play! home directory (\"playHome\" plugin configuration parameter) not set" );
+            File targetDir = new File( project.getBuild().getDirectory() );
+            File playTmpDir = new File( targetDir, "play" );
+            File playTmpHomeDir = new File( playTmpDir, "home" );
+            File warningFile = new File( playTmpHomeDir, "WARNING.txt" );
+
+            if ( warningFile.isFile() )
+            {
+                result = playTmpHomeDir;
+            }
+            else
+            {
+                throw new MojoExecutionException(
+                                                  "Play! home directory (\"playHome\" plugin configuration parameter) not set" );
+            }
         }
-        if ( !playHome.exists() )
+        else
         {
-            throw new MojoExecutionException( String.format( "Play! home directory %s does not exist", playHome.getCanonicalPath() ) );
+            if ( !playHome.exists() )
+            {
+                throw new MojoExecutionException( String.format( "Play! home directory %s does not exist",
+                                                                 playHome.getCanonicalPath() ) );
+            }
+            if ( !playHome.isDirectory() )
+            {
+                throw new MojoExecutionException( String.format( "Play! home directory %s is not a directory",
+                                                                 playHome.getCanonicalPath() ) );
+            }
         }
-        if ( !playHome.isDirectory() )
-        {
-            throw new MojoExecutionException( String.format( "Play! home directory %s is not a directory", playHome.getCanonicalPath() ) );
-        }
+        return result;
     }
 
     protected final BufferedReader createBufferedFileReader( File file, String encoding )

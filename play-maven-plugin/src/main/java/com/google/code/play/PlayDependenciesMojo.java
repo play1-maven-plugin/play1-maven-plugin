@@ -127,15 +127,19 @@ public class PlayDependenciesMojo
             //{
                 File zipFile = moduleArtifact.getFile();
                 String moduleSubDir = String.format( "%s-%s", moduleName, moduleArtifact.getVersion() );
-                File toDirectory = new File( modulesDirectory, moduleSubDir );
-                createDir( toDirectory );
-                UnArchiver zipUnArchiver = archiverManager.getUnArchiver( "zip" );
-                zipUnArchiver.setSourceFile( zipFile );
-                zipUnArchiver.setDestDirectory( toDirectory );
-                zipUnArchiver.setOverwrite( false/* ??true */);
-                zipUnArchiver.extract();
+                File moduleDirectory = new File( modulesDirectory, moduleSubDir );
+                createDir( moduleDirectory );
+                if ( moduleDirectory.list().length == 0 || moduleDirectory.lastModified() < zipFile.lastModified() )
+                {
+                    UnArchiver zipUnArchiver = archiverManager.getUnArchiver( "zip" );
+                    zipUnArchiver.setSourceFile( zipFile );
+                    zipUnArchiver.setDestDirectory( moduleDirectory );
+                    zipUnArchiver.setOverwrite( false/* ??true */);
+                    zipUnArchiver.extract();
+                    moduleDirectory.setLastModified( System.currentTimeMillis() );
+                }
 
-                result.put( moduleArtifact, toDirectory );
+                result.put( moduleArtifact, moduleDirectory );
             //}
         }
         return result;

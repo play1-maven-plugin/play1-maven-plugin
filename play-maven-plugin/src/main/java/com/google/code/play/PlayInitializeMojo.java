@@ -34,6 +34,7 @@ import org.codehaus.plexus.archiver.ArchiverException;
 import org.codehaus.plexus.archiver.UnArchiver;
 import org.codehaus.plexus.archiver.manager.ArchiverManager;
 import org.codehaus.plexus.archiver.manager.NoSuchArchiverException;
+import org.codehaus.plexus.util.FileUtils;
 
 /**
  * Initializes Play! Maven project:
@@ -87,6 +88,22 @@ public class PlayInitializeMojo
      * @since 1.0.0
      */
     private boolean compileTest = true;
+    /**
+     * Should temporary Play! home directory be cleaned before it's reinitializing.
+     * If true, homeOverwrite is meaningless.
+     * 
+     * @parameter expression="${play.homeClean}" default-value="false"
+     * @since 1.0.0
+     */
+    private boolean homeClean = false;
+
+    /**
+     * Should existing temporary Play! home content be overwritten.
+     * 
+     * @parameter expression="${play.homeOverwrite}" default-value="false"
+     * @since 1.0.0
+     */
+    private boolean homeOverwrite = false;
 
     /**
      * To look up Archiver/UnArchiver implementations.
@@ -388,6 +405,11 @@ public class PlayInitializeMojo
         File playTmpHomeDir = new File( playTmpDir, "home" );
         File warningFile = new File( playTmpHomeDir, "WARNING.txt" );
 
+        if ( homeClean )
+        {
+            FileUtils.deleteDirectory( playTmpHomeDir );
+        }
+
         if ( playTmpHomeDir.exists() )
         {
             if ( playTmpHomeDir.isDirectory() )
@@ -415,13 +437,15 @@ public class PlayInitializeMojo
                                                       playTmpHomeDir.getCanonicalPath() ) );
             }
         }
-        else // !playTmpHomeDir.exists()
+
+        // decompress framework
+        createDir( playTmpHomeDir );
+        if (!warningFile.exists()) {
+            writeToFile( warningFile, "This directory is generated automatically. Don't change its content." );
+        }
+        File frameworkDir = new File ( playTmpHomeDir, "framework" );
+        if ( !frameworkDir.exists() || frameworkDir.lastModified() < frameworkAtifact.getFile().lastModified())
         {
-            // decompress framework
-            createDir( playTmpHomeDir );
-
-            writeToFile( new File( playTmpHomeDir, "WARNING.txt" ), "This directory is generated automatically. Don't change its content." );
-
             UnArchiver zipUnArchiver = archiverManager.getUnArchiver( "zip" );
             zipUnArchiver.setSourceFile( frameworkAtifact.getFile() );
             zipUnArchiver.setDestDirectory( playTmpHomeDir );
@@ -431,23 +455,29 @@ public class PlayInitializeMojo
             File playFrameworkVersionFile = new File( playTmpHomeDir, playFrameworkVersionFilePath );
             createDir( playFrameworkVersionFile.getParentFile() );
             writeToFile( playFrameworkVersionFile, playDependencyVersion );
-            
-            // decompress provided-scoped modules
-            File modulesDirectory = new File( playTmpHomeDir, "modules" );
-            for ( Map.Entry<String, Artifact> moduleArtifactEntry : moduleArtifacts.entrySet() )
-            {
-                String moduleName = moduleArtifactEntry.getKey();
-                Artifact moduleArtifact = moduleArtifactEntry.getValue();
+            frameworkDir.setLastModified(System.currentTimeMillis());
+        }
 
-                if ( Artifact.SCOPE_PROVIDED.equals( moduleArtifact.getScope() ) )
+        // decompress provided-scoped modules
+        File modulesDirectory = new File( playTmpHomeDir, "modules" );
+        for ( Map.Entry<String, Artifact> moduleArtifactEntry : moduleArtifacts.entrySet() )
+        {
+            String moduleName = moduleArtifactEntry.getKey();
+            Artifact moduleArtifact = moduleArtifactEntry.getValue();
+            File zipFile = moduleArtifact.getFile();
+
+            if ( Artifact.SCOPE_PROVIDED.equals( moduleArtifact.getScope() ) )
+            {
+                File moduleDirectory = new File( modulesDirectory, moduleName );
+                createDir( moduleDirectory );
+                if ( moduleDirectory.list().length == 0 || moduleDirectory.lastModified() < zipFile.lastModified() )
                 {
-                    File moduleDirectory = new File( modulesDirectory, moduleName );
-                    createDir( moduleDirectory );
-                    // can I reuse? UnArchiver zipUnArchiver = archiverManager.getUnArchiver( "zip" );
-                    zipUnArchiver.setSourceFile( moduleArtifact.getFile() );
+                    UnArchiver zipUnArchiver = archiverManager.getUnArchiver( "zip" );
+                    zipUnArchiver.setSourceFile( zipFile );
                     zipUnArchiver.setDestDirectory( moduleDirectory );
                     zipUnArchiver.setOverwrite( false/* ??true */);
                     zipUnArchiver.extract();
+                    moduleDirectory.setLastModified( System.currentTimeMillis() );
                 }
             }
         }
@@ -458,6 +488,20 @@ public class PlayInitializeMojo
     private void createDir( File directory )
         throws IOException
     {
+        if ( homeOverwrite && directory.exists() )
+        {
+            if (directory.isDirectory())
+            {
+                FileUtils.cleanDirectory( directory );
+            }
+            else // is file
+            {
+                if ( !directory.delete() )
+                {
+                    throw new IOException( String.format( "Cannot delete \"%s\" file", directory.getCanonicalPath() ) );
+                }
+            }
+        }
         if ( directory.isFile() )
         {
             getLog().info( String.format( "Deleting \"%s\" file", directory ) );// TODO-more descriptive message

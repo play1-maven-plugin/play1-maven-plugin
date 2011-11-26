@@ -67,10 +67,10 @@ public class PlayJUnit4Provider
     
     private final String playId;
 
-    private final String playHome;
-    
-    private final String applicationPath;
+    private final File applicationPath;
 
+    private final File playHome;
+    
     private final ProviderParameters providerParameters;
 
     private final ConsoleLogger consoleLogger;
@@ -82,15 +82,13 @@ public class PlayJUnit4Provider
         Properties providerProperties = providerParameters.getProviderProperties();
         this.playId =
             ( providerProperties.containsKey( "play.testId" ) ? providerProperties.getProperty( "play.testId" ) : "test" );
-        this.playHome = providerProperties.getProperty( "play.home" );
-        checkPath(this.playHome);
-        this.applicationPath = providerProperties.getProperty( "application.path" );
-        checkPath(this.applicationPath);
+        this.applicationPath = checkPath( providerProperties.getProperty( "application.path" ) );//TODO-how to get project.baseDir??
+        this.playHome = checkPlayHome( providerProperties.getProperty( "play.home" ) );
 
         this.testClassLoader = booterParameters.getTestClassLoader();
         this.consoleLogger = booterParameters.getConsoleLogger();
         DirectoryScannerParameters directoryScannerParameters = booterParameters.getDirectoryScannerParameters();
-        this.directoryScanner = new PlayDirectoryScanner(new File(new File(applicationPath), "test"),
+        this.directoryScanner = new PlayDirectoryScanner(new File(applicationPath, "test"),
                                                          directoryScannerParameters.getIncludes(),
                                                          directoryScannerParameters.getExcludes(),
                                                          directoryScannerParameters.getRunOrder(),
@@ -102,7 +100,34 @@ public class PlayJUnit4Provider
     }
 
     // TODO-what exception classes should I throw?
-    private void checkPath( String path )
+    private File checkPlayHome( String playHome )
+    {
+        File result = null;
+        if ( "${play.home}".equals( playHome ) )
+        //if ( playHome == null || "${play.home}".equals( playHome ) )
+        {
+            //File targetDir = new File( this.applicationPath, "target" );
+            //File playTmpDir = new File( targetDir, "play" );
+            //File playTmpHomeDir = new File( playTmpDir, "home" );
+            File playTmpHomeDir = new File( this.applicationPath, "target/play/home" );
+            File warningFile = new File( playTmpHomeDir, "WARNING.txt" );
+            if ( warningFile.isFile() )
+            {
+                result = playTmpHomeDir;
+            }
+            else
+            {
+                throw new RuntimeException( "\"play.home\" variable not set" );
+            }
+        }
+        else {
+            result = checkPath( playHome );
+        }
+        return result;
+    }
+
+    // TODO-what exception classes should I throw?
+    private File checkPath( String path )
     {
         if ( path == null )
         {
@@ -117,6 +142,7 @@ public class PlayJUnit4Provider
         {
             throw new RuntimeException( "Path \"" + path + "\" is not a directory" );
         }
+        return file;
     }
 
     public RunResult invoke( Object forkTestSet )
@@ -167,8 +193,8 @@ public class PlayJUnit4Provider
 
     private void initializePlayEngine()
     {
-        Play.frameworkPath = new File(playHome);
-        Play.init( new File(applicationPath), playId );
+        Play.frameworkPath = playHome;
+        Play.init( applicationPath, playId );
         Play.start();
     }
 

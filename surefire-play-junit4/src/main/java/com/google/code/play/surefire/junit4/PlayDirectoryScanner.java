@@ -24,11 +24,13 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 
 import org.apache.maven.surefire.report.ConsoleLogger;
 import org.apache.maven.surefire.util.DirectoryScanner;
 import org.apache.maven.surefire.util.NestedRuntimeException;
+import org.apache.maven.surefire.util.RunOrder;
 import org.apache.maven.surefire.util.ScannerFilter;
 import org.apache.maven.surefire.util.TestsToRun;
 
@@ -59,18 +61,20 @@ public class PlayDirectoryScanner
 
     private final Comparator<Class<?>> sortOrder;
 
-    private final String runOrder;
+    //private final String runOrder;
+
+    private final RunOrder runOrder;
 
     private final ConsoleLogger consoleLogger;
 
 
-    public PlayDirectoryScanner( File basedir, List<String> includes, List<String> excludes, String runOrder, ConsoleLogger consoleLogger )
+    public PlayDirectoryScanner( File basedir, List<String> includes, List<String> excludes, RunOrder runOrder, ConsoleLogger consoleLogger )
     {
         this.basedir = basedir;
         this.includes = includes;
         this.excludes = excludes;
         this.runOrder = runOrder;
-        this.sortOrder = getSortOrderComparator( runOrder );
+        this.sortOrder = getSortOrderComparator();
         this.consoleLogger = consoleLogger;
     }
 
@@ -97,14 +101,7 @@ public class PlayDirectoryScanner
                 classesSkippedByValidation.add( testClass );
             }
         }
-        if ( "random".equals( runOrder ) )
-        {
-            Collections.shuffle( result );
-        }
-        else if ( sortOrder != null )
-        {
-            Collections.sort( result, sortOrder );
-        }
+        orderTestClasses( result );
         return new TestsToRun( result );
     }
 
@@ -121,7 +118,6 @@ public class PlayDirectoryScanner
         }
         return testClass;
     }
-
 
     String[] collectTests()
     {
@@ -157,17 +153,29 @@ public class PlayDirectoryScanner
 
     private /*???static*/ String[] processIncludesExcludes( List<String> list )
     {
-        String[] incs = new String[list.size()];
+        List<String> newList = new ArrayList<String>();
+        Iterator<String> iter = list.iterator();
+        while (iter.hasNext())
+        {
+            String include = iter.next();
+            String [] includes = include.split( "," );
+            for ( int i = 0; i < includes.length; ++i )
+            {
+                newList.add( includes[i] );
+            }
+        }
+
+        String[] incs = new String[newList.size()];
 
         for ( int i = 0; i < incs.length; i++ )
         {
-            String inc = (String) list.get( i );
+            String inc = (String) newList.get( i );
             /*if ( inc.endsWith( JAVA_SOURCE_FILE_EXTENSION ) )
             {
-                inc = new StringBuffer(
-                    inc.length() - JAVA_SOURCE_FILE_EXTENSION.length() + JAVA_CLASS_FILE_EXTENSION.length() ).append(
-                    inc.substring( 0, inc.lastIndexOf( JAVA_SOURCE_FILE_EXTENSION ) ) ).append(
-                    JAVA_CLASS_FILE_EXTENSION ).toString();
+                inc =
+                    new StringBuffer( inc.length() - JAVA_SOURCE_FILE_EXTENSION.length()
+                        + JAVA_CLASS_FILE_EXTENSION.length() ).append( inc.substring( 0,
+                                                                                      inc.lastIndexOf( JAVA_SOURCE_FILE_EXTENSION ) ) ).append( JAVA_CLASS_FILE_EXTENSION ).toString();
             }*/
             incs[i] = inc;
 
@@ -180,25 +188,37 @@ public class PlayDirectoryScanner
         return classesSkippedByValidation;
     }
 
-    private Comparator<Class<?>> getSortOrderComparator( String runOrder )
+    private void orderTestClasses( List<Class<?>> testClasses )
     {
-        if ( "alphabetical".equals( runOrder ) )
+        if ( RunOrder.RANDOM.equals( runOrder ) )
+        {
+            Collections.shuffle( testClasses );
+        }
+        else if ( sortOrder != null )
+        {
+            Collections.sort( testClasses, sortOrder );
+        }
+    }
+
+    private Comparator<Class<?>> getSortOrderComparator()
+    {
+        if ( RunOrder.ALPHABETICAL.equals( runOrder ) )
         {
             return getAlphabeticalComparator();
         }
-
-        else if ( "reversealphabetical".equals( runOrder ) )
+        else if ( RunOrder.REVERSE_ALPHABETICAL.equals( runOrder ) )
         {
             return getReverseAlphabeticalComparator();
         }
-        else if ( "hourly".equals( runOrder ) )
+        else if ( RunOrder.HOURLY.equals( runOrder ) )
         {
             final int hour = Calendar.getInstance().get( Calendar.HOUR_OF_DAY );
-            return ( ( hour % 2 ) == 0 )
-                ? getAlphabeticalComparator()
-                : getReverseAlphabeticalComparator();
+            return ( ( hour % 2 ) == 0 ) ? getAlphabeticalComparator() : getReverseAlphabeticalComparator();
         }
-        return null;
+        else
+        {
+            return null;
+        }
     }
 
     private Comparator<Class<?>> getReverseAlphabeticalComparator()

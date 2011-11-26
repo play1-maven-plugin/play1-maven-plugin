@@ -68,6 +68,15 @@ public class PlayDependenciesMojo
     private boolean dependenciesOverwrite = false;
 
     /**
+     * Should jar dependencies be processed. They are necessary for Play! Framework,
+     * but not needed for Maven build (Maven uses dependency mechanism).
+     * 
+     * @parameter expression="${play.dependenciesSkipJars}" default-value="false"
+     * @since 1.0.0
+     */
+    private boolean dependenciesSkipJars = false;
+
+    /**
      * To look up Archiver/UnArchiver implementations.
      * 
      * @component role="org.codehaus.plexus.archiver.manager.ArchiverManager"
@@ -83,12 +92,18 @@ public class PlayDependenciesMojo
             if ( dependenciesClean )
             {
                 File baseDir = project.getBasedir();
-                FileUtils.deleteDirectory( new File( baseDir, "lib" ) );
+                if ( !dependenciesSkipJars )
+                {
+                    FileUtils.deleteDirectory( new File( baseDir, "lib" ) );
+                }
                 FileUtils.deleteDirectory( new File( baseDir, "modules" ) );
             }
 
             Map<Artifact, File> moduleTypeArtifacts = processModuleDependencies();
-            processJarDependencies( moduleTypeArtifacts );
+            if ( !dependenciesSkipJars )
+            {
+                processJarDependencies( moduleTypeArtifacts );
+            }
         }
         catch ( ArchiverException e )
         {

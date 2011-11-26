@@ -137,6 +137,7 @@ public class PlayDependenciesMojo
         {
             String moduleName = moduleArtifactEntry.getKey();
             Artifact moduleArtifact = moduleArtifactEntry.getValue();
+            checkPotentialReactorProblem(moduleArtifact);
 
             //if ( !Artifact.SCOPE_PROVIDED.equals( moduleArtifact.getScope() ) )
             //{
@@ -171,6 +172,7 @@ public class PlayDependenciesMojo
             Artifact artifact = (Artifact) iter.next();
             if ( "jar".equals( artifact.getType() ) )
             {
+                checkPotentialReactorProblem(artifact);
                 //if ( !Artifact.SCOPE_PROVIDED.equals( artifact.getScope() ) )
                 //{
                     File libDir = new File( baseDir, "lib" );
@@ -242,6 +244,17 @@ public class PlayDependenciesMojo
         }
     }
 
+    private void checkPotentialReactorProblem(Artifact artifact) throws ArchiverException
+    {
+        File artifactFile = artifact.getFile();
+        if ( artifactFile.isDirectory() )
+        {
+            throw new ArchiverException(
+                                         String.format( "\"%s:%s:%s:%s\" dependent artifact's file is a directory, not a file. This is probably Maven reactor build problem.",
+                                                        artifact.getGroupId(), artifact.getArtifactId(),
+                                                        artifact.getType(), artifact.getVersion() ) );
+        }
+    }
 }
 
 // TODO

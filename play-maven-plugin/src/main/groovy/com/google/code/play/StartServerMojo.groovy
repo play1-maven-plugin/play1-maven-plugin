@@ -175,9 +175,8 @@ class StartServerMojo
             {
                 classpath() {
                     def projectClasspathElements = project.testClasspathElements
-                    def projectClasspathList = projectClasspathElements.findAll{project.build.outputDirectory != it.toString()}
 
-                    projectClasspathList.each() {projectClasspathElement ->
+                    projectClasspathElements.each() {projectClasspathElement ->
                         log.debug("  Adding to projectArtifact ->" + projectClasspathElement.toString())
                         pathelement(location: projectClasspathElement.toString())
                     }

@@ -191,14 +191,8 @@ public class PlayInitializeMojo
             project.addCompileSourceRoot( appPath.getAbsolutePath() );
             getLog().debug( "Added source directory: " + appPath.getAbsolutePath() );
 
-            Resource resource = new Resource();
-            resource.setDirectory( appPath.getAbsolutePath() );
-            resource.addExclude( "**/*.java" );
-            project.addResource( resource );
-            getLog().debug( "Added resource: " + resource.getDirectory() );
-
             File confPath = new File( baseDir, "conf" );
-            resource = new Resource();
+            Resource resource = new Resource();
             resource.setDirectory( confPath.getAbsolutePath() );
             resource.addExclude( "application.conf" );
             resource.addExclude( "messages" );
@@ -214,12 +208,6 @@ public class PlayInitializeMojo
                 {
                     project.addCompileSourceRoot( moduleAppPath.getAbsolutePath() );
                     getLog().debug( "Added source directory: " + moduleAppPath.getAbsolutePath() );
-
-                    resource = new Resource();
-                    resource.setDirectory( moduleAppPath.getAbsolutePath() );
-                    resource.addExclude( "**/*.java" );
-                    project.addResource( resource );
-                    getLog().debug( "Added resource: " + resource.getDirectory() );
                 }
             }
         }
@@ -229,12 +217,6 @@ public class PlayInitializeMojo
             File testPath = new File( baseDir, "test" );
             project.addTestCompileSourceRoot( testPath.getAbsolutePath() );
             getLog().debug( "Added test source directory: " + testPath.getAbsolutePath() );
-
-            Resource resource = new Resource();
-            resource.setDirectory( testPath.getAbsolutePath() );
-            resource.addExclude( "**/*.java" );
-            project.addTestResource( resource );
-            getLog().debug( "Added test resource: " + resource.getDirectory() );
 
             // add test sources from dependent modules?
         }

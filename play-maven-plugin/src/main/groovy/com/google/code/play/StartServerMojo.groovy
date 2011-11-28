@@ -21,6 +21,8 @@ package com.google.code.play
 
 import org.apache.maven.project.MavenProject
 
+import org.codehaus.plexus.util.FileUtils;
+
 import org.codehaus.gmaven.mojo.support.ProcessLauncher
 
 /**
@@ -129,11 +131,20 @@ class StartServerMojo
         
         playHome = checkPlayHome(playHome);
         
-        def applicationPath = project.basedir;
+        File applicationPath = project.basedir;
         
         File buildDirectory = new File( project.build.directory );
-        File workingDirectory = new File( buildDirectory, "play" );
-        ant.mkdir(dir: workingDirectory)
+        File logDirectory = new File( buildDirectory, "play" );
+        ant.mkdir(dir: logDirectory)
+        
+        File userExtensionsJsFile = new File( playHome, "modules/testrunner/public/test-runner/selenium/scripts/user-extensions.js" );
+        if ( userExtensionsJsFile.isFile() )
+        {
+            File seleniumDirectory = new File( buildDirectory, "selenium" );
+            ant.mkdir(dir: seleniumDirectory)
+            FileUtils.copyFileToDirectoryIfModified( userExtensionsJsFile, seleniumDirectory );
+        }
+        //else??
         
         //if (serverLogOutput) {
         //    ant.mkdir(dir: logFile.parentFile)
@@ -159,7 +170,7 @@ class StartServerMojo
         launcher.process = {
             ant.java(classname: 'com.google.code.play.PlayServerBooter',
                      fork: true,
-                     dir: workingDirectory,
+                     dir: applicationPath,
                      failonerror: true)
             {
                 classpath() {
@@ -179,7 +190,7 @@ class StartServerMojo
                 }*/
                 
                 if (serverLogOutput) {
-                    File logFile = new File( workingDirectory, "server.log" );
+                    File logFile = new File( logDirectory, "server.log" );
                     log.info("Redirecting output to: $logFile")
                     redirector(output: logFile)
                 }
@@ -194,7 +205,7 @@ class StartServerMojo
                         String[] args = argLine.split( " " );
                         for (String arg: args) {
                             jvmarg(value: arg);
-                            //System.out.println("jvmarg:'"+arg+"'");
+                            log.debug("  Adding jvmarg '" + arg + "'")
                         }
                     }
                 }

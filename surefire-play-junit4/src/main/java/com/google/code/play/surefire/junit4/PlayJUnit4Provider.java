@@ -82,7 +82,7 @@ public class PlayJUnit4Provider
         Properties providerProperties = providerParameters.getProviderProperties();
         this.playId =
             ( providerProperties.containsKey( "play.testId" ) ? providerProperties.getProperty( "play.testId" ) : "test" );
-        this.applicationPath = checkPath( providerProperties.getProperty( "application.path" ) );//TODO-how to get project.baseDir??
+        this.applicationPath = checkPath( System.getProperty( "user.dir" ) );
         this.playHome = checkPlayHome( providerProperties.getProperty( "play.home" ) );
 
         this.testClassLoader = booterParameters.getTestClassLoader();

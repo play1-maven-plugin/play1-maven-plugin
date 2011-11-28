@@ -65,7 +65,7 @@ public class PlayGenerateSeleniumJunit4SourcesMojo
             {
                 getLog().info( "Nothing to generate - all Selenium JUnit4 test sources are up to date" );
             }
-            project.addTestCompileSourceRoot( new File( project.getBuild().getDirectory(), "selenium/generated" ).getAbsolutePath() );
+            project.addTestCompileSourceRoot( destDir.getAbsolutePath() );
         }
     }
 

@@ -39,35 +39,40 @@ public class Dom4JSeleneseParser
     {
         List<List<String>> result = new ArrayList<List<String>>();
 
+        content = "<root>" + content + "</root>"; // root needed
         Document xmlDoc = DocumentHelper.parseText( content );
-        Element table = xmlDoc.getRootElement();
-        Element tbody = table.element( "tbody" );
-        List<Element> rows = tbody.elements( "tr" );
-        for ( Element row : rows )
+        Element root = xmlDoc.getRootElement();
+        List<Element> tables = root.elements( "table" );
+        for (Element table: tables)
         {
-            List<Element> data = row.elements( "td" );
-            if ( data.size() == 1 )
-            { // comment
-                String cmt = data.get( 0 ).getTextTrim();
-                System.out.println( "comment: '" + cmt + "'" );
-                List<String> command = new ArrayList<String>( 1 );
-                command.add( cmt );
-                result.add( command );
-            }
-            else if ( data.size() == 3 )
+            Element tbody = table.element( "tbody" );
+            List<Element> rows = tbody.elements( "tr" );
+            for ( Element row : rows )
             {
-                String cmd = data.get( 0 ).getText();
-                String param1 = getStringValue( data.get( 1 ) );
-                String param2 = getStringValue( data.get( 2 ) );
-                List<String> command = new ArrayList<String>( 1 );
-                command.add( cmd );
-                command.add( param1 );
-                command.add( param2 );
-                result.add( command );
-            }
-            else
-            {
-                throw new RuntimeException( "Something strange" );// FIXME
+                List<Element> data = row.elements( "td" );
+                if ( data.size() == 1 )
+                { // comment
+                    String cmt = data.get( 0 ).getTextTrim();
+                    System.out.println( "comment: '" + cmt + "'" );
+                    List<String> command = new ArrayList<String>( 1 );
+                    command.add( cmt );
+                    result.add( command );
+                }
+                else if ( data.size() == 3 )
+                {
+                    String cmd = data.get( 0 ).getText();
+                    String param1 = getStringValue( data.get( 1 ) );
+                    String param2 = getStringValue( data.get( 2 ) );
+                    List<String> command = new ArrayList<String>( 1 );
+                    command.add( cmd );
+                    command.add( param1 );
+                    command.add( param2 );
+                    result.add( command );
+                }
+                else
+                {
+                    throw new RuntimeException( "Something strange" );// FIXME
+                }
             }
         }
         return result;

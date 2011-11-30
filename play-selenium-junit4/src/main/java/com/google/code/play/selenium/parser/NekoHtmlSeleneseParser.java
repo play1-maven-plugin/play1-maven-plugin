@@ -50,17 +50,20 @@ public class NekoHtmlSeleneseParser
         InputSource inputSource = new InputSource( new StringReader( content ) );
         parser.parse( inputSource, fragment );
         // print( fragment, "frag: " );
-        Node table = findSubNode( fragment, Node.ELEMENT_NODE, "TABLE" );
-        Node tbody = findSubNode( table, Node.ELEMENT_NODE, "TBODY" );
-        NodeList childNodes = tbody.getChildNodes();
-        for ( int i = 0; i < childNodes.getLength(); i++ )
+        List<Node> tables = findSubNodes( fragment, Node.ELEMENT_NODE, "TABLE" );
+        for ( Node table : tables )
         {
-            Node child = childNodes.item( i );
-            // print( child, "frag.Child[" + i + "]: " );
-            if ( child.getNodeType() == Node.ELEMENT_NODE && "TR".equals( child.getNodeName() ) )
+            Node tbody = findFirstSubNode( table, Node.ELEMENT_NODE, "TBODY" );
+            NodeList childNodes = tbody.getChildNodes();
+            for ( int i = 0; i < childNodes.getLength(); i++ )
             {
-                List<String> command = getCommand( child );
-                result.add( command );
+                Node child = childNodes.item( i );
+                // print( child, "frag.Child[" + i + "]: " );
+                if ( child.getNodeType() == Node.ELEMENT_NODE && "TR".equals( child.getNodeName() ) )
+                {
+                    List<String> command = getCommand( child );
+                    result.add( command );
+                }
             }
         }
         return result;
@@ -114,18 +117,35 @@ public class NekoHtmlSeleneseParser
         return buf.toString();
     }
 
-    private Node findSubNode( Node parent, short nodeType, String nodeName )
+    private Node findFirstSubNode( Node parent, short nodeType, String nodeName )
     {
+        Node result = null;
         NodeList childNodes = parent.getChildNodes();
         for ( int i = 0; i < childNodes.getLength(); i++ )
         {
             Node child = childNodes.item( i );
             if ( child.getNodeType() == nodeType && nodeName.equals( child.getNodeName() ) )
             {
-                return child;
+                result = child;
+                break;
             }
         }
-        return null;
+        return result;
+    }
+
+    private List<Node> findSubNodes( Node parent, short nodeType, String nodeName )
+    {
+        List<Node> result = new ArrayList<Node>();
+        NodeList childNodes = parent.getChildNodes();
+        for ( int i = 0; i < childNodes.getLength(); i++ )
+        {
+            Node child = childNodes.item( i );
+            if ( child.getNodeType() == nodeType && nodeName.equals( child.getNodeName() ) )
+            {
+                result.add(child);
+            }
+        }
+        return result;
     }
 
     // private void print( Node node, String prefix )

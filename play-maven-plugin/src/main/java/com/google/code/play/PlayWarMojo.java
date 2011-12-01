@@ -61,14 +61,6 @@ public class PlayWarMojo
 //        "nbproject/**", "samples-and-tests/**", "src/**", "build.xml", "commands.py" };
 
     /**
-     * The directory with Play! distribution.
-     * 
-     * @parameter expression="${play.home}"
-     * @since 1.0.0
-     */
-    protected File playHome;
-
-    /**
      * Play! id (profile) used for WAR packaging.
      * 
      * @parameter expression="${play.warId}" default-value="war"
@@ -146,6 +138,8 @@ public class PlayWarMojo
         
         try
         {
+            File playHome = getPlayHome();
+            
             File baseDir = project.getBasedir();
             
             File precompiledDir = new File( baseDir, "precompiled" );
@@ -166,16 +160,6 @@ public class PlayWarMojo
             File configurationFile = new File( confDir, "application.conf" );
             ConfigurationParser configParser = new ConfigurationParser( configurationFile, playWarId );
             configParser.parse();
-            Map<String, String> modules = configParser.getModules();
-            //TODO-create method in a base class (create base class for uberzip i war mojos)?
-            for (String modulePath: modules.values())
-            {
-                if (modulePath.contains( "${play.path}" ))
-                {
-                    playHome = checkPlayHome(playHome);
-                    break;
-                }
-            }
 
             WarArchiver warArchiver = (WarArchiver)archiverManager.getArchiver( "war" );
             warArchiver.setDuplicateBehavior( Archiver.DUPLICATES_FAIL );// Just in case
@@ -196,12 +180,13 @@ public class PlayWarMojo
             File filteredWebXmlFile = new File( tmpDirectory, "filtered-web.xml" );
             warArchiver.setWebxml( filteredWebXmlFile );
 
-            //framework zip dependency
-            Artifact frameworkArtifact = findFrameworkArtifact( true ); // TODO if ${play.path} defined use it instead of this dependency
+            //framework
+            Artifact frameworkArtifact = findFrameworkArtifact( true );
             File frameworkZipFile = frameworkArtifact.getFile();
-            warArchiver.addArchivedFileSet( frameworkZipFile, "WEB-INF/", "framework/templates/**,resources/messages".split( "," ), null );
+            warArchiver.addArchivedFileSet( frameworkZipFile, "WEB-INF/",
+                                            "framework/templates/**,resources/messages".split( "," ), null );
 
-            //module zip dependencies
+            //modules
             Map<String, Artifact> moduleArtifacts = findAllModuleArtifacts( false );
             for ( Map.Entry<String, Artifact> moduleArtifactEntry : moduleArtifacts.entrySet() )
             {
@@ -209,10 +194,11 @@ public class PlayWarMojo
                 Artifact moduleArtifact = moduleArtifactEntry.getValue();
 
                 File moduleZipFile = moduleArtifact.getFile();
-                String moduleSubDir = String.format( "WEB-INF/application/modules/%s-%s/", moduleName, moduleArtifact.getVersion() );
+                String moduleSubDir =
+                    String.format( "WEB-INF/application/modules/%s-%s/", moduleName, moduleArtifact.getVersion() );
                 if ( Artifact.SCOPE_PROVIDED.equals( moduleArtifact.getScope() ) )
                 {
-                    moduleSubDir = String.format( "WEB-INF/modules/%s/", moduleName/*, moduleArtifact.getVersion()*/ );
+                    moduleSubDir = String.format( "WEB-INF/modules/%s/", moduleName/* , moduleArtifact.getVersion() */);
                 }
                 warArchiver.addArchivedFileSet( moduleZipFile, moduleSubDir );
             }
@@ -223,7 +209,9 @@ public class PlayWarMojo
                 Artifact artifact = (Artifact) iter.next();
                 if ( "jar".equals( artifact.getType() ) )
                 {
-                    //TODO-exclude test-scoped dependencies? (some of them - for sure, for example com.google.code.maven-play-plugin:play-selenium-junit4 and it's dependencies: net.sourceforge.nekohtml:nekohtml xerces:xercesImpl
+                    // TODO-exclude test-scoped dependencies? (some of them - for sure, for example
+                    // com.google.code.maven-play-plugin:play-selenium-junit4 and it's dependencies:
+                    // net.sourceforge.nekohtml:nekohtml xerces:xercesImpl
                     File jarFile = artifact.getFile();
                     warArchiver.addLib( jarFile );
                 }

@@ -39,14 +39,6 @@ class StartServerMojo
     /**
      * ...
      *
-     * @parameter expression="${play.home}"
-     * @since 1.0.0
-     */
-    String playHome
-
-    /**
-     * ...
-     *
      * @parameter expression="${play.testId}" default-value="test"
      * @since 1.0.0
      */
@@ -129,7 +121,7 @@ class StartServerMojo
             return
         }
         
-        playHome = checkPlayHome(playHome);
+        File playHome = getPlayHome();
         
         File applicationPath = project.basedir;
         
@@ -194,9 +186,9 @@ class StartServerMojo
                     redirector(output: logFile)
                 }
                 
-                sysproperty(key: 'play.home', value: playHome)
+                sysproperty(key: 'play.home', value: playHome.absolutePath)
                 sysproperty(key: 'play.id', value: playTestId)
-                sysproperty(key: 'application.path', value: applicationPath)
+                sysproperty(key: 'application.path', value: applicationPath.absolutePath)
                 
                 if (serverProcessArgLine != null) {
                     String argLine = serverProcessArgLine.trim();

@@ -36,14 +36,6 @@ class PrecompileMojo
     /**
      * ...
      *
-     * @parameter expression="${play.home}"
-     * @since 1.0.0
-     */
-    String playHome
-
-    /**
-     * ...
-     *
      * @parameter expression="${play.id}" default-value=""
      * @since 1.0.0
      */
@@ -101,9 +93,9 @@ class PrecompileMojo
             return
         }
         
-        playHome = checkPlayHome(playHome);
+        File playHome = getPlayHome();
         
-        def applicationPath = project.basedir;
+        File applicationPath = project.basedir;
 
         ant.delete(dir: new File(applicationPath, "precompiled"))
         ant.delete(dir: new File(applicationPath, "tmp"))
@@ -137,9 +129,9 @@ class PrecompileMojo
                     pathelement(location: pluginArifact('com.google.code.maven-play-plugin:play-server-booter'))
                 }
                 
-                sysproperty(key: 'play.home', value: playHome)
+                sysproperty(key: 'play.home', value: playHome.absolutePath)
                 sysproperty(key: 'play.id', value: playId)
-                sysproperty(key: 'application.path', value: applicationPath)
+                sysproperty(key: 'application.path', value: applicationPath.absolutePath)
                 sysproperty(key: 'precompile', value: true)
             }
         }

@@ -37,14 +37,6 @@ public class PlayWarSupportMojo
     extends AbstractPlayMojo
 {
     /**
-     * The directory with Play! distribution.
-     * 
-     * @parameter expression="${play.home}"
-     * @since 1.0.0
-     */
-    protected File playHome;
-
-    /**
      * Play! id (profile) used for WAR packaging.
      * 
      * @parameter expression="${play.warId}" default-value="war"
@@ -56,7 +48,7 @@ public class PlayWarSupportMojo
     protected void internalExecute()
         throws MojoExecutionException, MojoFailureException, IOException
     {
-        playHome = checkPlayHome( playHome );
+        File playHome = getPlayHome();
 
         File baseDir = project.getBasedir();
         File confDir = new File( baseDir, "conf" );

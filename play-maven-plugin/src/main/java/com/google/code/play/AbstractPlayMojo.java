@@ -79,42 +79,40 @@ public abstract class AbstractPlayMojo
         }
     }
 
-    protected File checkPlayHome( File playHome )
+    protected File getPlayHome()
         throws IOException, MojoExecutionException
     {
-        File result = playHome;
-        
-        if ( playHome == null )
+        File targetDir = new File( project.getBuild().getDirectory() );
+        File playTmpDir = new File( targetDir, "play" );
+        File playTmpHomeDir = new File( playTmpDir, "home" );
+        if ( !playTmpHomeDir.exists() )
         {
-            File targetDir = new File( project.getBuild().getDirectory() );
-            File playTmpDir = new File( targetDir, "play" );
-            File playTmpHomeDir = new File( playTmpDir, "home" );
-            File warningFile = new File( playTmpHomeDir, "WARNING.txt" );
-
-            if ( warningFile.isFile() )
-            {
-                result = playTmpHomeDir;
-            }
-            else
+            throw new MojoExecutionException( String.format( "Play! home directory \"%s\" does not exist",
+                                                             playTmpHomeDir.getCanonicalPath() ) );
+        }
+        if ( !playTmpHomeDir.isDirectory() )
+        {
+            throw new MojoExecutionException( String.format( "Play! home directory \"%s\" is not a directory",
+                                                             playTmpHomeDir.getCanonicalPath() ) );
+        }
+        // Additional check whether the temporary Play! home directory is created by this plugin
+        File warningFile = new File( playTmpHomeDir, "WARNING.txt" );
+        if ( warningFile.exists() )
+        {
+            if ( !warningFile.isFile() )
             {
                 throw new MojoExecutionException(
-                                                  "Play! home directory (\"playHome\" plugin configuration parameter) not set" );
+                                                  String.format( "Play! home directory warning file \"%s\" is not a file",
+                                                                 warningFile.getCanonicalPath() ) );
             }
         }
         else
         {
-            if ( !playHome.exists() )
-            {
-                throw new MojoExecutionException( String.format( "Play! home directory %s does not exist",
-                                                                 playHome.getCanonicalPath() ) );
-            }
-            if ( !playHome.isDirectory() )
-            {
-                throw new MojoExecutionException( String.format( "Play! home directory %s is not a directory",
-                                                                 playHome.getCanonicalPath() ) );
-            }
+            throw new MojoExecutionException(
+                                              String.format( "Play! home directory warning file \"%s\" does not exist",
+                                                             warningFile.getCanonicalPath() ) );
         }
-        return result;
+        return playTmpHomeDir;
     }
 
     protected final BufferedReader createBufferedFileReader( File file, String encoding )

@@ -77,6 +77,15 @@ public class PlayWarMojo
     protected String playWarId;
 
     /**
+     * Skip War generation.
+     * 
+     * @parameter expression="${play.warSkip}" default-value="false"
+     * @required
+     * @since 1.0.0
+     */
+    private boolean warSkip = false;
+
+    /**
      * The directory for the generated WAR file.
      * 
      * @parameter expression="${play.warOutputDirectory}" default-value="${project.build.directory}"
@@ -129,6 +138,12 @@ public class PlayWarMojo
     protected void internalExecute()
         throws MojoExecutionException, MojoFailureException, IOException
     {
+        if (warSkip)
+        {
+            getLog().info( "War generation skipped" );
+            return;
+        }
+        
         try
         {
             File baseDir = project.getBasedir();

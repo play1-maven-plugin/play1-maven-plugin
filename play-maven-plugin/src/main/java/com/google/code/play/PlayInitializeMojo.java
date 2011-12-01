@@ -120,6 +120,7 @@ public class PlayInitializeMojo
                 playVersion = artifact.getVersion();
                 // System.out.println("Play version: " + playVersion);
                 // java.net.URL artifactUrl = artifact.getFile().toURI().toURL();
+                break;
             }
         }
 
@@ -186,10 +187,6 @@ public class PlayInitializeMojo
             File confPath = new File( baseDir, "conf" );
             Resource resource = new Resource();
             resource.setDirectory( confPath.getAbsolutePath() );
-            resource.addExclude( "application.conf" );
-            resource.addExclude( "messages" );
-            resource.addExclude( "messages.*" );
-            resource.addExclude( "routes" );
             project.addResource( resource );
             getLog().debug( "Added resource: " + resource.getDirectory() );
 

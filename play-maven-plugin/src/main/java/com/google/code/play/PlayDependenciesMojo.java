@@ -51,6 +51,15 @@ public class PlayDependenciesMojo
 {
 
     /**
+     * Skip dependencies extraction.
+     * 
+     * @parameter expression="${play.dependenciesSkip}" default-value="false"
+     * @required
+     * @since 1.0.0
+     */
+    private boolean dependenciesSkip = false;
+
+    /**
      * Should project's "lib" and "modules" subdirectories be cleaned before dependency resolution.
      * If true, dependenciesOverwrite is meaningless.
      * 
@@ -87,6 +96,12 @@ public class PlayDependenciesMojo
     protected void internalExecute()
         throws MojoExecutionException, MojoFailureException, IOException
     {
+        if (dependenciesSkip)
+        {
+            getLog().info( "Dependencies extraction skipped" );
+            return;
+        }
+        
         try
         {
             if ( dependenciesClean )

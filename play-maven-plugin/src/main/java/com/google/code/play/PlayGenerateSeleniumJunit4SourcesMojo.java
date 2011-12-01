@@ -44,7 +44,7 @@ public class PlayGenerateSeleniumJunit4SourcesMojo
 {
 
     /**
-     * Skip generating JUnit test wrapper sources
+     * Skip generating JUnit test wrapper sources.
      * 
      * @parameter expression="${play.seleniumSkip}" default-value="false"
      * @since 1.0.0

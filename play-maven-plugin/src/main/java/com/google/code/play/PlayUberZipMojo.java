@@ -73,6 +73,15 @@ public class PlayUberZipMojo
     protected String playId;
 
     /**
+     * Skip UberZip generation.
+     * 
+     * @parameter expression="${play.uberzipSkip}" default-value="false"
+     * @required
+     * @since 1.0.0
+     */
+    private boolean uberzipSkip = false;
+
+    /**
      * The directory for the generated ZIP file.
      * 
      * @parameter expression="${play.uberzipOutputDirectory}" default-value="${project.build.directory}"
@@ -125,6 +134,12 @@ public class PlayUberZipMojo
     protected void internalExecute()
         throws MojoExecutionException, MojoFailureException, IOException
     {
+        if (uberzipSkip)
+        {
+            getLog().info( "UberZip generation skipped" );
+            return;
+        }
+        
         try
         {
             File baseDir = project.getBasedir();

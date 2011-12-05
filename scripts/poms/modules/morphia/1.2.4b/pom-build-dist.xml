@@ -58,7 +58,7 @@ under the License.
 
     <properties>
         <play.manifest.section>Play</play.manifest.section>
-        <manifest.specification.title>Morphia Module</manifest.specification.title>
+        <play.manifest.specification.title>Morphia Module</play.manifest.specification.title>
         <play.module.frameworkVersions>1.2</play.module.frameworkVersions>
 
         <play.version>1.2</play.version>

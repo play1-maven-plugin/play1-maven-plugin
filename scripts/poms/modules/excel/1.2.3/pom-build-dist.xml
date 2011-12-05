@@ -58,8 +58,8 @@ under the License.
 
     <properties>
         <play.manifest.section>Play</play.manifest.section>
-        <manifest.specification.title>Excel module</manifest.specification.title>
-        <module.frameworkVersions>1.2</module.frameworkVersions>
+        <play.manifest.specification.title>Excel module</play.manifest.specification.title>
+        <play.module.frameworkVersions>1.2</play.module.frameworkVersions>
 
         <play.version>1.2</play.version>
     </properties>

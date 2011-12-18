@@ -80,6 +80,7 @@ public class PlayInitializeMojo
      * @since 1.0.0
      */
     private boolean compileTest = true;
+
     /**
      * Should temporary Play! home directory be cleaned before it's reinitializing.
      * If true, homeOverwrite is meaningless.
@@ -313,8 +314,8 @@ public class PlayInitializeMojo
             if ( Artifact.SCOPE_PROVIDED.equals( moduleArtifact.getScope() ) )
             {
                 File moduleDirectory = new File( modulesDirectory, moduleName );
-                createDir( moduleDirectory );
-                if ( moduleDirectory.list().length == 0 || moduleDirectory.lastModified() < zipFile.lastModified() )
+                createModuleDirectory( moduleDirectory, homeOverwrite || moduleDirectory.lastModified() < zipFile.lastModified() );
+                if ( moduleDirectory.list().length == 0 )
                 {
                     UnArchiver zipUnArchiver = archiverManager.getUnArchiver( "zip" );
                     zipUnArchiver.setSourceFile( zipFile );
@@ -330,27 +331,29 @@ public class PlayInitializeMojo
     private void createDir( File directory )
         throws IOException
     {
-        if ( homeOverwrite && directory.exists() )
+        if ( directory.exists() )
         {
             if (directory.isDirectory())
             {
-                FileUtils.cleanDirectory( directory );
-            }
-            else // is file
-            {
-                if ( !directory.delete() )
+                if ( homeOverwrite )
                 {
-                    throw new IOException( String.format( "Cannot delete \"%s\" file", directory.getCanonicalPath() ) );
+                    FileUtils.cleanDirectory( directory );
                 }
             }
-        }
-        if ( directory.isFile() )
-        {
-            if ( !directory.delete() )
+            else
             {
-                throw new IOException( String.format( "Cannot delete \"%s\" file", directory.getCanonicalPath() ) );
+                throw new IOException( String.format( "\"%s\" is not a directory", directory.getCanonicalPath() ) );
             }
         }
+        else
+        {
+            if ( !directory.mkdirs() )
+            {
+                throw new IOException(
+                                       String.format( "Cannot create \"%s\" directory", directory.getCanonicalPath() ) );
+            }
+        }
+
         if ( !directory.exists() )
         {
             if ( !directory.mkdirs() )

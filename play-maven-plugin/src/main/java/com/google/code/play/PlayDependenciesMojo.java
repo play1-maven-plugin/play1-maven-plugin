@@ -159,8 +159,8 @@ public class PlayDependenciesMojo
                 File zipFile = moduleArtifact.getFile();
                 String moduleSubDir = String.format( "%s-%s", moduleName, moduleArtifact.getVersion() );
                 File moduleDirectory = new File( modulesDirectory, moduleSubDir );
-                createDir( moduleDirectory );
-                if ( moduleDirectory.list().length == 0 || moduleDirectory.lastModified() < zipFile.lastModified() )
+                createModuleDirectory( moduleDirectory, dependenciesOverwrite || moduleDirectory.lastModified() < zipFile.lastModified() );
+                if ( moduleDirectory.list().length == 0 )
                 {
                     UnArchiver zipUnArchiver = archiverManager.getUnArchiver( "zip" );
                     zipUnArchiver.setSourceFile( zipFile );
@@ -210,7 +210,7 @@ public class PlayDependenciesMojo
                     // System.out.println("jar: " + artifact.getGroupId() + ":" + artifact.getArtifactId() +
                     // " added to " +
                     // libDir);
-                    createDir( libDir );
+                    createLibDirectory( libDir );
                     if ( dependenciesOverwrite )
                     {
                         FileUtils.copyFileToDirectory( jarFile, libDir );
@@ -224,41 +224,59 @@ public class PlayDependenciesMojo
         }
     }
 
-    private void createDir( File directory )
+    private void createLibDirectory( File libDirectory )
         throws IOException
     {
-        if ( dependenciesOverwrite && directory.exists() )
+        if ( libDirectory.exists() )
         {
-            if (directory.isDirectory())
+            if ( !libDirectory.isDirectory() )
             {
-                FileUtils.cleanDirectory( directory );
-            }
-            else // is file
-            {
-                if ( !directory.delete() )
-                {
-                    throw new IOException( String.format( "Cannot delete \"%s\" file", directory.getCanonicalPath() ) );
-                }
+                throw new IOException( String.format( "\"%s\" is not a directory", libDirectory.getCanonicalPath() ) );
             }
         }
-
-        if ( directory.isFile() )
+        else
         {
-            getLog().info( String.format( "Deleting \"%s\" file", directory ) );// TODO-more descriptive message
-            if ( !directory.delete() )
+            if ( !libDirectory.mkdirs() )
             {
-                throw new IOException( String.format( "Cannot delete \"%s\" file", directory.getCanonicalPath() ) );
-            }
-        }
-        if ( !directory.exists() )
-        {
-            if ( !directory.mkdirs() )
-            {
-                throw new IOException( String.format( "Cannot create \"%s\" directory", directory.getCanonicalPath() ) );
+                throw new IOException(
+                                       String.format( "Cannot create \"%s\" directory", libDirectory.getCanonicalPath() ) );
             }
         }
     }
 
+/* moved to AbstractPlayMojo
+    private void createModuleDirectory( File moduleDirectory )
+        throws IOException
+    {
+        if ( moduleDirectory.exists() )
+        {
+            if ( moduleDirectory.isDirectory() )
+            {
+                if ( dependenciesOverwrite )
+                {
+                    FileUtils.cleanDirectory( moduleDirectory );
+                }
+            }
+            else // file if ( moduleDirectory.isFile() )
+            {
+                getLog().info( String.format( "Deleting \"%s\" file", moduleDirectory ) );// TODO-more descriptive message
+                if ( !moduleDirectory.delete() )
+                {
+                    throw new IOException( String.format( "Cannot delete \"%s\" file", moduleDirectory.getCanonicalPath() ) );
+                }
+            }
+        }
+
+        if ( !moduleDirectory.exists() )
+        {
+            if ( !moduleDirectory.mkdirs() )
+            {
+                throw new IOException( String.format( "Cannot create \"%s\" directory", moduleDirectory.getCanonicalPath() ) );
+            }
+        }
+    }
+*/
+    
     private void checkPotentialReactorProblem(Artifact artifact) throws ArchiverException
     {
         File artifactFile = artifact.getFile();

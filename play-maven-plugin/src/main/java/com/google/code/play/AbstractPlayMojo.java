@@ -39,6 +39,7 @@ import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
+import org.codehaus.plexus.util.FileUtils;
 
 /**
  * Abstract base class for Play! Mojos.
@@ -363,5 +364,40 @@ public abstract class AbstractPlayMojo
         return result;
     }
 */
+
+    protected void createModuleDirectory( File moduleDirectory, boolean overwrite )
+        throws IOException
+    {
+        if ( moduleDirectory.exists() )
+        {
+            if ( moduleDirectory.isDirectory() )
+            {
+                if ( overwrite )
+                {
+                    FileUtils.cleanDirectory( moduleDirectory );
+                }
+            }
+            else
+            // file if ( moduleDirectory.isFile() )
+            {
+                getLog().info( String.format( "Deleting \"%s\" file", moduleDirectory ) );// TODO-more descriptive
+                                                                                          // message
+                if ( !moduleDirectory.delete() )
+                {
+                    throw new IOException( String.format( "Cannot delete \"%s\" file",
+                                                          moduleDirectory.getCanonicalPath() ) );
+                }
+            }
+        }
+
+        if ( !moduleDirectory.exists() )
+        {
+            if ( !moduleDirectory.mkdirs() )
+            {
+                throw new IOException( String.format( "Cannot create \"%s\" directory",
+                                                      moduleDirectory.getCanonicalPath() ) );
+            }
+        }
+    }
 
 }

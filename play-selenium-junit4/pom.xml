@@ -44,6 +44,7 @@ under the License.
                     <artifactId>xml-apis</artifactId>
                 </exclusion>
             </exclusions>
+            <optional>true</optional>
         </dependency>
 
         <dependency>
@@ -62,6 +63,13 @@ under the License.
                     <artifactId>xml-apis</artifactId>
                 </exclusion>
             </exclusions>
+            <optional>true</optional>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jsoup</groupId>
+            <artifactId>jsoup</artifactId>
+            <version>1.6.1</version>
         </dependency>
 
         <dependency>

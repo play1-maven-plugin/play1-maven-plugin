@@ -39,7 +39,8 @@ import org.junit.Assert;
 import org.junit.Before;
 
 //import com.google.code.play.selenium.parser.Dom4JSeleneseParser;
-import com.google.code.play.selenium.parser.NekoHtmlSeleneseParser;
+import com.google.code.play.selenium.parser.JSoupSeleneseParser;
+//import com.google.code.play.selenium.parser.NekoHtmlSeleneseParser;
 import com.google.code.play.selenium.step.*;
 
 public abstract class PlaySeleniumTest
@@ -121,7 +122,8 @@ public abstract class PlaySeleniumTest
                 if ( contentType.startsWith( "text/html" ) )
                 {
                     // SeleneseParser parser = new Dom4JSeleneseParser();
-                    SeleneseParser parser = new NekoHtmlSeleneseParser();
+                    // SeleneseParser parser = new NekoHtmlSeleneseParser();
+                    SeleneseParser parser = new JSoupSeleneseParser();
                     List<List<String>> commands = parser.parseSeleneseContent( content );
                     StoredVars storedVars = new StoredVars();
                     List<Step> steps = processContent( commands, storedVars );

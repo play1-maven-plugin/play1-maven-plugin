@@ -38,14 +38,17 @@ import org.apache.maven.surefire.testset.DirectoryScannerParameters;
 import org.apache.maven.surefire.testset.TestSetFailedException;
 //import org.apache.maven.surefire.util.DirectoryScanner;
 //import org.apache.maven.surefire.util.DefaultDirectoryScanner;
+import org.apache.maven.surefire.util.RunOrderCalculator;
 import org.apache.maven.surefire.util.TestsToRun;
 
 import org.junit.runner.Result;
 import org.junit.runner.notification.RunNotifier;
 
+import play.Invoker;
 import play.Play;
 
 import java.io.File;
+import java.lang.reflect.Constructor;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
@@ -73,6 +76,8 @@ public class PlayJUnit4Provider
     
     private final ProviderParameters providerParameters;
 
+    private final RunOrderCalculator runOrderCalculator;
+
     private final ConsoleLogger consoleLogger;
 
     public PlayJUnit4Provider( ProviderParameters booterParameters )
@@ -91,8 +96,8 @@ public class PlayJUnit4Provider
         this.directoryScanner = new PlayDirectoryScanner(new File(applicationPath, "test"),
                                                          directoryScannerParameters.getIncludes(),
                                                          directoryScannerParameters.getExcludes(),
-                                                         directoryScannerParameters.getRunOrder(),
                                                          consoleLogger);
+        this.runOrderCalculator = booterParameters.getRunOrderCalculator();
         customRunListeners =
             JUnit4RunListenerFactory.createCustomListeners( booterParameters.getProviderProperties().getProperty( "listener" ) );
         jUnit4TestChecker = new JUnit4TestChecker( testClassLoader );
@@ -225,7 +230,7 @@ public class PlayJUnit4Provider
 
         try
         {
-            PlayJUnit4TestSet.execute( clazz, listeners, this.requestedTestMethod );
+            execute( clazz, listeners, this.requestedTestMethod );
         }
         catch ( TestSetFailedException e )
         {
@@ -276,7 +281,8 @@ public class PlayJUnit4Provider
 
     private TestsToRun scanClassPath()
     {
-        return directoryScanner.locateTestClasses( Play.classloader, jUnit4TestChecker );
+        final TestsToRun scannedClasses = directoryScanner.locateTestClasses( Play.classloader, jUnit4TestChecker );
+        return runOrderCalculator.orderTestClasses(  scannedClasses );
     }
 
     private void upgradeCheck()
@@ -303,6 +309,37 @@ public class PlayJUnit4Provider
     {
         final String property = System.getProperty( "surefire.junit4.upgradecheck" );
         return property != null;
+    }
+
+    public static void execute( Class<?> testClass, RunNotifier fNotifier, String testMethod )
+        throws TestSetFailedException
+    {
+        try
+        {
+            String invocationClassName = "com.google.code.play.surefire.junit4.TestInvocation";
+            if ( "1.2".compareTo( Play.version ) <= 0 )
+            {
+                invocationClassName = "com.google.code.play.surefire.junit4.Play12TestInvocation";
+            }
+            Invoker.DirectInvocation invocation = getInvocation( invocationClassName, testClass, fNotifier, testMethod );
+            Invoker.invokeInThread( invocation );
+        }
+        catch ( Throwable e )
+        {
+            throw new TestSetFailedException( e );
+            // ????? throw ExceptionUtils.getRootCause(e);
+        }
+    }
+
+    public static Invoker.DirectInvocation getInvocation( String invocationClassName, Class<?> testClass,
+                                                          RunNotifier fNotifier, String testMethod )
+        throws Throwable
+    {
+        Invoker.DirectInvocation invocation = null;
+        Class<?> cl = Class.forName( invocationClassName );
+        Constructor<?> c = cl.getConstructor( Class.class, RunNotifier.class, String.class );
+        invocation = (Invoker.DirectInvocation) c.newInstance( testClass, fNotifier, testMethod );
+        return invocation;
     }
 
 }

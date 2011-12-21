@@ -21,16 +21,12 @@ package com.google.code.play.surefire.junit4;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 
 import org.apache.maven.surefire.report.ConsoleLogger;
 import org.apache.maven.surefire.util.DirectoryScanner;
 import org.apache.maven.surefire.util.NestedRuntimeException;
-import org.apache.maven.surefire.util.RunOrder;
 import org.apache.maven.surefire.util.ScannerFilter;
 import org.apache.maven.surefire.util.TestsToRun;
 
@@ -59,22 +55,14 @@ public class PlayDirectoryScanner
 
     private final List<Class<?>> classesSkippedByValidation = new ArrayList<Class<?>>();
 
-    private final Comparator<Class<?>> sortOrder;
-
-    //private final String runOrder;
-
-    private final RunOrder runOrder;
-
     private final ConsoleLogger consoleLogger;
 
 
-    public PlayDirectoryScanner( File basedir, List<String> includes, List<String> excludes, RunOrder runOrder, ConsoleLogger consoleLogger )
+    public PlayDirectoryScanner( File basedir, List<String> includes, List<String> excludes, ConsoleLogger consoleLogger )
     {
         this.basedir = basedir;
         this.includes = includes;
         this.excludes = excludes;
-        this.runOrder = runOrder;
-        this.sortOrder = getSortOrderComparator();
         this.consoleLogger = consoleLogger;
     }
 
@@ -101,7 +89,6 @@ public class PlayDirectoryScanner
                 classesSkippedByValidation.add( testClass );
             }
         }
-        orderTestClasses( result );
         return new TestsToRun( result );
     }
 
@@ -186,61 +173,6 @@ public class PlayDirectoryScanner
     public List<Class<?>> getClassesSkippedByValidation()
     {
         return classesSkippedByValidation;
-    }
-
-    private void orderTestClasses( List<Class<?>> testClasses )
-    {
-        if ( RunOrder.RANDOM.equals( runOrder ) )
-        {
-            Collections.shuffle( testClasses );
-        }
-        else if ( sortOrder != null )
-        {
-            Collections.sort( testClasses, sortOrder );
-        }
-    }
-
-    private Comparator<Class<?>> getSortOrderComparator()
-    {
-        if ( RunOrder.ALPHABETICAL.equals( runOrder ) )
-        {
-            return getAlphabeticalComparator();
-        }
-        else if ( RunOrder.REVERSE_ALPHABETICAL.equals( runOrder ) )
-        {
-            return getReverseAlphabeticalComparator();
-        }
-        else if ( RunOrder.HOURLY.equals( runOrder ) )
-        {
-            final int hour = Calendar.getInstance().get( Calendar.HOUR_OF_DAY );
-            return ( ( hour % 2 ) == 0 ) ? getAlphabeticalComparator() : getReverseAlphabeticalComparator();
-        }
-        else
-        {
-            return null;
-        }
-    }
-
-    private Comparator<Class<?>> getReverseAlphabeticalComparator()
-    {
-        return new Comparator<Class<?>>()
-        {
-            public int compare( Class<?> o1, Class<?> o2 )
-            {
-                return ( o2.getName().compareTo( o1.getName() ) );
-            }
-        };
-    }
-
-    private Comparator<Class<?>> getAlphabeticalComparator()
-    {
-        return new Comparator<Class<?>>()
-        {
-            public int compare( Class<?> o1, Class<?> o2 )
-            {
-                return ( o1.getName().compareTo( o2.getName() ) );
-            }
-        };
     }
 
 }

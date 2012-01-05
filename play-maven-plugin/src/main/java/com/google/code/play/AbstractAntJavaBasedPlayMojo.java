@@ -1,0 +1,127 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
+package com.google.code.play;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
+
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.MojoFailureException;
+
+import org.apache.tools.ant.BuildLogger;
+import org.apache.tools.ant.NoBannerLogger;
+import org.apache.tools.ant.Project;
+import org.apache.tools.ant.ProjectHelper;
+import org.apache.tools.ant.taskdefs.Java;
+import org.apache.tools.ant.types.Environment;
+import org.apache.tools.ant.types.Path;
+
+import org.codehaus.plexus.util.FileUtils;
+
+/**
+ * Base class for mojos using Ant Java task.
+ */
+public abstract class AbstractAntJavaBasedPlayMojo
+    extends AbstractPlayMojo
+{
+
+    /**
+     * List of artifacts this plugin depends on. Used for resolving the Findbugs coreplugin.
+     *
+     * @parameter expression="${plugin.artifacts}"
+     * @required
+     * @readonly
+     */
+    private List<Artifact> pluginArtifacts;
+
+    protected Artifact getPluginArtifact(String groupId, String artifactId) throws MojoExecutionException {
+        Artifact result = null;
+        for (Artifact artifact: pluginArtifacts) {
+            if (artifact.getGroupId().equals(groupId) && artifact.getArtifactId().equals( artifactId )) {
+                result = artifact;
+                break;
+            }
+        }
+        if (result == null) {
+            throw new MojoExecutionException( String.format("Unable to locate '%s:%s' in the list of plugin artifacts", groupId, artifactId ));
+        }
+        return result;
+    }
+    
+    protected static class JavaRunnable
+        implements Runnable
+    {
+        private Java java;
+
+        private Exception exception;
+
+        public JavaRunnable( Java java )
+        {
+            this.java = java;
+        }
+
+        public Exception getException()
+        {
+            Exception result = null;
+            synchronized ( this )
+            {
+                result = exception;
+            }
+            return result;
+        }
+
+        public void run()
+        {
+            try
+            {
+                java.execute();
+            }
+            catch ( Exception e )
+            {
+                synchronized ( this )
+                {
+                    this.exception = e;
+                }
+            }
+        }
+    }
+
+    protected Project createProject() {
+        final Project project = new Project();
+
+        final ProjectHelper helper = ProjectHelper.getProjectHelper();
+        project.addReference(ProjectHelper.PROJECTHELPER_REFERENCE, helper);
+        helper.getImportStack().addElement("AntBuilder"); // import checks that stack is not empty 
+
+        final BuildLogger logger = new NoBannerLogger();
+
+        logger.setMessageOutputLevel(org.apache.tools.ant.Project.MSG_INFO);
+        logger.setOutputPrintStream(System.out);
+        logger.setErrorPrintStream(System.err);
+
+        project.addBuildListener(logger);
+
+        project.init();
+        project.getBaseDir();
+        return project;
+    }
+}

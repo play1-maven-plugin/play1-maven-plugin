@@ -64,7 +64,7 @@ public class PlayZipMojo
 
     /**
      * Should project dependencies ("lib" and "modules" directories) be packaged.
-     * No include/exclude filters. Use "provided" scope to exclude from packaging.
+     * No include/exclude filters.
      * 
      * @parameter expression="${play.zipDependencies}" default-value="false"
      * @since 1.0.0

@@ -44,7 +44,7 @@ import org.codehaus.plexus.util.FileUtils;
  * 
  * @author <a href="mailto:gslowikowski@gmail.com">Grzegorz Slowikowski</a>
  * @goal dependencies
- * @requiresDependencyResolution test
+ * @requiresDependencyResolution runtime
  */
 public class PlayDependenciesMojo
     extends AbstractPlayMojo
@@ -154,25 +154,25 @@ public class PlayDependenciesMojo
             Artifact moduleArtifact = moduleArtifactEntry.getValue();
             checkPotentialReactorProblem( moduleArtifact );
 
-            if ( !Artifact.SCOPE_PROVIDED.equals( moduleArtifact.getScope() ) )
+            // if ( !Artifact.SCOPE_PROVIDED.equals( moduleArtifact.getScope() ) )
+            // {
+            File zipFile = moduleArtifact.getFile();
+            String moduleSubDir = String.format( "%s-%s", moduleName, moduleArtifact.getVersion() );
+            File moduleDirectory = new File( modulesDirectory, moduleSubDir );
+            createModuleDirectory( moduleDirectory,
+                                   dependenciesOverwrite || moduleDirectory.lastModified() < zipFile.lastModified() );
+            if ( moduleDirectory.list().length == 0 )
             {
-                File zipFile = moduleArtifact.getFile();
-                String moduleSubDir = String.format( "%s-%s", moduleName, moduleArtifact.getVersion() );
-                File moduleDirectory = new File( modulesDirectory, moduleSubDir );
-                createModuleDirectory( moduleDirectory, dependenciesOverwrite
-                    || moduleDirectory.lastModified() < zipFile.lastModified() );
-                if ( moduleDirectory.list().length == 0 )
-                {
-                    UnArchiver zipUnArchiver = archiverManager.getUnArchiver( "zip" );
-                    zipUnArchiver.setSourceFile( zipFile );
-                    zipUnArchiver.setDestDirectory( moduleDirectory );
-                    zipUnArchiver.setOverwrite( false/* ??true */);
-                    zipUnArchiver.extract();
-                    moduleDirectory.setLastModified( System.currentTimeMillis() );
-                }
-
-                result.put( moduleArtifact, moduleDirectory );
+                UnArchiver zipUnArchiver = archiverManager.getUnArchiver( "zip" );
+                zipUnArchiver.setSourceFile( zipFile );
+                zipUnArchiver.setDestDirectory( moduleDirectory );
+                zipUnArchiver.setOverwrite( false/* ??true */ );
+                zipUnArchiver.extract();
+                moduleDirectory.setLastModified( System.currentTimeMillis() );
             }
+
+            result.put( moduleArtifact, moduleDirectory );
+            // }
         }
         return result;
     }
@@ -189,38 +189,38 @@ public class PlayDependenciesMojo
             if ( "jar".equals( artifact.getType() ) )
             {
                 checkPotentialReactorProblem( artifact );
-                if ( !Artifact.SCOPE_PROVIDED.equals( artifact.getScope() ) )
+                // if ( !Artifact.SCOPE_PROVIDED.equals( artifact.getScope() ) )
+                // {
+                File libDir = new File( baseDir, "lib" );
+                // System.out.println("jar: " + artifact.getGroupId() + ":" + artifact.getArtifactId());
+                File jarFile = artifact.getFile();
+                for ( Map.Entry<Artifact, File> moduleTypeArtifactEntry : moduleTypeArtifacts.entrySet() )
                 {
-                    File libDir = new File( baseDir, "lib" );
-                    // System.out.println("jar: " + artifact.getGroupId() + ":" + artifact.getArtifactId());
-                    File jarFile = artifact.getFile();
-                    for ( Map.Entry<Artifact, File> moduleTypeArtifactEntry : moduleTypeArtifacts.entrySet() )
+                    Artifact moduleArtifact = moduleTypeArtifactEntry.getKey();
+                    // System.out.println("checking module: " + moduleArtifact.getGroupId() + ":" +
+                    // moduleArtifact.getArtifactId());
+                    if ( artifact.getGroupId().equals( moduleArtifact.getGroupId() )
+                        && artifact.getArtifactId().equals( moduleArtifact.getArtifactId() ) )
                     {
-                        Artifact moduleArtifact = moduleTypeArtifactEntry.getKey();
-                        // System.out.println("checking module: " + moduleArtifact.getGroupId() + ":" +
-                        // moduleArtifact.getArtifactId());
-                        if ( artifact.getGroupId().equals( moduleArtifact.getGroupId() )
-                            && artifact.getArtifactId().equals( moduleArtifact.getArtifactId() ) )
-                        {
-                            File modulePath = moduleTypeArtifactEntry.getValue();
-                            libDir = new File( modulePath, "lib" );
-                            // System.out.println("checked ok - lib is " + libDir.getCanonicalPath());
-                            break;
-                        }
-                    }
-                    // System.out.println("jar: " + artifact.getGroupId() + ":" + artifact.getArtifactId() +
-                    // " added to " +
-                    // libDir);
-                    createLibDirectory( libDir );
-                    if ( dependenciesOverwrite )
-                    {
-                        FileUtils.copyFileToDirectory( jarFile, libDir );
-                    }
-                    else
-                    {
-                        FileUtils.copyFileToDirectoryIfModified( jarFile, libDir );
+                        File modulePath = moduleTypeArtifactEntry.getValue();
+                        libDir = new File( modulePath, "lib" );
+                        // System.out.println("checked ok - lib is " + libDir.getCanonicalPath());
+                        break;
                     }
                 }
+                // System.out.println("jar: " + artifact.getGroupId() + ":" + artifact.getArtifactId() +
+                // " added to " +
+                // libDir);
+                createLibDirectory( libDir );
+                if ( dependenciesOverwrite )
+                {
+                    FileUtils.copyFileToDirectory( jarFile, libDir );
+                }
+                else
+                {
+                    FileUtils.copyFileToDirectoryIfModified( jarFile, libDir );
+                }
+                // }
             }
         }
     }

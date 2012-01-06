@@ -109,8 +109,7 @@ public abstract class AbstractPlayMojo
         }
         else
         {
-            throw new MojoExecutionException(
-                                              String.format( "Play! home directory warning file \"%s\" does not exist",
+            throw new MojoExecutionException( String.format( "Play! home directory warning file \"%s\" does not exist",
                                                              warningFile.getCanonicalPath() ) );
         }
         return playTmpHomeDir;
@@ -380,8 +379,7 @@ public abstract class AbstractPlayMojo
             else
             // file if ( moduleDirectory.isFile() )
             {
-                getLog().info( String.format( "Deleting \"%s\" file", moduleDirectory ) );// TODO-more descriptive
-                                                                                          // message
+                getLog().info( String.format( "Deleting \"%s\" file", moduleDirectory ) ); // TODO-more descriptive message
                 if ( !moduleDirectory.delete() )
                 {
                     throw new IOException( String.format( "Cannot delete \"%s\" file",

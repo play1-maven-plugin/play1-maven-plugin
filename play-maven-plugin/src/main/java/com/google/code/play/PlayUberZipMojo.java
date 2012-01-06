@@ -126,19 +126,19 @@ public class PlayUberZipMojo
     protected void internalExecute()
         throws MojoExecutionException, MojoFailureException, IOException
     {
-        if (uberzipSkip)
+        if ( uberzipSkip )
         {
             getLog().info( "UberZip generation skipped" );
             return;
         }
-        
+
         try
         {
             File baseDir = project.getBasedir();
             File destFile = new File( uberzipOutputDirectory, getDestinationFileName() );
 
             Archiver zipArchiver = archiverManager.getArchiver( "zip" );
-            zipArchiver.setDuplicateBehavior( Archiver.DUPLICATES_FAIL );// Just in case
+            zipArchiver.setDuplicateBehavior( Archiver.DUPLICATES_FAIL ); // Just in case
             zipArchiver.setDestFile( destFile );
 
             // APPLICATION
@@ -148,12 +148,12 @@ public class PlayUberZipMojo
             String[] excludes = ( uberzipExcludes != null ? uberzipExcludes.split( "," ) : null );
             zipArchiver.addDirectory( baseDir, "application/", includes, excludes );
 
-            //framework
+            // framework
             Artifact frameworkArtifact = findFrameworkArtifact( false );
             File frameworkZipFile = frameworkArtifact.getFile();
             zipArchiver.addArchivedFileSet( frameworkZipFile );
 
-            //modules
+            // modules
             Map<String, Artifact> moduleArtifacts = findAllModuleArtifacts( false );
             for ( Map.Entry<String, Artifact> moduleArtifactEntry : moduleArtifacts.entrySet() )
             {
@@ -165,7 +165,7 @@ public class PlayUberZipMojo
                     String.format( "application/modules/%s-%s/", moduleName, moduleArtifact.getVersion() );
                 if ( Artifact.SCOPE_PROVIDED.equals( moduleArtifact.getScope() ) )
                 {
-                    moduleSubDir = String.format( "modules/%s/", moduleName/* , moduleArtifact.getVersion() */);
+                    moduleSubDir = String.format( "modules/%s/", moduleName/* , moduleArtifact.getVersion() */ );
                 }
                 zipArchiver.addArchivedFileSet( moduleZipFile, moduleSubDir );
             }

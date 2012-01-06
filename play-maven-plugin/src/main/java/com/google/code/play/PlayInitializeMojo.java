@@ -56,7 +56,7 @@ public class PlayInitializeMojo
 {
 
     public static final String playFrameworkVersionFilePath = "framework/src/play/version";
-    
+
     /**
      * Default Play! id (profile).
      * 
@@ -126,7 +126,7 @@ public class PlayInitializeMojo
         }
 
         getLog().debug( "Play! version: " + playVersion );
-        File playHome = prepareAndGetPlayHome(playVersion);
+        File playHome = prepareAndGetPlayHome( playVersion );
         playId = resolvePlayId( playHome, playId );
 
         File baseDir = project.getBasedir();
@@ -148,7 +148,7 @@ public class PlayInitializeMojo
             modules.put( moduleName, new File( modulePath ) );
         }
         // Play 1.2.x
-        if ( ( playVersion != null/* nie podoba mi sie to */) && "1.2".compareTo( /* Play.version */playVersion ) <= 0 )
+        if ( ( playVersion != null/* I don't like it */ ) && "1.2".compareTo( /* Play.version */playVersion ) <= 0 )
         {
             File modulesDir = new File( baseDir, "modules" );
             if ( modulesDir.isDirectory() )
@@ -212,7 +212,7 @@ public class PlayInitializeMojo
         }
     }
 
-    protected File prepareAndGetPlayHome(String playDependencyVersion)
+    protected File prepareAndGetPlayHome( String playDependencyVersion )
         throws MojoExecutionException, IOException
     {
         File targetDir = new File( project.getBuild().getDirectory() );
@@ -244,8 +244,8 @@ public class PlayInitializeMojo
         return playTmpHomeDir;
     }
 
-    private void decompressFrameworkAndSetPlayHome( Artifact frameworkAtifact,
-                                                    Map<String, Artifact> moduleArtifacts, String playDependencyVersion, File playTmpHomeDir )
+    private void decompressFrameworkAndSetPlayHome( Artifact frameworkAtifact, Map<String, Artifact> moduleArtifacts,
+                                                    String playDependencyVersion, File playTmpHomeDir )
         throws ArchiverException, MojoExecutionException, NoSuchArchiverException, IOException
     {
         File warningFile = new File( playTmpHomeDir, "WARNING.txt" );
@@ -279,28 +279,29 @@ public class PlayInitializeMojo
             else
             {
                 throw new MojoExecutionException( String.format( "Play! home directory \"%s\" is not a directory",
-                                                      playTmpHomeDir.getCanonicalPath() ) );
+                                                                 playTmpHomeDir.getCanonicalPath() ) );
             }
         }
 
         // decompress framework
         createDir( playTmpHomeDir );
-        if (!warningFile.exists()) {
+        if ( !warningFile.exists() )
+        {
             writeToFile( warningFile, "This directory is generated automatically. Don't change its content." );
         }
-        File frameworkDir = new File ( playTmpHomeDir, "framework" );
-        if ( !frameworkDir.exists() || frameworkDir.lastModified() < frameworkAtifact.getFile().lastModified())
+        File frameworkDir = new File( playTmpHomeDir, "framework" );
+        if ( !frameworkDir.exists() || frameworkDir.lastModified() < frameworkAtifact.getFile().lastModified() )
         {
             UnArchiver zipUnArchiver = archiverManager.getUnArchiver( "zip" );
             zipUnArchiver.setSourceFile( frameworkAtifact.getFile() );
             zipUnArchiver.setDestDirectory( playTmpHomeDir );
-            zipUnArchiver.setOverwrite( false/* ??true */);
+            zipUnArchiver.setOverwrite( false/* ??true */ );
             zipUnArchiver.extract();
 
             File playFrameworkVersionFile = new File( playTmpHomeDir, playFrameworkVersionFilePath );
             createDir( playFrameworkVersionFile.getParentFile() );
             writeToFile( playFrameworkVersionFile, playDependencyVersion );
-            frameworkDir.setLastModified(System.currentTimeMillis());
+            frameworkDir.setLastModified( System.currentTimeMillis() );
         }
 
         // decompress provided-scoped modules
@@ -314,13 +315,14 @@ public class PlayInitializeMojo
             if ( Artifact.SCOPE_PROVIDED.equals( moduleArtifact.getScope() ) )
             {
                 File moduleDirectory = new File( modulesDirectory, moduleName );
-                createModuleDirectory( moduleDirectory, homeOverwrite || moduleDirectory.lastModified() < zipFile.lastModified() );
+                createModuleDirectory( moduleDirectory,
+                                       homeOverwrite || moduleDirectory.lastModified() < zipFile.lastModified() );
                 if ( moduleDirectory.list().length == 0 )
                 {
                     UnArchiver zipUnArchiver = archiverManager.getUnArchiver( "zip" );
                     zipUnArchiver.setSourceFile( zipFile );
                     zipUnArchiver.setDestDirectory( moduleDirectory );
-                    zipUnArchiver.setOverwrite( false/* ??true */);
+                    zipUnArchiver.setOverwrite( false/* ??true */ );
                     zipUnArchiver.extract();
                     moduleDirectory.setLastModified( System.currentTimeMillis() );
                 }
@@ -333,7 +335,7 @@ public class PlayInitializeMojo
     {
         if ( directory.exists() )
         {
-            if (directory.isDirectory())
+            if ( directory.isDirectory() )
             {
                 if ( homeOverwrite )
                 {
@@ -349,8 +351,7 @@ public class PlayInitializeMojo
         {
             if ( !directory.mkdirs() )
             {
-                throw new IOException(
-                                       String.format( "Cannot create \"%s\" directory", directory.getCanonicalPath() ) );
+                throw new IOException( String.format( "Cannot create \"%s\" directory", directory.getCanonicalPath() ) );
             }
         }
 

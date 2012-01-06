@@ -73,7 +73,7 @@ public class PlayStartServerMojo
 
     /**
      * Arbitrary JVM options to set on the command line.
-     *
+     * 
      * @parameter expression="${play.serverProcessArgLine}"
      * @since 1.0.0
      */
@@ -91,7 +91,7 @@ public class PlayStartServerMojo
 
         File playHome = getPlayHome();
         File baseDir = project.getBasedir();
-        
+
         File confDir = new File( baseDir, "conf" );
         File configurationFile = new File( confDir, "application.conf" );
 
@@ -107,51 +107,54 @@ public class PlayStartServerMojo
 
         File buildDirectory = new File( project.getBuild().getDirectory() );
         File logDirectory = new File( buildDirectory, "play" );
-        //ant.mkdir(dir: logDirectory)
-        if (!logDirectory.exists() && !logDirectory.mkdirs())
+        // ant.mkdir(dir: logDirectory)
+        if ( !logDirectory.exists() && !logDirectory.mkdirs() )
         {
-            //???
+            // ???
         }
 
-        File userExtensionsJsFile = new File( playHome, "modules/testrunner/public/test-runner/selenium/scripts/user-extensions.js" );
+        File userExtensionsJsFile =
+            new File( playHome, "modules/testrunner/public/test-runner/selenium/scripts/user-extensions.js" );
         if ( userExtensionsJsFile.isFile() )
         {
             File seleniumDirectory = new File( buildDirectory, "selenium" );
-            //ant.mkdir(dir: seleniumDirectory)
-        if (!seleniumDirectory.exists() && !seleniumDirectory.mkdirs())
-        {
-            //???
-        }
+            // ant.mkdir(dir: seleniumDirectory)
+            if ( !seleniumDirectory.exists() && !seleniumDirectory.mkdirs() )
+            {
+                // ???
+            }
             FileUtils.copyFileToDirectoryIfModified( userExtensionsJsFile, seleniumDirectory );
         }
-        //else??
+        // else??
 
         Project antProject = createProject();
         Path classPath = new Path( antProject );
-        for (Artifact a: (List<Artifact>)project.getTestArtifacts()) {
-            classPath.createPathElement().setLocation(a.getFile());
+        for ( Artifact a : (List<Artifact>) project.getTestArtifacts() )
+        {
+            classPath.createPathElement().setLocation( a.getFile() );
         }
-        classPath.createPathElement().setLocation(getPluginArtifact( "com.google.code.maven-play-plugin", "play-server-booter" ).getFile());
+        classPath.createPathElement().setLocation( getPluginArtifact( "com.google.code.maven-play-plugin",
+                                                                      "play-server-booter" ).getFile() );
 
         Java java = new Java();
         java.setProject( antProject );
         java.setClassname( "com.google.code.play.PlayServerBooter" );
-        java.setFork(true);
+        java.setFork( true );
         java.setDir( baseDir );
         java.setFailonerror( true );
         java.setClasspath( classPath );
 
-        //if (serverLogOutput) {
-            File logFile = new File( logDirectory, "server.log" );
-            getLog().info(String.format( "Redirecting output to: %s", logFile.getAbsoluteFile()));
-            java.setOutput( logFile );
-        //}
-        
+        // if (serverLogOutput) {
+        File logFile = new File( logDirectory, "server.log" );
+        getLog().info( String.format( "Redirecting output to: %s", logFile.getAbsoluteFile() ) );
+        java.setOutput( logFile );
+        // }
+
         Environment.Variable sysPropPlayHome = new Environment.Variable();
         sysPropPlayHome.setKey( "play.home" );
         sysPropPlayHome.setValue( playHome.getAbsolutePath() );
         java.addSysproperty( sysPropPlayHome );
-        
+
         Environment.Variable sysPropPlayId = new Environment.Variable();
         sysPropPlayId.setKey( "play.id" );
         sysPropPlayId.setValue( playTestId );
@@ -161,26 +164,29 @@ public class PlayStartServerMojo
         sysPropAppPath.setKey( "application.path" );
         sysPropAppPath.setValue( baseDir.getAbsolutePath() );
         java.addSysproperty( sysPropAppPath );
-        
-        if (serverProcessArgLine != null) {
+
+        if ( serverProcessArgLine != null )
+        {
             String argLine = serverProcessArgLine.trim();
-            if (!"".equals(argLine)) {
+            if ( !"".equals( argLine ) )
+            {
                 String[] args = argLine.split( " " );
-                for (String arg: args) {
+                for ( String arg : args )
+                {
                     Commandline.Argument jvmArg = java.createJvmarg();
                     jvmArg.setValue( arg );
-                    //jvmarg(value: arg);
-                    getLog().debug("  Adding jvmarg '" + arg + "'");
+                    // jvmarg(value: arg);
+                    getLog().debug( "  Adding jvmarg '" + arg + "'" );
                 }
             }
         }
 
         JavaRunnable runner = new JavaRunnable( java );
         Thread t = new Thread( runner, "Play! Server runner" );
-        getLog().info( "Launching Play! Server");
+        getLog().info( "Launching Play! Server" );
         t.start();
 
-        //boolean timedOut = false;
+        // boolean timedOut = false;
         
         /*TimerTask timeoutTask = null;
         if (timeout > 0) {
@@ -207,19 +213,23 @@ public class PlayStartServerMojo
             //}
             
             Exception runnerException = runner.getException();
-            if (runnerException != null) {
-                throw new MojoExecutionException("Failed to start Play! Server", runnerException);
+            if ( runnerException != null )
+            {
+                throw new MojoExecutionException( "Failed to start Play! Server", runnerException );
             }
-            
-            try {
+
+            try
+            {
                 connectUrl.openConnection().getContent();
                 started = true;
             }
-            catch (Exception e) {
-                //return false;
+            catch ( Exception e )
+            {
+                // return false;
             }
 
-            if (!started) {
+            if ( !started )
+            {
                 try
                 {
                     Thread.sleep( verifyWaitDelay );
@@ -235,7 +245,7 @@ public class PlayStartServerMojo
             timeoutTask.cancel();
         }*/
 
-        getLog().info( "Play! Server started");
+        getLog().info( "Play! Server started" );
         
         Exception startServerException = runner.getException();
         if ( startServerException != null )

@@ -54,7 +54,7 @@ public class PlayPrecompileMojo
 
     /**
      * Allows the server startup to be skipped.
-     *
+     * 
      * @parameter expression="${play.precompileSkip}" default-value="false"
      * @since 1.0.0
      */
@@ -78,37 +78,39 @@ public class PlayPrecompileMojo
 
         Project antProject = createProject();
         Path classPath = new Path( antProject );
-        for (Artifact a: (List<Artifact>)project.getTestArtifacts()) {
-            classPath.createPathElement().setLocation(a.getFile());
+        for ( Artifact a : (List<Artifact>) project.getTestArtifacts() )
+        {
+            classPath.createPathElement().setLocation( a.getFile() );
         }
-        classPath.createPathElement().setLocation(getPluginArtifact( "com.google.code.maven-play-plugin", "play-server-booter" ).getFile());
+        classPath.createPathElement().setLocation( getPluginArtifact( "com.google.code.maven-play-plugin",
+                                                                      "play-server-booter" ).getFile() );
 
         Java java = new Java();
         java.setProject( antProject );
         java.setClassname( "com.google.code.play.PlayServerBooter" );
         java.setFailonerror( true );
         java.setClasspath( classPath );
-        
+
         Environment.Variable sysPropPlayHome = new Environment.Variable();
         sysPropPlayHome.setKey( "play.home" );
         sysPropPlayHome.setValue( playHome.getAbsolutePath() );
         java.addSysproperty( sysPropPlayHome );
-        
+
         Environment.Variable sysPropPlayId = new Environment.Variable();
         sysPropPlayId.setKey( "play.id" );
-        sysPropPlayId.setValue( (playId != null ? playId : "") );
+        sysPropPlayId.setValue( ( playId != null ? playId : "" ) );
         java.addSysproperty( sysPropPlayId );
 
         Environment.Variable sysPropAppPath = new Environment.Variable();
         sysPropAppPath.setKey( "application.path" );
         sysPropAppPath.setValue( baseDir.getAbsolutePath() );
         java.addSysproperty( sysPropAppPath );
-        
+
         Environment.Variable sysPropPrecompile = new Environment.Variable();
         sysPropPrecompile.setKey( "precompile" );
-        sysPropPrecompile.setValue( Boolean.toString(true) );
+        sysPropPrecompile.setValue( Boolean.toString( true ) );
         java.addSysproperty( sysPropPrecompile );
-        
+
         JavaRunnable runner = new JavaRunnable( java );
         Thread t = new Thread( runner, "Play! precompilation runner" );
         t.start();

@@ -19,23 +19,16 @@
 
 package com.google.code.play;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.List;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.MojoFailureException;
 
 import org.apache.tools.ant.BuildLogger;
 import org.apache.tools.ant.NoBannerLogger;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.ProjectHelper;
 import org.apache.tools.ant.taskdefs.Java;
-import org.apache.tools.ant.types.Environment;
-import org.apache.tools.ant.types.Path;
-
-import org.codehaus.plexus.util.FileUtils;
 
 /**
  * Base class for mojos using Ant Java task.
@@ -46,27 +39,34 @@ public abstract class AbstractAntJavaBasedPlayMojo
 
     /**
      * List of artifacts this plugin depends on. Used for resolving the Findbugs coreplugin.
-     *
+     * 
      * @parameter expression="${plugin.artifacts}"
      * @required
      * @readonly
      */
     private List<Artifact> pluginArtifacts;
 
-    protected Artifact getPluginArtifact(String groupId, String artifactId) throws MojoExecutionException {
+    protected Artifact getPluginArtifact( String groupId, String artifactId )
+        throws MojoExecutionException
+    {
         Artifact result = null;
-        for (Artifact artifact: pluginArtifacts) {
-            if (artifact.getGroupId().equals(groupId) && artifact.getArtifactId().equals( artifactId )) {
+        for ( Artifact artifact : pluginArtifacts )
+        {
+            if ( artifact.getGroupId().equals( groupId ) && artifact.getArtifactId().equals( artifactId ) )
+            {
                 result = artifact;
                 break;
             }
         }
-        if (result == null) {
-            throw new MojoExecutionException( String.format("Unable to locate '%s:%s' in the list of plugin artifacts", groupId, artifactId ));
+        if ( result == null )
+        {
+            throw new MojoExecutionException(
+                                              String.format( "Unable to locate '%s:%s' in the list of plugin artifacts",
+                                                             groupId, artifactId ) );
         }
         return result;
     }
-    
+
     protected static class JavaRunnable
         implements Runnable
     {
@@ -105,20 +105,21 @@ public abstract class AbstractAntJavaBasedPlayMojo
         }
     }
 
-    protected Project createProject() {
+    protected Project createProject()
+    {
         final Project project = new Project();
 
         final ProjectHelper helper = ProjectHelper.getProjectHelper();
-        project.addReference(ProjectHelper.PROJECTHELPER_REFERENCE, helper);
-        helper.getImportStack().addElement("AntBuilder"); // import checks that stack is not empty 
+        project.addReference( ProjectHelper.PROJECTHELPER_REFERENCE, helper );
+        helper.getImportStack().addElement( "AntBuilder" ); // import checks that stack is not empty
 
         final BuildLogger logger = new NoBannerLogger();
 
-        logger.setMessageOutputLevel(org.apache.tools.ant.Project.MSG_INFO);
-        logger.setOutputPrintStream(System.out);
-        logger.setErrorPrintStream(System.err);
+        logger.setMessageOutputLevel( org.apache.tools.ant.Project.MSG_INFO );
+        logger.setOutputPrintStream( System.out );
+        logger.setErrorPrintStream( System.err );
 
-        project.addBuildListener(logger);
+        project.addBuildListener( logger );
 
         project.init();
         project.getBaseDir();

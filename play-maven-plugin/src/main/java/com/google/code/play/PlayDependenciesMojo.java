@@ -96,12 +96,12 @@ public class PlayDependenciesMojo
     protected void internalExecute()
         throws MojoExecutionException, MojoFailureException, IOException
     {
-        if (dependenciesSkip)
+        if ( dependenciesSkip )
         {
             getLog().info( "Dependencies extraction skipped" );
             return;
         }
-        
+
         try
         {
             if ( dependenciesClean )
@@ -139,7 +139,7 @@ public class PlayDependenciesMojo
         Map<Artifact, File> moduleTypeArtifacts = decompressModuleDependencies( moduleArtifacts );
         return moduleTypeArtifacts;
     }
-    
+
     private Map<Artifact, File> decompressModuleDependencies( Map<String, Artifact> moduleArtifacts )
         throws ArchiverException, NoSuchArchiverException, IOException
     {
@@ -152,26 +152,27 @@ public class PlayDependenciesMojo
         {
             String moduleName = moduleArtifactEntry.getKey();
             Artifact moduleArtifact = moduleArtifactEntry.getValue();
-            checkPotentialReactorProblem(moduleArtifact);
+            checkPotentialReactorProblem( moduleArtifact );
 
-            //if ( !Artifact.SCOPE_PROVIDED.equals( moduleArtifact.getScope() ) )
-            //{
-                File zipFile = moduleArtifact.getFile();
-                String moduleSubDir = String.format( "%s-%s", moduleName, moduleArtifact.getVersion() );
-                File moduleDirectory = new File( modulesDirectory, moduleSubDir );
-                createModuleDirectory( moduleDirectory, dependenciesOverwrite || moduleDirectory.lastModified() < zipFile.lastModified() );
-                if ( moduleDirectory.list().length == 0 )
-                {
-                    UnArchiver zipUnArchiver = archiverManager.getUnArchiver( "zip" );
-                    zipUnArchiver.setSourceFile( zipFile );
-                    zipUnArchiver.setDestDirectory( moduleDirectory );
-                    zipUnArchiver.setOverwrite( false/* ??true */);
-                    zipUnArchiver.extract();
-                    moduleDirectory.setLastModified( System.currentTimeMillis() );
-                }
+            // if ( !Artifact.SCOPE_PROVIDED.equals( moduleArtifact.getScope() ) )
+            // {
+            File zipFile = moduleArtifact.getFile();
+            String moduleSubDir = String.format( "%s-%s", moduleName, moduleArtifact.getVersion() );
+            File moduleDirectory = new File( modulesDirectory, moduleSubDir );
+            createModuleDirectory( moduleDirectory,
+                                   dependenciesOverwrite || moduleDirectory.lastModified() < zipFile.lastModified() );
+            if ( moduleDirectory.list().length == 0 )
+            {
+                UnArchiver zipUnArchiver = archiverManager.getUnArchiver( "zip" );
+                zipUnArchiver.setSourceFile( zipFile );
+                zipUnArchiver.setDestDirectory( moduleDirectory );
+                zipUnArchiver.setOverwrite( false/* ??true */ );
+                zipUnArchiver.extract();
+                moduleDirectory.setLastModified( System.currentTimeMillis() );
+            }
 
-                result.put( moduleArtifact, moduleDirectory );
-            //}
+            result.put( moduleArtifact, moduleDirectory );
+            // }
         }
         return result;
     }
@@ -187,39 +188,39 @@ public class PlayDependenciesMojo
             Artifact artifact = (Artifact) iter.next();
             if ( "jar".equals( artifact.getType() ) )
             {
-                checkPotentialReactorProblem(artifact);
-                //if ( !Artifact.SCOPE_PROVIDED.equals( artifact.getScope() ) )
-                //{
-                    File libDir = new File( baseDir, "lib" );
-                    // System.out.println("jar: " + artifact.getGroupId() + ":" + artifact.getArtifactId());
-                    File jarFile = artifact.getFile();
-                    for ( Map.Entry<Artifact, File> moduleTypeArtifactEntry : moduleTypeArtifacts.entrySet() )
+                checkPotentialReactorProblem( artifact );
+                // if ( !Artifact.SCOPE_PROVIDED.equals( artifact.getScope() ) )
+                // {
+                File libDir = new File( baseDir, "lib" );
+                // System.out.println("jar: " + artifact.getGroupId() + ":" + artifact.getArtifactId());
+                File jarFile = artifact.getFile();
+                for ( Map.Entry<Artifact, File> moduleTypeArtifactEntry : moduleTypeArtifacts.entrySet() )
+                {
+                    Artifact moduleArtifact = moduleTypeArtifactEntry.getKey();
+                    // System.out.println("checking module: " + moduleArtifact.getGroupId() + ":" +
+                    // moduleArtifact.getArtifactId());
+                    if ( artifact.getGroupId().equals( moduleArtifact.getGroupId() )
+                        && artifact.getArtifactId().equals( moduleArtifact.getArtifactId() ) )
                     {
-                        Artifact moduleArtifact = moduleTypeArtifactEntry.getKey();
-                        // System.out.println("checking module: " + moduleArtifact.getGroupId() + ":" +
-                        // moduleArtifact.getArtifactId());
-                        if ( artifact.getGroupId().equals( moduleArtifact.getGroupId() )
-                            && artifact.getArtifactId().equals( moduleArtifact.getArtifactId() ) )
-                        {
-                            File modulePath = moduleTypeArtifactEntry.getValue();
-                            libDir = new File( modulePath, "lib" );
-                            // System.out.println("checked ok - lib is " + libDir.getCanonicalPath());
-                            break;
-                        }
+                        File modulePath = moduleTypeArtifactEntry.getValue();
+                        libDir = new File( modulePath, "lib" );
+                        // System.out.println("checked ok - lib is " + libDir.getCanonicalPath());
+                        break;
                     }
-                    // System.out.println("jar: " + artifact.getGroupId() + ":" + artifact.getArtifactId() +
-                    // " added to " +
-                    // libDir);
-                    createLibDirectory( libDir );
-                    if ( dependenciesOverwrite )
-                    {
-                        FileUtils.copyFileToDirectory( jarFile, libDir );
-                    }
-                    else
-                    {
-                        FileUtils.copyFileToDirectoryIfModified( jarFile, libDir );
-                    }
-                //}
+                }
+                // System.out.println("jar: " + artifact.getGroupId() + ":" + artifact.getArtifactId() +
+                // " added to " +
+                // libDir);
+                createLibDirectory( libDir );
+                if ( dependenciesOverwrite )
+                {
+                    FileUtils.copyFileToDirectory( jarFile, libDir );
+                }
+                else
+                {
+                    FileUtils.copyFileToDirectoryIfModified( jarFile, libDir );
+                }
+                // }
             }
         }
     }
@@ -244,40 +245,8 @@ public class PlayDependenciesMojo
         }
     }
 
-/* moved to AbstractPlayMojo
-    private void createModuleDirectory( File moduleDirectory )
-        throws IOException
-    {
-        if ( moduleDirectory.exists() )
-        {
-            if ( moduleDirectory.isDirectory() )
-            {
-                if ( dependenciesOverwrite )
-                {
-                    FileUtils.cleanDirectory( moduleDirectory );
-                }
-            }
-            else // file if ( moduleDirectory.isFile() )
-            {
-                getLog().info( String.format( "Deleting \"%s\" file", moduleDirectory ) );// TODO-more descriptive message
-                if ( !moduleDirectory.delete() )
-                {
-                    throw new IOException( String.format( "Cannot delete \"%s\" file", moduleDirectory.getCanonicalPath() ) );
-                }
-            }
-        }
-
-        if ( !moduleDirectory.exists() )
-        {
-            if ( !moduleDirectory.mkdirs() )
-            {
-                throw new IOException( String.format( "Cannot create \"%s\" directory", moduleDirectory.getCanonicalPath() ) );
-            }
-        }
-    }
-*/
-    
-    private void checkPotentialReactorProblem(Artifact artifact) throws ArchiverException
+    private void checkPotentialReactorProblem( Artifact artifact )
+        throws ArchiverException
     {
         File artifactFile = artifact.getFile();
         if ( artifactFile.isDirectory() )

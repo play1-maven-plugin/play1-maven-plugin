@@ -90,7 +90,7 @@ public class PlayZipMojo
             File destFile = new File( zipOutputDirectory, zipName + ".zip" );
 
             Archiver zipArchiver = archiverManager.getArchiver( "zip" );
-            zipArchiver.setDuplicateBehavior( Archiver.DUPLICATES_FAIL );// Just in case
+            zipArchiver.setDuplicateBehavior( Archiver.DUPLICATES_FAIL ); // Just in case
             zipArchiver.setDestFile( destFile );
 
             getLog().debug( "Zip includes: " + zipIncludes );
@@ -129,8 +129,7 @@ public class PlayZipMojo
             Artifact artifact = (Artifact) iter.next();
             if ( "zip".equals( artifact.getType() ) )
             {
-                if ( "module".equals( artifact.getClassifier() )
-                    || "module-min".equals( artifact.getClassifier() ) )
+                if ( "module".equals( artifact.getClassifier() ) || "module-min".equals( artifact.getClassifier() ) )
                 {
                     processZipDependency( artifact, archiver, moduleTypeArtifacts );
                 }

@@ -48,17 +48,17 @@ public class PlayWarMojo
     extends AbstractPlayMojo
 {
 
-//    private final static String[] libIncludes = new String[] { "*.jar" };
+    // private final static String[] libIncludes = new String[] { "*.jar" };
 
-//    private final static String[] libExcludes = new String[] { "provided-*.jar" };
+    // private final static String[] libExcludes = new String[] { "provided-*.jar" };
 
-    private final static String[] confIncludes =
+    private static final String[] confIncludes =
         new String[] { "application.conf", "messages", "messages.*", "routes" };
 
     // private final static String[] confIncludes = new String[]{"messages", "messages.*", "routes"};
 
-//    private final static String[] moduleExcludes = new String[] { "dist/**", "documentation/**", "lib/**",
-//        "nbproject/**", "samples-and-tests/**", "src/**", "build.xml", "commands.py" };
+    // private final static String[] moduleExcludes = new String[] { "dist/**", "documentation/**", "lib/**",
+    // "nbproject/**", "samples-and-tests/**", "src/**", "build.xml", "commands.py" };
 
     /**
      * Play! id (profile) used for WAR packaging.
@@ -130,28 +130,30 @@ public class PlayWarMojo
     protected void internalExecute()
         throws MojoExecutionException, MojoFailureException, IOException
     {
-        if (warSkip)
+        if ( warSkip )
         {
             getLog().info( "War generation skipped" );
             return;
         }
-        
+
         try
         {
             File playHome = getPlayHome();
-            
+
             File baseDir = project.getBasedir();
-            
+
             File precompiledDir = new File( baseDir, "precompiled" );
             if ( !precompiledDir.exists() )
             {
-                throw new MojoExecutionException( String.format( "\"precompiled\" directory %s does not exist", precompiledDir.getCanonicalPath() ) );
+                throw new MojoExecutionException( String.format( "\"precompiled\" directory %s does not exist",
+                                                                 precompiledDir.getCanonicalPath() ) );
             }
             if ( !precompiledDir.isDirectory() )
             {
-                throw new MojoExecutionException( String.format( "\"precompiled\" directory %s is not a directory", precompiledDir.getCanonicalPath() ) );
+                throw new MojoExecutionException( String.format( "\"precompiled\" directory %s is not a directory",
+                                                                 precompiledDir.getCanonicalPath() ) );
             }
-            
+
             File buildDirectory = new File( project.getBuild().getDirectory() );
 
             File destFile = new File( warOutputDirectory, getDestinationFileName() );
@@ -161,8 +163,8 @@ public class PlayWarMojo
             ConfigurationParser configParser = new ConfigurationParser( configurationFile, playWarId );
             configParser.parse();
 
-            WarArchiver warArchiver = (WarArchiver)archiverManager.getArchiver( "war" );
-            warArchiver.setDuplicateBehavior( Archiver.DUPLICATES_FAIL );// Just in case
+            WarArchiver warArchiver = (WarArchiver) archiverManager.getArchiver( "war" );
+            warArchiver.setDuplicateBehavior( Archiver.DUPLICATES_FAIL ); // Just in case
             warArchiver.setDestFile( destFile );
 
             // APPLICATION
@@ -180,13 +182,13 @@ public class PlayWarMojo
             File filteredWebXmlFile = new File( tmpDirectory, "filtered-web.xml" );
             warArchiver.setWebxml( filteredWebXmlFile );
 
-            //framework
+            // framework
             Artifact frameworkArtifact = findFrameworkArtifact( true );
             File frameworkZipFile = frameworkArtifact.getFile();
             warArchiver.addArchivedFileSet( frameworkZipFile, "WEB-INF/",
                                             "framework/templates/**,resources/messages".split( "," ), null );
 
-            //modules
+            // modules
             Map<String, Artifact> moduleArtifacts = findAllModuleArtifacts( false );
             for ( Map.Entry<String, Artifact> moduleArtifactEntry : moduleArtifacts.entrySet() )
             {
@@ -198,7 +200,7 @@ public class PlayWarMojo
                     String.format( "WEB-INF/application/modules/%s-%s/", moduleName, moduleArtifact.getVersion() );
                 if ( Artifact.SCOPE_PROVIDED.equals( moduleArtifact.getScope() ) )
                 {
-                    moduleSubDir = String.format( "WEB-INF/modules/%s/", moduleName/* , moduleArtifact.getVersion() */);
+                    moduleSubDir = String.format( "WEB-INF/modules/%s/", moduleName/* , moduleArtifact.getVersion() */ );
                 }
                 warArchiver.addArchivedFileSet( moduleZipFile, moduleSubDir );
             }

@@ -21,7 +21,9 @@ package com.google.code.play;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -170,11 +172,15 @@ public class PlayUberZipMojo
                 zipArchiver.addArchivedFileSet( moduleZipFile, moduleSubDir );
             }
 
+            Collection<Artifact> excludedArtifacts =
+                getDependencyArtifacts( (List<Artifact>) project.getTestArtifacts(),
+                                        "com.google.code.maven-play-plugin", "play-selenium-junit4" );
             Set<?> artifacts = project.getArtifacts();
             for ( Iterator<?> iter = artifacts.iterator(); iter.hasNext(); )
             {
                 Artifact artifact = (Artifact) iter.next();
-                if ( "jar".equals( artifact.getType() ) )
+                if ( artifact.getArtifactHandler().isAddedToClasspath() && !excludedArtifacts.contains( artifact ) )
+                //if ( "jar".equals( artifact.getType() ) )
                 {
                     File jarFile = artifact.getFile();
                     String destinationFileName = "application/lib/" + jarFile.getName();

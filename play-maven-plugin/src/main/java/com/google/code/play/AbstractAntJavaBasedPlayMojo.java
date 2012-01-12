@@ -112,18 +112,60 @@ public abstract class AbstractAntJavaBasedPlayMojo
         return project;
     }
     
+    protected Collection<Artifact> getExcludedArtifacts( Set<?> classPathArtifacts, String playId )
+        throws IOException
+    {
+        List<Artifact> result = new ArrayList<Artifact>();
+
+        // Get "application.conf" modules active in "playId" profile
+        Collection<String> providedModuleNames = getProvidedModuleNames(playId);
+
+        Map<String, Artifact> moduleArtifacts = findAllModuleArtifacts( true );
+
+        for ( Iterator<?> iter = classPathArtifacts.iterator(); iter.hasNext(); )
+        {
+            Artifact artifact = (Artifact) iter.next();
+            if ( Artifact.SCOPE_PROVIDED.equals( artifact.getScope() ) )
+            {
+                for ( Map.Entry<String, Artifact> moduleArtifactEntry : moduleArtifacts.entrySet() )
+                {
+                    Artifact moduleArtifact = moduleArtifactEntry.getValue();
+                    if ( Artifact.SCOPE_PROVIDED.equals( moduleArtifact.getScope() ) )
+                    {
+                        if ( artifact.getGroupId().equals( moduleArtifact.getGroupId() )
+                            && artifact.getArtifactId().equals( moduleArtifact.getArtifactId() ) )
+                        {
+                            String moduleName = moduleArtifactEntry.getKey();
+                            if ( !providedModuleNames.contains( moduleName ) )
+                            {
+                                result.add( artifact );
+                            }
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        return result;
+    }
+    
     protected Path getProjectClassPath( Project antProject, String playId )
         throws MojoExecutionException, IOException
     {
         Path classPath = new Path( antProject );
 
         Set<?> classPathArtifacts = project.getArtifacts();
+        Collection<Artifact> excludedArtifacts = getExcludedArtifacts( classPathArtifacts, playId );
         for ( Iterator<?> iter = classPathArtifacts.iterator(); iter.hasNext(); )
         {
             Artifact artifact = (Artifact) iter.next();
-            getLog().debug( String.format( "CP: %s:%s:%s (%s)", artifact.getGroupId(), artifact.getArtifactId(),
-                                           artifact.getType(), artifact.getScope() ) );
-            classPath.createPathElement().setLocation( artifact.getFile() );
+            if (!excludedArtifacts.contains( artifact ))
+            {
+                getLog().debug( String.format( "CP: %s:%s:%s (%s)", artifact.getGroupId(),
+                                               artifact.getArtifactId(), artifact.getType(), artifact.getScope() ) );
+                classPath.createPathElement().setLocation( artifact.getFile() );
+            }
         }
         classPath.createPathElement().setLocation( getPluginArtifact( "com.google.code.maven-play-plugin",
                                                                       "play-server-booter", "jar" ).getFile() );

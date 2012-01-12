@@ -19,10 +19,13 @@
 
 package com.google.code.play;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.maven.artifact.Artifact;
@@ -205,6 +208,56 @@ public abstract class AbstractDependencyProcessingPlayMojo
                 dependencyTreeBuilder.buildDependencyTree( project, localRepository, artifactFactory,
                                                            artifactMetadataSource, null, artifactCollector );
         }
+    }
+    
+    protected Set<String> getProvidedModuleNames(String playId) throws IOException
+    {
+        File baseDir = project.getBasedir();
+        File confDir = new File( baseDir, "conf" );
+        File configurationFile = new File( confDir, "application.conf" );
+
+        ConfigurationParser configParser = new ConfigurationParser( configurationFile, playId );
+        configParser.parse();
+        return getProvidedModuleNames(configParser, playId, false);
+    }
+
+    protected Set<String> getProvidedModuleNames(ConfigurationParser configParser, String playId, boolean forceProdMode) throws IOException
+    {
+        Map<String, String> modulePaths = configParser.getModules();
+
+        Set<String> moduleNames = new HashSet<String>();
+        for ( String moduleName : modulePaths.keySet() )
+        {
+            moduleNames.add( moduleName );
+            // getLog().debug( String.format( "Module: %s", moduleName ) );
+        }
+        //TODO-LATER
+        //String modeStr = configParser.getProperty( "application.mode" );
+        ////TODO-validate
+        //if (!forceProdMode && !modeStr.equalsIgnoreCase( "prod" ))
+        //{
+        //    moduleNames.add( "docviewer" );//TODO-add only in dev mode
+        //}
+        if ( !forceProdMode )
+        {
+            moduleNames.add( "docviewer" );
+        }
+        if ( isTestProfile( playId ) )
+        {
+            moduleNames.add( "testrunner" );
+        }
+
+        return moduleNames;
+    }
+    
+    private boolean isTestProfile( String playId )
+    {
+        boolean result = false;
+        if ( playId != null )
+        {
+            result = "test".equals( playId ) || playId.startsWith( "test-" );
+        }
+        return result;
     }
     
 }

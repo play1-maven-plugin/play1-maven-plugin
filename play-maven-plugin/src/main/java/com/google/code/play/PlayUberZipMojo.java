@@ -139,6 +139,12 @@ public class PlayUberZipMojo
             File baseDir = project.getBasedir();
             File destFile = new File( uberzipOutputDirectory, getDestinationFileName() );
 
+            File confDir = new File( baseDir, "conf" );
+            File configurationFile = new File( confDir, "application.conf" );
+            ConfigurationParser configParser = new ConfigurationParser( configurationFile, playId );
+            configParser.parse();
+            Set<String> providedModuleNames = getProvidedModuleNames(configParser, playId, false);
+
             Archiver zipArchiver = archiverManager.getArchiver( "zip" );
             zipArchiver.setDuplicateBehavior( Archiver.DUPLICATES_FAIL ); // Just in case
             zipArchiver.setDestFile( destFile );
@@ -201,6 +207,7 @@ public class PlayUberZipMojo
             }
 
             // modules/*/lib and application/modules/*/lib
+            Set<Artifact> notActiveProvidedModules = new HashSet<Artifact>();
             Map<String, Artifact> moduleArtifacts = findAllModuleArtifacts( false );
             for ( Map.Entry<String, Artifact> moduleArtifactEntry : moduleArtifacts.entrySet() )
             {
@@ -210,6 +217,8 @@ public class PlayUberZipMojo
                 File moduleZipFile = moduleZipArtifact.getFile();
                 if ( Artifact.SCOPE_PROVIDED.equals( moduleZipArtifact.getScope() ) )
                 {
+                    if ( providedModuleNames.contains( moduleName ) )
+                    {
                         String moduleSubDir =
                             String.format( "modules/%s/", moduleName/* , moduleArtifact.getVersion() */);
                         zipArchiver.addArchivedFileSet( moduleZipFile, moduleSubDir );
@@ -222,6 +231,11 @@ public class PlayUberZipMojo
                             zipArchiver.addFile( jarFile, destinationFileName );
                             filteredArtifacts.remove( classPathArtifact );
                         }
+                    }
+                    else
+                    {
+                        notActiveProvidedModules.add( moduleZipArtifact );
+                    }
                 }
                 else
                 {
@@ -239,6 +253,12 @@ public class PlayUberZipMojo
                         filteredArtifacts.remove( classPathArtifact );
                     }
                 }
+            }
+
+            for ( Artifact moduleZipArtifact : notActiveProvidedModules )
+            {
+                dependencySubtree = getModuleDependencyArtifacts( filteredArtifacts, moduleZipArtifact );
+                filteredArtifacts.removeAll( dependencySubtree );
             }
 
             // application/lib

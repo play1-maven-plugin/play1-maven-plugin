@@ -164,6 +164,7 @@ public class PlayWarMojo
             File configurationFile = new File( confDir, "application.conf" );
             ConfigurationParser configParser = new ConfigurationParser( configurationFile, playWarId );
             configParser.parse();
+            Set<String> providedModuleNames = getProvidedModuleNames(configParser, playWarId, true);
 
             WarArchiver warArchiver = (WarArchiver) archiverManager.getArchiver( "war" );
             warArchiver.setDuplicateBehavior( Archiver.DUPLICATES_FAIL ); // Just in case
@@ -226,6 +227,7 @@ public class PlayWarMojo
             }
 
             // modules
+            Set<Artifact> notActiveProvidedModules = new HashSet<Artifact>();
             Map<String, Artifact> moduleArtifacts = findAllModuleArtifacts( false );
             for ( Map.Entry<String, Artifact> moduleArtifactEntry : moduleArtifacts.entrySet() )
             {
@@ -237,6 +239,8 @@ public class PlayWarMojo
                     String.format( "WEB-INF/application/modules/%s-%s/", moduleName, moduleZipArtifact.getVersion() );
                 if ( Artifact.SCOPE_PROVIDED.equals( moduleZipArtifact.getScope() ) )
                 {
+                    if ( providedModuleNames.contains( moduleName ) )
+                    {
                         moduleSubDir =
                             String.format( "WEB-INF/modules/%s/", moduleName/* , moduleArtifact.getVersion() */);
                         warArchiver.addArchivedFileSet( moduleZipFile, moduleSubDir );
@@ -247,6 +251,11 @@ public class PlayWarMojo
                             warArchiver.addLib( jarFile );
                             filteredArtifacts.remove( classPathArtifact );
                         }
+                    }
+                    else
+                    {
+                        notActiveProvidedModules.add( moduleZipArtifact );
+                    }
                 }
                 else
                 {
@@ -259,6 +268,12 @@ public class PlayWarMojo
                         filteredArtifacts.remove( classPathArtifact );
                     }
                 }
+            }
+
+            for ( Artifact moduleZipArtifact : notActiveProvidedModules )
+            {
+                dependencySubtree = getModuleDependencyArtifacts( filteredArtifacts, moduleZipArtifact );
+                filteredArtifacts.removeAll( dependencySubtree );
             }
 
             // lib

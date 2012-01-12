@@ -23,14 +23,15 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.shared.dependency.tree.DependencyTreeBuilderException;
 
 import org.codehaus.plexus.archiver.ArchiverException;
 import org.codehaus.plexus.archiver.UnArchiver;
@@ -49,7 +50,7 @@ import org.codehaus.plexus.util.FileUtils;
  * @requiresDependencyResolution test
  */
 public class PlayDependenciesMojo
-    extends AbstractPlayMojo
+    extends AbstractDependencyProcessingPlayMojo
 {
 
     /**
@@ -119,9 +120,15 @@ public class PlayDependenciesMojo
             Map<Artifact, File> moduleTypeArtifacts = processModuleDependencies();
             if ( !dependenciesSkipJars )
             {
-                Collection<Artifact> excludedArtifacts =
-                    getDependencyArtifacts( (List<Artifact>) project.getTestArtifacts(),
-                                            "com.google.code.maven-play-plugin", "play-selenium-junit4" );
+                Set<?> projectArtifacts = project.getArtifacts();
+                Set<Artifact> excludedArtifacts = new HashSet<Artifact>();
+                Artifact playSeleniumJunit4Artifact =
+                                getDependencyArtifact( projectArtifacts, "com.google.code.maven-play-plugin",
+                                                        "play-selenium-junit4", "jar" );
+                if (playSeleniumJunit4Artifact != null)
+                {
+                    excludedArtifacts.addAll( getDependencyArtifacts( projectArtifacts, playSeleniumJunit4Artifact ) );
+                }
                 processJarDependencies( moduleTypeArtifacts, excludedArtifacts );
             }
         }
@@ -129,6 +136,10 @@ public class PlayDependenciesMojo
         {
             // throw new MojoExecutionException( "Error unpacking file [" + file.getAbsolutePath() + "]" + "to ["
             // + unpackDirectory.getAbsolutePath() + "]", e );
+            throw new MojoExecutionException( "?", e );
+        }
+        catch ( DependencyTreeBuilderException e )
+        {
             throw new MojoExecutionException( "?", e );
         }
         catch ( NoSuchArchiverException e )
@@ -183,49 +194,69 @@ public class PlayDependenciesMojo
     }
 
     private void processJarDependencies( Map<Artifact, File> moduleTypeArtifacts, Collection<Artifact> excludedArtifacts )
-        throws ArchiverException, NoSuchArchiverException, IOException
+        throws ArchiverException, NoSuchArchiverException, IOException, DependencyTreeBuilderException
     {
         File baseDir = project.getBasedir();
-        Set<?> artifacts = project.getArtifacts();
-
-        for ( Iterator<?> iter = artifacts.iterator(); iter.hasNext(); )
+        Set<?> projectArtifacts = project.getArtifacts();
+        Set<Artifact> filteredArtifacts = new HashSet<Artifact>();
+        for ( Iterator<?> iter = projectArtifacts.iterator(); iter.hasNext(); )
         {
             Artifact artifact = (Artifact) iter.next();
-            if ( artifact.getArtifactHandler().isAddedToClasspath() && !excludedArtifacts.contains( artifact ) )
-            //if ( "jar".equals( artifact.getType() ) )
+            if ( artifact.getArtifactHandler().isAddedToClasspath()
+                && !Artifact.SCOPE_PROVIDED.equals( artifact.getScope() ) && !excludedArtifacts.contains( artifact ) )
             {
                 checkPotentialReactorProblem( artifact );
-                if ( !Artifact.SCOPE_PROVIDED.equals( artifact.getScope() ) )
+                filteredArtifacts.add( artifact );
+            }
+        }
+
+        // modules/*/lib
+        for ( Map.Entry<Artifact, File> moduleTypeArtifactEntry : moduleTypeArtifacts.entrySet() )
+        {
+            Artifact moduleZipArtifact = moduleTypeArtifactEntry.getKey();
+            Set<Artifact> dependencySubtree = getModuleDependencyArtifacts( filteredArtifacts, moduleZipArtifact );
+            if ( !dependencySubtree.isEmpty() )
+            {
+                File modulePath = moduleTypeArtifactEntry.getValue();
+                File moduleLibDir = new File( modulePath, "lib" );
+                createLibDirectory( moduleLibDir );
+                for (Artifact classPathArtifact: dependencySubtree)
                 {
-                    File libDir = new File( baseDir, "lib" );
-                    // System.out.println("jar: " + artifact.getGroupId() + ":" + artifact.getArtifactId());
-                    File jarFile = artifact.getFile();
-                    for ( Map.Entry<Artifact, File> moduleTypeArtifactEntry : moduleTypeArtifacts.entrySet() )
-                    {
-                        Artifact moduleArtifact = moduleTypeArtifactEntry.getKey();
-                        // System.out.println("checking module: " + moduleArtifact.getGroupId() + ":" +
-                        // moduleArtifact.getArtifactId());
-                        if ( artifact.getGroupId().equals( moduleArtifact.getGroupId() )
-                            && artifact.getArtifactId().equals( moduleArtifact.getArtifactId() ) )
-                        {
-                            File modulePath = moduleTypeArtifactEntry.getValue();
-                            libDir = new File( modulePath, "lib" );
-                            // System.out.println("checked ok - lib is " + libDir.getCanonicalPath());
-                            break;
-                        }
-                    }
-                    // System.out.println("jar: " + artifact.getGroupId() + ":" + artifact.getArtifactId() +
-                    // " added to " +
-                    // libDir);
-                    createLibDirectory( libDir );
+                    File jarFile = classPathArtifact.getFile();
                     if ( dependenciesOverwrite )
                     {
-                        FileUtils.copyFileToDirectory( jarFile, libDir );
+                        FileUtils.copyFileToDirectory( jarFile, moduleLibDir );
                     }
                     else
                     {
-                        FileUtils.copyFileToDirectoryIfModified( jarFile, libDir );
+                        if ( jarFile == null )
+                        {
+                            getLog().info( "null file" );// TODO-???
+                        }
+                        // getLog().info(a.getGroupId()+":"+a.getArtifactId()+":"+a.getType()+":"+jarFile.getAbsolutePath());
+                        FileUtils.copyFileToDirectoryIfModified( jarFile, moduleLibDir );
                     }
+                    filteredArtifacts.remove( classPathArtifact );
+                }
+            }
+        }
+        
+        // lib
+        if ( !filteredArtifacts.isEmpty() )
+        {
+            File libDir = new File( baseDir, "lib" );
+            createLibDirectory( libDir );
+            for ( Iterator<?> iter = filteredArtifacts.iterator(); iter.hasNext(); )
+            {
+                Artifact classPathArtifact = (Artifact) iter.next();
+                File jarFile = classPathArtifact.getFile();
+                if ( dependenciesOverwrite )
+                {
+                    FileUtils.copyFileToDirectory( jarFile, libDir );
+                }
+                else
+                {
+                    FileUtils.copyFileToDirectoryIfModified( jarFile, libDir );
                 }
             }
         }

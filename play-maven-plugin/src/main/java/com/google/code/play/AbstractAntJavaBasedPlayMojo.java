@@ -19,7 +19,13 @@
 
 package com.google.code.play;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -29,12 +35,13 @@ import org.apache.tools.ant.NoBannerLogger;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.ProjectHelper;
 import org.apache.tools.ant.taskdefs.Java;
+import org.apache.tools.ant.types.Path;
 
 /**
  * Base class for mojos using Ant Java task.
  */
 public abstract class AbstractAntJavaBasedPlayMojo
-    extends AbstractPlayMojo
+    extends AbstractDependencyProcessingPlayMojo
 {
 
     /**
@@ -45,27 +52,6 @@ public abstract class AbstractAntJavaBasedPlayMojo
      * @readonly
      */
     private List<Artifact> pluginArtifacts;
-
-    protected Artifact getPluginArtifact( String groupId, String artifactId )
-        throws MojoExecutionException
-    {
-        Artifact result = null;
-        for ( Artifact artifact : pluginArtifacts )
-        {
-            if ( artifact.getGroupId().equals( groupId ) && artifact.getArtifactId().equals( artifactId ) )
-            {
-                result = artifact;
-                break;
-            }
-        }
-        if ( result == null )
-        {
-            throw new MojoExecutionException(
-                                              String.format( "Unable to locate '%s:%s' in the list of plugin artifacts",
-                                                             groupId, artifactId ) );
-        }
-        return result;
-    }
 
     protected static class JavaRunnable
         implements Runnable
@@ -125,4 +111,45 @@ public abstract class AbstractAntJavaBasedPlayMojo
         project.getBaseDir();
         return project;
     }
+    
+    protected Path getProjectClassPath( Project antProject, String playId )
+        throws MojoExecutionException, IOException
+    {
+        Path classPath = new Path( antProject );
+
+        Set<?> classPathArtifacts = project.getArtifacts();
+        for ( Iterator<?> iter = classPathArtifacts.iterator(); iter.hasNext(); )
+        {
+            Artifact artifact = (Artifact) iter.next();
+            getLog().debug( String.format( "CP: %s:%s:%s (%s)", artifact.getGroupId(), artifact.getArtifactId(),
+                                           artifact.getType(), artifact.getScope() ) );
+            classPath.createPathElement().setLocation( artifact.getFile() );
+        }
+        classPath.createPathElement().setLocation( getPluginArtifact( "com.google.code.maven-play-plugin",
+                                                                      "play-server-booter", "jar" ).getFile() );
+        return classPath;
+    }    
+
+    private Artifact getPluginArtifact( String groupId, String artifactId, String type )
+        throws MojoExecutionException
+    {
+        Artifact result = null;
+        for ( Artifact artifact : pluginArtifacts )
+        {
+            if ( artifact.getGroupId().equals( groupId ) && artifact.getArtifactId().equals( artifactId )
+                && type.equals( artifact.getType() ) )
+            {
+                result = artifact;
+                break;
+            }
+        }
+        if ( result == null )
+        {
+            throw new MojoExecutionException(
+                                              String.format( "Unable to locate '%s:%s' in the list of plugin artifacts",
+                                                             groupId, artifactId ) );
+        }
+        return result;
+    }
+
 }

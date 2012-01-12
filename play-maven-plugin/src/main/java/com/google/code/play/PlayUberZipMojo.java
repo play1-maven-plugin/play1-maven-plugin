@@ -21,15 +21,15 @@ package com.google.code.play;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.shared.dependency.tree.DependencyTreeBuilderException;
 
 import org.codehaus.plexus.archiver.Archiver;
 import org.codehaus.plexus.archiver.ArchiverException;
@@ -45,7 +45,7 @@ import org.codehaus.plexus.archiver.manager.NoSuchArchiverException;
  * @requiresDependencyResolution test
  */
 public class PlayUberZipMojo
-    extends AbstractPlayMojo
+    extends AbstractDependencyProcessingPlayMojo
 {
 
     // private final static String[] libIncludes = new String[]{"*.jar"};
@@ -150,75 +150,113 @@ public class PlayUberZipMojo
             String[] excludes = ( uberzipExcludes != null ? uberzipExcludes.split( "," ) : null );
             zipArchiver.addDirectory( baseDir, "application/", includes, excludes );
 
-            // framework
-            Artifact frameworkArtifact = findFrameworkArtifact( false );
-            File frameworkZipFile = frameworkArtifact.getFile();
-            zipArchiver.addArchivedFileSet( frameworkZipFile );
+            // preparation
+            Set<?> projectArtifacts = project.getArtifacts();
 
-            // modules
+            Set<Artifact> excludedArtifacts = new HashSet<Artifact>();
+            Artifact playSeleniumJunit4Artifact =
+                            getDependencyArtifact( projectArtifacts, "com.google.code.maven-play-plugin",
+                                                    "play-selenium-junit4", "jar" );
+            if (playSeleniumJunit4Artifact != null)
+            {
+                excludedArtifacts.addAll( getDependencyArtifacts( projectArtifacts, playSeleniumJunit4Artifact ) );
+            }
+
+            Set<Artifact> filteredArtifacts = new HashSet<Artifact>();//TODO-rename to filteredClassPathArtifacts
+            for ( Iterator<?> iter = projectArtifacts.iterator(); iter.hasNext(); )
+            {
+                Artifact artifact = (Artifact) iter.next();
+                if ( artifact.getArtifactHandler().isAddedToClasspath() && !excludedArtifacts.contains( artifact ) )
+                {
+                    //TODO-add checkPotentialReactorProblem( artifact );
+                    filteredArtifacts.add( artifact );
+                }
+            }
+
+            // framework
+            Artifact frameworkZipArtifact = findFrameworkArtifact( false );
+            File frameworkZipFile = frameworkZipArtifact.getFile();
+            zipArchiver.addArchivedFileSet( frameworkZipFile );
+            Artifact frameworkJarArtifact =
+                            getDependencyArtifact( filteredArtifacts/* ?? */, frameworkZipArtifact.getGroupId(),
+                                                   frameworkZipArtifact.getArtifactId(), "jar" );
+            //TODO-validate not null
+            File frameworkJarFile = frameworkJarArtifact.getFile();
+            String frameworkDestinationFileName = "framework/" + frameworkJarFile.getName();
+            String playVersion = frameworkJarArtifact.getVersion();
+            if ( "1.2".compareTo( playVersion ) > 0 )
+            {
+                // Play 1.1.x
+                frameworkDestinationFileName = "framework/play.jar";
+            }
+            zipArchiver.addFile( frameworkJarFile, frameworkDestinationFileName );
+            filteredArtifacts.remove( frameworkJarArtifact );
+            Set<Artifact> dependencySubtree = getDependencyArtifacts( filteredArtifacts/* ?? */, frameworkJarArtifact );
+            for (Artifact classPathArtifact: dependencySubtree)
+            {
+                File jarFile = classPathArtifact.getFile();
+                String destinationFileName = "framework/lib/" + jarFile.getName();
+                zipArchiver.addFile( jarFile, destinationFileName );
+                filteredArtifacts.remove( classPathArtifact );
+            }
+
+            // modules/*/lib and application/modules/*/lib
             Map<String, Artifact> moduleArtifacts = findAllModuleArtifacts( false );
             for ( Map.Entry<String, Artifact> moduleArtifactEntry : moduleArtifacts.entrySet() )
             {
                 String moduleName = moduleArtifactEntry.getKey();
-                Artifact moduleArtifact = moduleArtifactEntry.getValue();
+                Artifact moduleZipArtifact = moduleArtifactEntry.getValue();
 
-                File moduleZipFile = moduleArtifact.getFile();
-                String moduleSubDir =
-                    String.format( "application/modules/%s-%s/", moduleName, moduleArtifact.getVersion() );
-                if ( Artifact.SCOPE_PROVIDED.equals( moduleArtifact.getScope() ) )
+                File moduleZipFile = moduleZipArtifact.getFile();
+                if ( Artifact.SCOPE_PROVIDED.equals( moduleZipArtifact.getScope() ) )
                 {
-                    moduleSubDir = String.format( "modules/%s/", moduleName/* , moduleArtifact.getVersion() */ );
+                        String moduleSubDir =
+                            String.format( "modules/%s/", moduleName/* , moduleArtifact.getVersion() */);
+                        zipArchiver.addArchivedFileSet( moduleZipFile, moduleSubDir );
+                        dependencySubtree = getModuleDependencyArtifacts( filteredArtifacts, moduleZipArtifact );
+                        for ( Artifact classPathArtifact : dependencySubtree )
+                        {
+                            File jarFile = classPathArtifact.getFile();
+                            String destinationFileName =
+                                String.format( "modules/%s/lib/%s", moduleName, jarFile.getName() );
+                            zipArchiver.addFile( jarFile, destinationFileName );
+                            filteredArtifacts.remove( classPathArtifact );
+                        }
                 }
-                zipArchiver.addArchivedFileSet( moduleZipFile, moduleSubDir );
+                else
+                {
+                    String moduleSubDir =
+                        String.format( "application/modules/%s-%s/", moduleName, moduleZipArtifact.getVersion() );
+                    zipArchiver.addArchivedFileSet( moduleZipFile, moduleSubDir );
+                    dependencySubtree = getModuleDependencyArtifacts( filteredArtifacts, moduleZipArtifact );
+                    for ( Artifact classPathArtifact : dependencySubtree )
+                    {
+                        File jarFile = classPathArtifact.getFile();
+                        String destinationFileName =
+                            String.format( "application/modules/%s-%s/lib/%s", moduleName,
+                                           moduleZipArtifact.getVersion(), jarFile.getName() );
+                        zipArchiver.addFile( jarFile, destinationFileName );
+                        filteredArtifacts.remove( classPathArtifact );
+                    }
+                }
             }
 
-            Collection<Artifact> excludedArtifacts =
-                getDependencyArtifacts( (List<Artifact>) project.getTestArtifacts(),
-                                        "com.google.code.maven-play-plugin", "play-selenium-junit4" );
-            Set<?> artifacts = project.getArtifacts();
-            for ( Iterator<?> iter = artifacts.iterator(); iter.hasNext(); )
+            // application/lib
+            for ( Iterator<?> iter = filteredArtifacts.iterator(); iter.hasNext(); )
             {
                 Artifact artifact = (Artifact) iter.next();
-                if ( artifact.getArtifactHandler().isAddedToClasspath() && !excludedArtifacts.contains( artifact ) )
-                //if ( "jar".equals( artifact.getType() ) )
-                {
-                    File jarFile = artifact.getFile();
-                    String destinationFileName = "application/lib/" + jarFile.getName();
-                    // Play! Framework's library
-                    if ( Artifact.SCOPE_PROVIDED.equals( artifact.getScope() ) )
-                    {
-                        // check if there is module zip dependency
-                        String moduleName = artifact.getArtifactId();
-                        if ( artifact.getArtifactId().startsWith( "play-" ) )
-                        {
-                            moduleName = moduleName.substring( "play-".length() );
-                        }
-                        if ( moduleArtifacts.containsKey( moduleName ) )
-                        {
-                            destinationFileName = String.format( "modules/%s/lib/%s", moduleName, jarFile.getName() );
-                        }
-                        else
-                        {
-                            destinationFileName = "framework/lib/" + jarFile.getName();
-                            if ( "play".equals( artifact.getArtifactId() ) ) // ???
-                            {
-                                destinationFileName = "framework/" + jarFile.getName();
-                                String playVersion = artifact.getVersion();
-                                if ( "1.2".compareTo( playVersion ) > 0 )
-                                {
-                                    // Play 1.1.x
-                                    destinationFileName = "framework/play.jar";
-                                }
-                            }
-                        }
-                    }
-                    zipArchiver.addFile( jarFile, destinationFileName );
-                }
+                File jarFile = artifact.getFile();
+                String destinationFileName = "application/lib/" + jarFile.getName();
+                zipArchiver.addFile( jarFile, destinationFileName );
             }
 
             zipArchiver.createArchive();
         }
         catch ( ArchiverException e )
+        {
+            throw new MojoExecutionException( "?", e );
+        }
+        catch ( DependencyTreeBuilderException e )
         {
             throw new MojoExecutionException( "?", e );
         }

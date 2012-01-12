@@ -22,6 +22,7 @@ package com.google.code.play;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
@@ -29,6 +30,7 @@ import java.util.Set;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.shared.dependency.tree.DependencyTreeBuilderException;
 
 import org.codehaus.plexus.archiver.Archiver;
 import org.codehaus.plexus.archiver.ArchiverException;
@@ -44,7 +46,7 @@ import org.codehaus.plexus.archiver.manager.NoSuchArchiverException;
  * @requiresDependencyResolution runtime
  */
 public class PlayZipMojo
-    extends AbstractPlayMojo
+    extends AbstractDependencyProcessingPlayMojo
 {
     /**
      * Application resources include filter
@@ -112,6 +114,10 @@ public class PlayZipMojo
         {
             throw new MojoExecutionException( "?", e );
         }
+        catch ( DependencyTreeBuilderException e )
+        {
+            throw new MojoExecutionException( "?", e );
+        }
         catch ( NoSuchArchiverException e )
         {
             throw new MojoExecutionException( "?", e );
@@ -166,35 +172,48 @@ public class PlayZipMojo
     }
 
     private void processJarDependencies( Archiver archiver, Map<Artifact, String> moduleTypeArtifacts )
-        throws ArchiverException, NoSuchArchiverException, IOException
+        throws ArchiverException, NoSuchArchiverException, IOException, DependencyTreeBuilderException
     {
-        Set<?> artifacts = project.getArtifacts();
-
-        for ( Iterator<?> iter = artifacts.iterator(); iter.hasNext(); )
+        Set<?> projectArtifacts = project.getArtifacts();
+        Set<Artifact> filteredArtifacts = new HashSet<Artifact>();
+        for ( Iterator<?> iter = projectArtifacts.iterator(); iter.hasNext(); )
         {
             Artifact artifact = (Artifact) iter.next();
-            if ( "jar".equals( artifact.getType() ) )
+            if ( artifact.getArtifactHandler().isAddedToClasspath() )
             {
-                // System.out.println("jar: " + artifact.getGroupId() + ":" + artifact.getArtifactId());
-                File jarFile = artifact.getFile();
-                String libDir = "lib";
-                for ( Map.Entry<Artifact, String> moduleTypeArtifactEntry : moduleTypeArtifacts.entrySet() )
+                //TODO checkPotentialReactorProblem( artifact );
+                filteredArtifacts.add( artifact );
+            }
+        }
+
+        // modules/*/lib
+        for ( Map.Entry<Artifact, String> moduleTypeArtifactEntry : moduleTypeArtifacts.entrySet() )
+        {
+            Artifact moduleZipArtifact = moduleTypeArtifactEntry.getKey();
+            Set<Artifact> dependencySubtree = getModuleDependencyArtifacts( filteredArtifacts, moduleZipArtifact );
+            if ( !dependencySubtree.isEmpty() )
+            {
+                String moduleSubDir = moduleTypeArtifactEntry.getValue();
+                String libDir = String.format( "modules/%s/lib", moduleSubDir );
+                for (Artifact classPathArtifact: dependencySubtree)
                 {
-                    Artifact moduleArtifact = moduleTypeArtifactEntry.getKey();
-                    // System.out.println("checking module: " + moduleArtifact.getGroupId() + ":" +
-                    // moduleArtifact.getArtifactId());
-                    if ( artifact.getGroupId().equals( moduleArtifact.getGroupId() )
-                        && artifact.getArtifactId().equals( moduleArtifact.getArtifactId() ) )
-                    {
-                        String moduleSubDir = moduleTypeArtifactEntry.getValue();
-                        libDir = String.format( "modules/%s/lib", moduleSubDir );
-                        // System.out.println("checked ok - lib is " + libDir.getCanonicalPath());
-                        break;
-                    }
+                    File jarFile = classPathArtifact.getFile();
+                    archiver.addFile( jarFile, libDir + "/" + jarFile.getName() );
+                    filteredArtifacts.remove( classPathArtifact );
                 }
-                // System.out.println("jar: " + artifact.getGroupId() + ":" + artifact.getArtifactId() + " added to " +
-                // libDir);
+            }
+        }
+        
+        // lib
+        if ( !filteredArtifacts.isEmpty() )
+        {
+            String libDir = "lib";
+            for ( Iterator<?> iter = filteredArtifacts.iterator(); iter.hasNext(); )
+            {
+                Artifact classPathArtifact = (Artifact) iter.next();
+                File jarFile = classPathArtifact.getFile();
                 archiver.addFile( jarFile, libDir + "/" + jarFile.getName() );
+                filteredArtifacts.remove( classPathArtifact );
             }
         }
     }

@@ -21,9 +21,7 @@ package com.google.code.play;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
 
-import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 
@@ -77,13 +75,7 @@ public class PlayPrecompileMojo
         FileUtils.deleteDirectory( new File( baseDir, "tmp" ) );
 
         Project antProject = createProject();
-        Path classPath = new Path( antProject );
-        for ( Artifact a : (List<Artifact>) project.getTestArtifacts() )
-        {
-            classPath.createPathElement().setLocation( a.getFile() );
-        }
-        classPath.createPathElement().setLocation( getPluginArtifact( "com.google.code.maven-play-plugin",
-                                                                      "play-server-booter" ).getFile() );
+        Path classPath = getProjectClassPath( antProject, playId );
 
         Java java = new Java();
         java.setProject( antProject );

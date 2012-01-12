@@ -22,15 +22,15 @@ package com.google.code.play;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.shared.dependency.tree.DependencyTreeBuilderException;
 
 import org.codehaus.plexus.archiver.Archiver;
 import org.codehaus.plexus.archiver.ArchiverException;
@@ -47,7 +47,7 @@ import org.codehaus.plexus.archiver.war.WarArchiver;
  * @requiresDependencyResolution test
  */
 public class PlayWarMojo
-    extends AbstractPlayMojo
+    extends AbstractDependencyProcessingPlayMojo
 {
 
     // private final static String[] libIncludes = new String[] { "*.jar" };
@@ -173,6 +173,7 @@ public class PlayWarMojo
             getLog().debug( "War includes: " + warIncludes );
             getLog().debug( "War excludes: " + warExcludes );
             String[] includes = ( warIncludes != null ? warIncludes.split( "," ) : null );
+            //TODO-don't add "test/**" if profile is not test profile 
             String[] excludes = ( warExcludes != null ? warExcludes.split( "," ) : null );
             warArchiver.addDirectory( baseDir, "WEB-INF/application/", includes, excludes );
 
@@ -184,45 +185,89 @@ public class PlayWarMojo
             File filteredWebXmlFile = new File( tmpDirectory, "filtered-web.xml" );
             warArchiver.setWebxml( filteredWebXmlFile );
 
+            // preparation
+            Set<?> projectArtifacts = project.getArtifacts();
+
+            Set<Artifact> excludedArtifacts = new HashSet<Artifact>();
+            Artifact playSeleniumJunit4Artifact =
+                            getDependencyArtifact( projectArtifacts, "com.google.code.maven-play-plugin",
+                                                    "play-selenium-junit4", "jar" );
+            if (playSeleniumJunit4Artifact != null)
+            {
+                excludedArtifacts.addAll( getDependencyArtifacts( projectArtifacts, playSeleniumJunit4Artifact ) );
+            }
+
+            Set<Artifact> filteredArtifacts = new HashSet<Artifact>();
+            for ( Iterator<?> iter = projectArtifacts.iterator(); iter.hasNext(); )
+            {
+                Artifact artifact = (Artifact) iter.next();
+                if ( artifact.getArtifactHandler().isAddedToClasspath() && !excludedArtifacts.contains( artifact ) )
+                {
+                    //TODO-add checkPotentialReactorProblem( artifact );
+                    filteredArtifacts.add( artifact );
+                }
+            }
+            
             // framework
-            Artifact frameworkArtifact = findFrameworkArtifact( true );
-            File frameworkZipFile = frameworkArtifact.getFile();
+            Artifact frameworkZipArtifact = findFrameworkArtifact( true );
+            File frameworkZipFile = frameworkZipArtifact.getFile();
             warArchiver.addArchivedFileSet( frameworkZipFile, "WEB-INF/",
                                             "framework/templates/**,resources/messages".split( "," ), null );
+            Artifact frameworkJarArtifact =
+                getDependencyArtifact( filteredArtifacts, frameworkZipArtifact.getGroupId(),
+                                       frameworkZipArtifact.getArtifactId(), "jar" );
+            //TODO-validate not null
+            Set<Artifact> dependencySubtree = getDependencyArtifacts( filteredArtifacts/* ?? */, frameworkJarArtifact );
+            for (Artifact classPathArtifact: dependencySubtree)
+            {
+                File jarFile = classPathArtifact.getFile();
+                warArchiver.addLib( jarFile );
+                filteredArtifacts.remove( classPathArtifact );
+            }
 
             // modules
             Map<String, Artifact> moduleArtifacts = findAllModuleArtifacts( false );
             for ( Map.Entry<String, Artifact> moduleArtifactEntry : moduleArtifacts.entrySet() )
             {
                 String moduleName = moduleArtifactEntry.getKey();
-                Artifact moduleArtifact = moduleArtifactEntry.getValue();
+                Artifact moduleZipArtifact = moduleArtifactEntry.getValue();
 
-                File moduleZipFile = moduleArtifact.getFile();
+                File moduleZipFile = moduleZipArtifact.getFile();
                 String moduleSubDir =
-                    String.format( "WEB-INF/application/modules/%s-%s/", moduleName, moduleArtifact.getVersion() );
-                if ( Artifact.SCOPE_PROVIDED.equals( moduleArtifact.getScope() ) )
+                    String.format( "WEB-INF/application/modules/%s-%s/", moduleName, moduleZipArtifact.getVersion() );
+                if ( Artifact.SCOPE_PROVIDED.equals( moduleZipArtifact.getScope() ) )
                 {
-                    moduleSubDir = String.format( "WEB-INF/modules/%s/", moduleName/* , moduleArtifact.getVersion() */);
+                        moduleSubDir =
+                            String.format( "WEB-INF/modules/%s/", moduleName/* , moduleArtifact.getVersion() */);
+                        warArchiver.addArchivedFileSet( moduleZipFile, moduleSubDir );
+                        dependencySubtree = getModuleDependencyArtifacts( filteredArtifacts, moduleZipArtifact );
+                        for ( Artifact classPathArtifact : dependencySubtree )
+                        {
+                            File jarFile = classPathArtifact.getFile();
+                            warArchiver.addLib( jarFile );
+                            filteredArtifacts.remove( classPathArtifact );
+                        }
                 }
-                warArchiver.addArchivedFileSet( moduleZipFile, moduleSubDir );
+                else
+                {
+                    warArchiver.addArchivedFileSet( moduleZipFile, moduleSubDir );
+                    dependencySubtree = getModuleDependencyArtifacts( filteredArtifacts, moduleZipArtifact );
+                    for ( Artifact classPathArtifact : dependencySubtree )
+                    {
+                        File jarFile = classPathArtifact.getFile();
+                        warArchiver.addLib( jarFile );
+                        filteredArtifacts.remove( classPathArtifact );
+                    }
+                }
             }
 
-            Collection<Artifact> excludedArtifacts =
-                getDependencyArtifacts( (List<Artifact>) project.getTestArtifacts(),
-                                        "com.google.code.maven-play-plugin", "play-selenium-junit4" );
-            Set<?> artifacts = project.getArtifacts();
-            for ( Iterator<?> iter = artifacts.iterator(); iter.hasNext(); )
+            // lib
+            for ( Iterator<?> iter = filteredArtifacts.iterator(); iter.hasNext(); )
             {
                 Artifact artifact = (Artifact) iter.next();
-                if ( artifact.getArtifactHandler().isAddedToClasspath() && !excludedArtifacts.contains( artifact ) )
-                // if ( "jar".equals( artifact.getType() ) )
-                {
-                    // TODO-exclude test-scoped dependencies? (some of them - for sure, for example
-                    // com.google.code.maven-play-plugin:play-selenium-junit4 and it's dependencies:
-                    // net.sourceforge.nekohtml:nekohtml xerces:xercesImpl
-                    File jarFile = artifact.getFile();
-                    warArchiver.addLib( jarFile );
-                }
+                // TODO-exclude test-scoped dependencies?
+                File jarFile = artifact.getFile();
+                warArchiver.addLib( jarFile );
             }
 
             File warDir = new File( baseDir, "war" );
@@ -234,6 +279,10 @@ public class PlayWarMojo
             warArchiver.createArchive();
         }
         catch ( ArchiverException e )
+        {
+            throw new MojoExecutionException( "?", e );
+        }
+        catch ( DependencyTreeBuilderException e )
         {
             throw new MojoExecutionException( "?", e );
         }

@@ -29,27 +29,17 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.factory.ArtifactFactory;
-import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
-import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.resolver.ArtifactCollector;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.shared.dependency.tree.DependencyNode;
-import org.apache.maven.shared.dependency.tree.DependencyTreeBuilder;//test
-import org.apache.maven.shared.dependency.tree.DependencyTreeBuilderException;//test
+
 import org.codehaus.plexus.util.FileUtils;
 
 /**
@@ -69,56 +59,6 @@ public abstract class AbstractPlayMojo
      * @readonly
      */
     protected MavenProject project;
-
-    /**
-     * The artifact repository to use.
-     *
-     * @parameter expression="${localRepository}"
-     * @required
-     * @readonly
-     */
-    private ArtifactRepository localRepository;
-
-    /**
-     * The artifact factory to use.
-     *
-     * @component
-     * @required
-     * @readonly
-     */
-    private ArtifactFactory artifactFactory;
-
-    /**
-     * The artifact metadata source to use.
-     *
-     * @component
-     * @required
-     * @readonly
-     */
-    private ArtifactMetadataSource artifactMetadataSource;
-
-    /**
-     * The artifact collector to use.
-     *
-     * @component
-     * @required
-     * @readonly
-     */
-    private ArtifactCollector artifactCollector;
-
-    /**
-     * The dependency tree builder to use.
-     *
-     * @component
-     * @required
-     * @readonly
-     */
-    private DependencyTreeBuilder dependencyTreeBuilder;
-
-    /**
-     * The computed dependency tree root node of the Maven project.
-     */
-    private DependencyNode rootNode;
 
     protected abstract void internalExecute()
         throws MojoExecutionException, MojoFailureException, IOException;
@@ -459,99 +399,4 @@ public abstract class AbstractPlayMojo
         }
     }
 
-    
-
-    protected Collection<Artifact> getDependencyArtifacts( Collection<Artifact> classPathArtifacts, String groupId, String artifactId )
-                    throws MojoExecutionException
-    {
-        Collection<Artifact> result = null;
-        for (Artifact artifact: classPathArtifacts) {
-            if (groupId.equals( artifact.getGroupId() ) && artifactId.equals( artifact.getArtifactId() )) {
-                result = getDependencyArtifacts( artifact );
-                break;
-            }
-        }
-        if (result == null)
-        {
-            result = Collections.emptyList();
-        }
-        return result;
-    }
-
-    protected Collection<Artifact> getDependencyArtifacts( Artifact rootArtifact )
-        throws MojoExecutionException
-    {
-        Collection<Artifact> result = null;
-
-        buildDependencyTree();
-        DependencyNode artifactNode = findArtifactNode( rootArtifact, rootNode );
-        if ( artifactNode != null )
-        {
-            result = new ArrayList<Artifact>();
-            addDependencyArtifacts( result, artifactNode );
-        }
-        else
-        {
-            result = Collections.emptyList();
-        }
-
-        return result;
-    }
-    
-    private void addDependencyArtifacts( Collection<Artifact> collection, DependencyNode artifactNode )
-    {
-        if ( artifactNode.getState() == DependencyNode.INCLUDED )
-        {
-            if ( artifactNode.getArtifact().getArtifactHandler().isAddedToClasspath() )
-            {
-                collection.add( artifactNode.getArtifact() );
-            }
-            for ( DependencyNode childNode : (List<DependencyNode>) artifactNode.getChildren() )
-            {
-                addDependencyArtifacts( collection, childNode );
-            }
-        }
-    }
-    
-    private DependencyNode findArtifactNode(Artifact artifact, DependencyNode rootNode) {
-        DependencyNode result = null;
-        if (rootNode.getArtifact().equals( artifact ))
-        {
-            result = rootNode;
-        }
-        else
-        {
-            for (DependencyNode childNode: (List<DependencyNode>) rootNode.getChildren())
-            {
-                DependencyNode tmp = findArtifactNode( artifact, childNode );
-                if (tmp != null)
-                {
-                    result = tmp;
-                    break;
-                }
-            }
-        }
-        return result;
-    }
-
-    // copied from dependency:tree mojo (v2.4)
-    private void buildDependencyTree()
-        throws MojoExecutionException
-    {
-        if ( rootNode == null )
-        {
-            try
-            {
-                rootNode =
-                    dependencyTreeBuilder.buildDependencyTree( project, localRepository, artifactFactory,
-                                                               artifactMetadataSource, null/* artifactFilter */,
-                                                               artifactCollector );
-            }
-            catch ( DependencyTreeBuilderException exception )//TODO-dont wrap exception
-            {
-                throw new MojoExecutionException( "Cannot build project dependency tree", exception );
-            }
-        }
-    }
-    
 }

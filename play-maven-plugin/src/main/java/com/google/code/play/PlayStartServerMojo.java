@@ -135,27 +135,15 @@ public class PlayStartServerMojo
         java.setDir( baseDir );
         java.setFailonerror( true );
         java.setClasspath( classPath );
+        addSystemProperty( java, "play.home", playHome.getAbsolutePath() );
+        addSystemProperty( java, "play.id", playTestId );
+        addSystemProperty( java, "application.path", baseDir.getAbsolutePath() );
 
         // if (serverLogOutput) {
         File logFile = new File( logDirectory, "server.log" );
         getLog().info( String.format( "Redirecting output to: %s", logFile.getAbsoluteFile() ) );
         java.setOutput( logFile );
         // }
-
-        Environment.Variable sysPropPlayHome = new Environment.Variable();
-        sysPropPlayHome.setKey( "play.home" );
-        sysPropPlayHome.setValue( playHome.getAbsolutePath() );
-        java.addSysproperty( sysPropPlayHome );
-
-        Environment.Variable sysPropPlayId = new Environment.Variable();
-        sysPropPlayId.setKey( "play.id" );
-        sysPropPlayId.setValue( playTestId );
-        java.addSysproperty( sysPropPlayId );
-
-        Environment.Variable sysPropAppPath = new Environment.Variable();
-        sysPropAppPath.setKey( "application.path" );
-        sysPropAppPath.setValue( baseDir.getAbsolutePath() );
-        java.addSysproperty( sysPropAppPath );
 
         if ( serverProcessArgLine != null )
         {

@@ -35,6 +35,7 @@ import org.apache.tools.ant.NoBannerLogger;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.ProjectHelper;
 import org.apache.tools.ant.taskdefs.Java;
+import org.apache.tools.ant.types.Environment;
 import org.apache.tools.ant.types.Path;
 
 /**
@@ -112,6 +113,14 @@ public abstract class AbstractAntJavaBasedPlayMojo
         return project;
     }
     
+    protected void addSystemProperty( Java java, String propertyName, String propertyValue )
+    {
+        Environment.Variable sysPropPlayHome = new Environment.Variable();
+        sysPropPlayHome.setKey( propertyName );
+        sysPropPlayHome.setValue( propertyValue );
+        java.addSysproperty( sysPropPlayHome );
+    }
+
     protected Collection<Artifact> getExcludedArtifacts( Set<?> classPathArtifacts, String playId )
         throws IOException
     {

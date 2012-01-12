@@ -27,7 +27,6 @@ import org.apache.maven.plugin.MojoFailureException;
 
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.taskdefs.Java;
-import org.apache.tools.ant.types.Environment;
 import org.apache.tools.ant.types.Path;
 
 import org.codehaus.plexus.util.FileUtils;
@@ -82,26 +81,10 @@ public class PlayPrecompileMojo
         java.setClassname( "com.google.code.play.PlayServerBooter" );
         java.setFailonerror( true );
         java.setClasspath( classPath );
-
-        Environment.Variable sysPropPlayHome = new Environment.Variable();
-        sysPropPlayHome.setKey( "play.home" );
-        sysPropPlayHome.setValue( playHome.getAbsolutePath() );
-        java.addSysproperty( sysPropPlayHome );
-
-        Environment.Variable sysPropPlayId = new Environment.Variable();
-        sysPropPlayId.setKey( "play.id" );
-        sysPropPlayId.setValue( ( playId != null ? playId : "" ) );
-        java.addSysproperty( sysPropPlayId );
-
-        Environment.Variable sysPropAppPath = new Environment.Variable();
-        sysPropAppPath.setKey( "application.path" );
-        sysPropAppPath.setValue( baseDir.getAbsolutePath() );
-        java.addSysproperty( sysPropAppPath );
-
-        Environment.Variable sysPropPrecompile = new Environment.Variable();
-        sysPropPrecompile.setKey( "precompile" );
-        sysPropPrecompile.setValue( Boolean.toString( true ) );
-        java.addSysproperty( sysPropPrecompile );
+        addSystemProperty( java, "play.home", playHome.getAbsolutePath() );
+        addSystemProperty( java, "play.id", ( playId != null ? playId : "" ) );
+        addSystemProperty( java, "application.path", baseDir.getAbsolutePath() );
+        addSystemProperty( java, "precompile", Boolean.toString( true ) );
 
         JavaRunnable runner = new JavaRunnable( java );
         Thread t = new Thread( runner, "Play! precompilation runner" );

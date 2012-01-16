@@ -48,6 +48,13 @@ public class PlayStopMojo
         throws MojoExecutionException, MojoFailureException, IOException
     {
         File baseDir = project.getBasedir();
+        
+        File pidFile = new File( baseDir, "server.pid" );
+        if ( !pidFile.exists() )
+        {
+            getLog().warn( "\"server.pid\" file not found, trying to stop server anyway." );
+        }
+
         File confDir = new File( baseDir, "conf" );
         File configurationFile = new File( confDir, "application.conf" );
 

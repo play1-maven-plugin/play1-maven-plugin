@@ -20,6 +20,9 @@
 package com.google.code.play;
 
 import java.io.File;
+import java.io.FileWriter;
+import java.io.PrintStream;
+import java.lang.management.ManagementFactory;
 
 import play.Play;
 import play.server.Server;
@@ -30,6 +33,40 @@ public class PlayServerBooter
     public static void main( String[] args )
         throws Exception
     {
+        String pidFile = System.getProperty( "pidFile" );
+        if ( pidFile != null )
+        {
+            // http://blog.igorminar.com/2007/03/how-java-application-can-discover-its.html
+            String name = ManagementFactory.getRuntimeMXBean().getName();
+            // System.out.println(name);
+            String pidStr = "unknown";
+            int p = name.indexOf( '@' );
+            if ( p > 0 )
+            {
+                pidStr = name.substring( 0, p );
+            }
+            // System.out.println(pidStr);
+            FileWriter fw = new FileWriter( new File( pidFile ) );
+            try
+            {
+                fw.write( pidStr );
+            }
+            finally
+            {
+                fw.close();
+            }
+            System.getProperties().remove( "pidFile" );
+        }
+
+        String outFile = System.getProperty( "outFile" );
+        if ( outFile != null )
+        {
+            PrintStream out = new PrintStream( new File( "logs/system.out" ) );
+            System.setOut( out );
+            System.setErr( out );
+            System.getProperties().remove( "outFile" );
+        }
+
         Play.frameworkPath = new File( System.getProperty( "play.home" ) );
         Server.main( args );
     }

@@ -51,14 +51,6 @@ public class PlayStartMojo
      */
     protected String playId;
 
-//    /**
-//     * Enable logging mode.
-//     *
-//     * @parameter expression="${play.serverLogOutput}" default-value="true"
-//     * @since 1.0.0
-//     */
-//    private boolean serverLogOutput;
-
     /**
      * Arbitrary JVM options to set on the command line.
      * 
@@ -116,18 +108,17 @@ public class PlayStartMojo
         java.setProject( antProject );
         java.setClassname( "com.google.code.play.PlayServerBooter" );
         java.setFork( true );
+        java.setSpawn( true );
         java.setDir( baseDir );
-        java.setFailonerror( true );
         java.setClasspath( classPath );
         addSystemProperty( java, "play.home", playHome.getAbsolutePath() );
         addSystemProperty( java, "play.id", ( playId != null ? playId : "" ) );
         addSystemProperty( java, "application.path", baseDir.getAbsolutePath() );
-
-        // if (serverLogOutput) {
-        File logFile = new File( logDirectory, "server.log" );
-        getLog().info( String.format( "Redirecting output to: %s", logFile.getAbsoluteFile() ) );
-        java.setOutput( logFile );
-        // }
+        //because of Java limitations:
+        //- cannot manipulate input/output streams of spawned process
+        //- cannot get process id of spawned process
+        addSystemProperty( java, "pidFile", "server.pid" );
+        addSystemProperty( java, "outFile", "logs/system.out" );
 
         if ( serverProcessArgLine != null )
         {
@@ -139,7 +130,6 @@ public class PlayStartMojo
                 {
                     Commandline.Argument jvmArg = java.createJvmarg();
                     jvmArg.setValue( arg );
-                    // jvmarg(value: arg);
                     getLog().debug( "  Adding jvmarg '" + arg + "'" );
                 }
             }
@@ -171,7 +161,7 @@ public class PlayStartMojo
 
         URL connectUrl = new URL(String.format( "http://localhost:%d", serverPort));
         /*private*/ int verifyWaitDelay = 1000;
-        while (!started) {
+        while (!started) {//TODO-parametrize if we should wait or not
             //if (timedOut) {
             //    throw new MojoExecutionException("Unable to verify if Play! Server was started in the given time ($timeout seconds)");
             //}

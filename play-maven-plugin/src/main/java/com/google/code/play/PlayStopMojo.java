@@ -21,7 +21,6 @@ package com.google.code.play;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -48,42 +47,44 @@ public class PlayStopMojo
         throws MojoExecutionException, MojoFailureException, IOException
     {
         File baseDir = project.getBasedir();
-        
+
         File pidFile = new File( baseDir, "server.pid" );
         if ( !pidFile.exists() )
         {
-            getLog().warn( "\"server.pid\" file not found, trying to stop server anyway." );
+            throw new MojoExecutionException( String.format( "Play! Server is not started (\"%s\" file not found)",
+                                                             pidFile.getName() ) );
         }
 
-        File confDir = new File( baseDir, "conf" );
-        File configurationFile = new File( confDir, "application.conf" );
-
-        ConfigurationParser configParser = new ConfigurationParser( configurationFile, playId );
-        configParser.parse();
-
-        int serverPort = 9000;
-        String serverPortStr = configParser.getProperty( "http.port" );
-        if ( serverPortStr != null )
+        String pid = readFileFirstLine( pidFile ).trim();
+        if ( "unknown".equals( pid ) )
         {
-            serverPort = Integer.parseInt( serverPortStr );
+            throw new MojoExecutionException(
+                                              String.format( "Cannot stop Play! Server (unknown process id in \"%s\" file",
+                                                             pidFile.getAbsolutePath() ) );
         }
-
-        getLog().info( "Stopping Play! server..." );
-
-        URL url = new URL( String.format( "http://localhost:%d/@kill", Integer.valueOf( serverPort ) ) );
-
-        getLog().debug( String.format( "Stop request URL: %s", url ) );
 
         try
         {
-            url.openConnection().getContent();
+            kill( pid );
+            if ( !pidFile.delete() )
+            {
+                throw new IOException( String.format( "Cannot delete %s file", pidFile.getAbsolutePath() ) );
+            }
+            getLog().info( "Play! Server stopped" );
         }
-        catch ( java.net.SocketException e )
+        catch ( InterruptedException e )
         {
-            // ignore
+            throw new MojoExecutionException( "?", e );
         }
-
-        getLog().info( "Stop request sent" );
+    }
+    
+    // copied from Play! Framework's "play.utils.Utils" Java class
+    private void kill( String pid )
+        throws IOException, InterruptedException
+    {
+        String os = System.getProperty( "os.name" );
+        String command = ( os.startsWith( "Windows" ) ) ? "taskkill /F /PID " + pid : "kill " + pid;
+        Runtime.getRuntime().exec( command ).waitFor();
     }
 
 }

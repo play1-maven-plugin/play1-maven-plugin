@@ -21,17 +21,14 @@ package com.google.code.play;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.taskdefs.Java;
-import org.apache.tools.ant.types.Commandline;
+//import org.apache.tools.ant.types.Commandline;
 import org.apache.tools.ant.types.Path;
-
-import org.codehaus.plexus.util.FileUtils;
 
 /**
  * Start Play! Server ("play start" equivalent).
@@ -51,13 +48,13 @@ public class PlayStartMojo
      */
     protected String playId;
 
-    /**
-     * Arbitrary JVM options to set on the command line.
-     * 
-     * @parameter expression="${play.serverProcessArgLine}"
-     * @since 1.0.0
-     */
-    private String serverProcessArgLine;
+//    /**
+//     * Arbitrary JVM options to set on the command line.
+//     * 
+//     * @parameter expression="${play.serverProcessArgLine}"
+//     * @since 1.0.0
+//     */
+//    private String serverProcessArgLine;
 
     @Override
     protected void internalExecute()
@@ -66,145 +63,93 @@ public class PlayStartMojo
         File playHome = getPlayHome();
         File baseDir = project.getBasedir();
 
+        File pidFile = new File( baseDir, "server.pid" );
+        if ( pidFile.exists() )
+        {
+            throw new MojoExecutionException( String.format( "Play! Server already started (\"%s\" file found)",
+                                                             pidFile.getName() ) );
+        }
+
         File confDir = new File( baseDir, "conf" );
         File configurationFile = new File( confDir, "application.conf" );
 
         ConfigurationParser configParser = new ConfigurationParser( configurationFile, playId );
         configParser.parse();
 
-        int serverPort = 9000;
-        String serverPortStr = configParser.getProperty( "http.port" );
-        if ( serverPortStr != null )
-        {
-            serverPort = Integer.parseInt( serverPortStr );
-        }
+        String sysOut = configParser.getProperty( "application.log.system.out" );
+        boolean redirectSysOutToFile = !( "false".equals( sysOut ) || "off".equals( sysOut ) );
 
-        File buildDirectory = new File( project.getBuild().getDirectory() );
-        File logDirectory = new File( buildDirectory, "play" );
-        // ant.mkdir(dir: logDirectory)
-        if ( !logDirectory.exists() && !logDirectory.mkdirs() )
-        {
-            // ???
-        }
-
-        File userExtensionsJsFile =
-            new File( playHome, "modules/testrunner/public/test-runner/selenium/scripts/user-extensions.js" );
-        if ( userExtensionsJsFile.isFile() )
-        {
-            File seleniumDirectory = new File( buildDirectory, "selenium" );
-            // ant.mkdir(dir: seleniumDirectory)
-            if ( !seleniumDirectory.exists() && !seleniumDirectory.mkdirs() )
+        File logDirectory = new File( baseDir, "logs" );
+        File logFile = new File(logDirectory, "system.out");
+        if (redirectSysOutToFile) {
+            if ( !logDirectory.exists() && !logDirectory.mkdirs() )
             {
-                // ???
+                throw new MojoExecutionException( String.format( "Cannot create %s directory", logDirectory.getAbsolutePath() ) );
             }
-            FileUtils.copyFileToDirectoryIfModified( userExtensionsJsFile, seleniumDirectory );
         }
-        // else??
 
         Project antProject = createProject();
         Path classPath = getProjectClassPath(antProject, playId);
 
-        Java java = new Java();
-        java.setProject( antProject );
-        java.setClassname( "com.google.code.play.PlayServerBooter" );
-        java.setFork( true );
-        java.setSpawn( true );
-        java.setDir( baseDir );
-        java.setClasspath( classPath );
-        addSystemProperty( java, "play.home", playHome.getAbsolutePath() );
-        addSystemProperty( java, "play.id", ( playId != null ? playId : "" ) );
-        addSystemProperty( java, "application.path", baseDir.getAbsolutePath() );
+        Java javaTask = new Java();
+        javaTask.setProject( antProject );
+        javaTask.setClassname( "com.google.code.play.PlayServerBooter" );
+        javaTask.setFork( true );
+        javaTask.setSpawn( true );
+        javaTask.setDir( baseDir );
+        javaTask.setClasspath( classPath );
+        addSystemProperty( javaTask, "play.home", playHome.getAbsolutePath() );
+        addSystemProperty( javaTask, "play.id", ( playId != null ? playId : "" ) );
+        addSystemProperty( javaTask, "application.path", baseDir.getAbsolutePath() );
         //because of Java limitations:
         //- cannot manipulate input/output streams of spawned process
         //- cannot get process id of spawned process
-        addSystemProperty( java, "pidFile", "server.pid" );
-        addSystemProperty( java, "outFile", "logs/system.out" );
-
-        if ( serverProcessArgLine != null )
+        addSystemProperty( javaTask, "pidFile", pidFile.getAbsolutePath()/*"server.pid"*/ );
+        if ( redirectSysOutToFile )
         {
-            String argLine = serverProcessArgLine.trim();
-            if ( !"".equals( argLine ) )
-            {
-                String[] args = argLine.split( " " );
-                for ( String arg : args )
-                {
-                    Commandline.Argument jvmArg = java.createJvmarg();
-                    jvmArg.setValue( arg );
-                    getLog().debug( "  Adding jvmarg '" + arg + "'" );
-                }
-            }
+            addSystemProperty( javaTask, "outFile", logFile.getAbsolutePath()/*"logs/system.out"*/ );
         }
 
-        JavaRunnable runner = new JavaRunnable( java );
+// Not ready yet
+//        if ( serverProcessArgLine != null )//TODO-what should be default value??? why it does not work???
+//        {
+//            String argLine = serverProcessArgLine.trim();
+//            if ( !"".equals( argLine ) )
+//            {
+//                String[] args = argLine.split( " " );
+//                for ( String arg : args )
+//                {
+//                    Commandline.Argument jvmArg = javaTask.createJvmarg();
+//                    jvmArg.setValue( arg );
+//                    getLog().debug( "  Adding jvmarg '" + arg + "'" );
+//                }
+//            }
+//        }
+
+        JavaRunnable runner = new JavaRunnable( javaTask );
         Thread t = new Thread( runner, "Play! Server runner" );
-        getLog().info( "Launching Play! Server" );
         t.start();
-
-        // boolean timedOut = false;
-        
-        /*TimerTask timeoutTask = null;
-        if (timeout > 0) {
-            TimerTask task = new TimerTask() {
-                public void run() {
-                    timedOut = true;
-                }
-            };
-            timer.schedule( task, timeout * 1000 );
-            //timeoutTask = timer.runAfter(timeout * 1000, {
-            //    timedOut = true;
-            //})
-        }*/
-        
-        boolean started = false;
-        
-        getLog().info( "Waiting for Play! server...");
-
-        URL connectUrl = new URL(String.format( "http://localhost:%d", serverPort));
-        /*private*/ int verifyWaitDelay = 1000;
-        while (!started) {//TODO-parametrize if we should wait or not
-            //if (timedOut) {
-            //    throw new MojoExecutionException("Unable to verify if Play! Server was started in the given time ($timeout seconds)");
-            //}
-            
-            Exception runnerException = runner.getException();
-            if ( runnerException != null )
-            {
-                throw new MojoExecutionException( "Failed to start Play! Server", runnerException );
-            }
-
-            try
-            {
-                connectUrl.openConnection().getContent();
-                started = true;
-            }
-            catch ( Exception e )
-            {
-                // return false;
-            }
-
-            if ( !started )
-            {
-                try
-                {
-                    Thread.sleep( verifyWaitDelay );
-                }
-                catch ( InterruptedException e )
-                {
-                    throw new MojoExecutionException( "?", e );
-                }
-            }
+        try
+        {
+            t.join();
         }
-        
-        /*if (timeoutTask != null) {
-            timeoutTask.cancel();
-        }*/
-
-        getLog().info( "Play! Server started" );
-        
+        catch ( InterruptedException e )
+        {
+            throw new MojoExecutionException( "?", e );
+        }
         Exception startServerException = runner.getException();
         if ( startServerException != null )
         {
             throw new MojoExecutionException( "?", startServerException );
+        }
+        
+        if ( redirectSysOutToFile )
+        {
+            getLog().info( String.format( "Play! Server started, output is redirected to %s", logFile.getPath() ) );
+        }
+        else
+        {
+            getLog().info( "Play! Server started" );
         }
     }
 

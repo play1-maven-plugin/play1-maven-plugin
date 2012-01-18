@@ -69,18 +69,7 @@ public class PlayRunMojo
         JavaRunnable runner = new JavaRunnable( java );
         Thread t = new Thread( runner, "Play! Server runner" );
         t.start();
-        while ( true )
-        {
-            try
-            {
-                Thread.sleep( 10000 );
-            }
-            catch ( InterruptedException e )
-            {
-                throw new MojoExecutionException( "?", e );
-            }
-        }
-        /*try
+        try
         {
             t.join();
         }
@@ -92,7 +81,19 @@ public class PlayRunMojo
         if ( precompileException != null )
         {
             throw new MojoExecutionException( "?", precompileException );
-        }*/
+        }
+
+        while ( true ) // wait for Ctrl+C
+        {
+            try
+            {
+                Thread.sleep( 10000 );
+            }
+            catch ( InterruptedException e )
+            {
+                throw new MojoExecutionException( "?", e );
+            }
+        }
     }
 
 }

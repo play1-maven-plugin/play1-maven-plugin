@@ -112,7 +112,7 @@ public abstract class AbstractDependencyProcessingPlayMojo
         return result;
     }
     
-    protected Artifact getDependencyArtifact(Set<?> classPathArtifacts, String groupId, String artifactId, String type )
+    protected Artifact getDependencyArtifact( Set<?> classPathArtifacts, String groupId, String artifactId, String type )
     {
         Artifact result = null;
         for ( Iterator<?> iter = classPathArtifacts.iterator(); iter.hasNext(); )
@@ -158,7 +158,7 @@ public abstract class AbstractDependencyProcessingPlayMojo
             // (only if exists, if does not exist - we don't need it)
             for ( Iterator<?> iter = classPathArtifacts.iterator(); iter.hasNext(); )
             {
-                Artifact a = (Artifact)iter.next();
+                Artifact a = (Artifact) iter.next();
                 if ( a.getGroupId().equals( artifact.getGroupId() )
                     && a.getArtifactId().equals( artifact.getArtifactId() ) && a.getType().equals( artifact.getType() ) )
                 {
@@ -175,9 +175,10 @@ public abstract class AbstractDependencyProcessingPlayMojo
         }
     }
     
-    private DependencyNode findArtifactNode(Artifact artifact, DependencyNode rootNode) {
+    private DependencyNode findArtifactNode( Artifact artifact, DependencyNode rootNode )
+    {
         DependencyNode result = null;
-        if (rootNode.getArtifact().equals( artifact ))
+        if ( rootNode.getArtifact().equals( artifact ) )
         {
             result = rootNode;
         }
@@ -188,7 +189,7 @@ public abstract class AbstractDependencyProcessingPlayMojo
             {
                 DependencyNode childNode = (DependencyNode) iter.next();
                 DependencyNode tmp = findArtifactNode( artifact, childNode );
-                if (tmp != null)
+                if ( tmp != null )
                 {
                     result = tmp;
                     break;
@@ -210,7 +211,8 @@ public abstract class AbstractDependencyProcessingPlayMojo
         }
     }
     
-    protected Set<String> getProvidedModuleNames(String playId) throws IOException
+    protected Set<String> getProvidedModuleNames( String playId )
+        throws IOException
     {
         File baseDir = project.getBasedir();
         File confDir = new File( baseDir, "conf" );
@@ -218,10 +220,11 @@ public abstract class AbstractDependencyProcessingPlayMojo
 
         ConfigurationParser configParser = new ConfigurationParser( configurationFile, playId );
         configParser.parse();
-        return getProvidedModuleNames(configParser, playId, false);
+        return getProvidedModuleNames( configParser, playId, false );
     }
 
-    protected Set<String> getProvidedModuleNames(ConfigurationParser configParser, String playId, boolean forceProdMode) throws IOException
+    protected Set<String> getProvidedModuleNames( ConfigurationParser configParser, String playId, boolean forceProdMode )
+        throws IOException
     {
         Map<String, String> modulePaths = configParser.getModules();
 

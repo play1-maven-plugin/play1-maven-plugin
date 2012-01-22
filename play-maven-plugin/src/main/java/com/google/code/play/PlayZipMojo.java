@@ -65,8 +65,7 @@ public class PlayZipMojo
     private String zipExcludes;
 
     /**
-     * Should project dependencies ("lib" and "modules" directories) be packaged.
-     * No include/exclude filters.
+     * Should project dependencies ("lib" and "modules" directories) be packaged. No include/exclude filters.
      * 
      * @parameter expression="${play.zipDependencies}" default-value="false"
      * @since 1.0.0
@@ -142,7 +141,8 @@ public class PlayZipMojo
             }
             else if ( "play".equals( artifact.getType() ) )
             {
-                processZipDependency( artifact, archiver, null ); // it's not necessary to add "play" type dependencies to "moduleTypeArtifacts" map
+                processZipDependency( artifact, archiver, null ); // it's not necessary to add "play" type dependencies
+                                                                  // to "moduleTypeArtifacts" map
             }
         }
         return moduleTypeArtifacts;
@@ -181,7 +181,7 @@ public class PlayZipMojo
             Artifact artifact = (Artifact) iter.next();
             if ( artifact.getArtifactHandler().isAddedToClasspath() )
             {
-                //TODO checkPotentialReactorProblem( artifact );
+                // TODO checkPotentialReactorProblem( artifact );
                 filteredArtifacts.add( artifact );
             }
         }
@@ -195,7 +195,7 @@ public class PlayZipMojo
             {
                 String moduleSubDir = moduleTypeArtifactEntry.getValue();
                 String libDir = String.format( "modules/%s/lib", moduleSubDir );
-                for (Artifact classPathArtifact: dependencySubtree)
+                for ( Artifact classPathArtifact : dependencySubtree )
                 {
                     File jarFile = classPathArtifact.getFile();
                     archiver.addFile( jarFile, libDir + "/" + jarFile.getName() );
@@ -203,7 +203,7 @@ public class PlayZipMojo
                 }
             }
         }
-        
+
         // lib
         if ( !filteredArtifacts.isEmpty() )
         {

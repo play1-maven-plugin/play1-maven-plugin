@@ -108,7 +108,8 @@ public class PlayWarMojo
     /**
      * Application resources include filter
      * 
-     * @parameter expression="${play.warIncludes}" default-value="app/**,conf/**,precompiled/**,public/**,tags/**,test/**"
+     * @parameter expression="${play.warIncludes}"
+     *            default-value="app/**,conf/**,precompiled/**,public/**,tags/**,test/**"
      * @since 1.0.0
      */
     private String warIncludes;
@@ -164,7 +165,7 @@ public class PlayWarMojo
             File configurationFile = new File( confDir, "application.conf" );
             ConfigurationParser configParser = new ConfigurationParser( configurationFile, playWarId );
             configParser.parse();
-            Set<String> providedModuleNames = getProvidedModuleNames(configParser, playWarId, true);
+            Set<String> providedModuleNames = getProvidedModuleNames( configParser, playWarId, true );
 
             WarArchiver warArchiver = (WarArchiver) archiverManager.getArchiver( "war" );
             warArchiver.setDuplicateBehavior( Archiver.DUPLICATES_FAIL ); // Just in case
@@ -174,7 +175,7 @@ public class PlayWarMojo
             getLog().debug( "War includes: " + warIncludes );
             getLog().debug( "War excludes: " + warExcludes );
             String[] includes = ( warIncludes != null ? warIncludes.split( "," ) : null );
-            //TODO-don't add "test/**" if profile is not test profile 
+            // TODO-don't add "test/**" if profile is not test profile
             String[] excludes = ( warExcludes != null ? warExcludes.split( "," ) : null );
             warArchiver.addDirectory( baseDir, "WEB-INF/application/", includes, excludes );
 
@@ -191,9 +192,9 @@ public class PlayWarMojo
 
             Set<Artifact> excludedArtifacts = new HashSet<Artifact>();
             Artifact playSeleniumJunit4Artifact =
-                            getDependencyArtifact( projectArtifacts, "com.google.code.maven-play-plugin",
-                                                    "play-selenium-junit4", "jar" );
-            if (playSeleniumJunit4Artifact != null)
+                getDependencyArtifact( projectArtifacts, "com.google.code.maven-play-plugin", "play-selenium-junit4",
+                                       "jar" );
+            if ( playSeleniumJunit4Artifact != null )
             {
                 excludedArtifacts.addAll( getDependencyArtifacts( projectArtifacts, playSeleniumJunit4Artifact ) );
             }
@@ -204,11 +205,11 @@ public class PlayWarMojo
                 Artifact artifact = (Artifact) iter.next();
                 if ( artifact.getArtifactHandler().isAddedToClasspath() && !excludedArtifacts.contains( artifact ) )
                 {
-                    //TODO-add checkPotentialReactorProblem( artifact );
+                    // TODO-add checkPotentialReactorProblem( artifact );
                     filteredArtifacts.add( artifact );
                 }
             }
-            
+
             // framework
             Artifact frameworkZipArtifact = findFrameworkArtifact( true );
             File frameworkZipFile = frameworkZipArtifact.getFile();
@@ -217,9 +218,9 @@ public class PlayWarMojo
             Artifact frameworkJarArtifact =
                 getDependencyArtifact( filteredArtifacts, frameworkZipArtifact.getGroupId(),
                                        frameworkZipArtifact.getArtifactId(), "jar" );
-            //TODO-validate not null
+            // TODO-validate not null
             Set<Artifact> dependencySubtree = getDependencyArtifacts( filteredArtifacts/* ?? */, frameworkJarArtifact );
-            for (Artifact classPathArtifact: dependencySubtree)
+            for ( Artifact classPathArtifact : dependencySubtree )
             {
                 File jarFile = classPathArtifact.getFile();
                 warArchiver.addLib( jarFile );
@@ -242,7 +243,7 @@ public class PlayWarMojo
                     if ( providedModuleNames.contains( moduleName ) )
                     {
                         moduleSubDir =
-                            String.format( "WEB-INF/modules/%s/", moduleName/* , moduleArtifact.getVersion() */);
+                            String.format( "WEB-INF/modules/%s/", moduleName/* , moduleArtifact.getVersion() */ );
                         warArchiver.addArchivedFileSet( moduleZipFile, moduleSubDir );
                         dependencySubtree = getModuleDependencyArtifacts( filteredArtifacts, moduleZipArtifact );
                         for ( Artifact classPathArtifact : dependencySubtree )
@@ -359,4 +360,5 @@ public class PlayWarMojo
 }
 
 // TODO
-// add "warExclude" option (deleteFrom(war_path, app.readConf('war.exclude').split("|")) where is it from? I don't remember and cannot find ;)
+// add "warExclude" option (deleteFrom(war_path, app.readConf('war.exclude').split("|")) where is it from? I don't
+// remember and cannot find ;)

@@ -143,7 +143,7 @@ public class PlayUberZipMojo
             File configurationFile = new File( confDir, "application.conf" );
             ConfigurationParser configParser = new ConfigurationParser( configurationFile, playId );
             configParser.parse();
-            Set<String> providedModuleNames = getProvidedModuleNames(configParser, playId, false);
+            Set<String> providedModuleNames = getProvidedModuleNames( configParser, playId, false );
 
             Archiver zipArchiver = archiverManager.getArchiver( "zip" );
             zipArchiver.setDuplicateBehavior( Archiver.DUPLICATES_FAIL ); // Just in case
@@ -161,20 +161,20 @@ public class PlayUberZipMojo
 
             Set<Artifact> excludedArtifacts = new HashSet<Artifact>();
             Artifact playSeleniumJunit4Artifact =
-                            getDependencyArtifact( projectArtifacts, "com.google.code.maven-play-plugin",
-                                                    "play-selenium-junit4", "jar" );
-            if (playSeleniumJunit4Artifact != null)
+                getDependencyArtifact( projectArtifacts, "com.google.code.maven-play-plugin", "play-selenium-junit4",
+                                       "jar" );
+            if ( playSeleniumJunit4Artifact != null )
             {
                 excludedArtifacts.addAll( getDependencyArtifacts( projectArtifacts, playSeleniumJunit4Artifact ) );
             }
 
-            Set<Artifact> filteredArtifacts = new HashSet<Artifact>();//TODO-rename to filteredClassPathArtifacts
+            Set<Artifact> filteredArtifacts = new HashSet<Artifact>(); // TODO-rename to filteredClassPathArtifacts
             for ( Iterator<?> iter = projectArtifacts.iterator(); iter.hasNext(); )
             {
                 Artifact artifact = (Artifact) iter.next();
                 if ( artifact.getArtifactHandler().isAddedToClasspath() && !excludedArtifacts.contains( artifact ) )
                 {
-                    //TODO-add checkPotentialReactorProblem( artifact );
+                    // TODO-add checkPotentialReactorProblem( artifact );
                     filteredArtifacts.add( artifact );
                 }
             }
@@ -184,9 +184,9 @@ public class PlayUberZipMojo
             File frameworkZipFile = frameworkZipArtifact.getFile();
             zipArchiver.addArchivedFileSet( frameworkZipFile );
             Artifact frameworkJarArtifact =
-                            getDependencyArtifact( filteredArtifacts/* ?? */, frameworkZipArtifact.getGroupId(),
-                                                   frameworkZipArtifact.getArtifactId(), "jar" );
-            //TODO-validate not null
+                getDependencyArtifact( filteredArtifacts/* ?? */, frameworkZipArtifact.getGroupId(),
+                                       frameworkZipArtifact.getArtifactId(), "jar" );
+            // TODO-validate not null
             File frameworkJarFile = frameworkJarArtifact.getFile();
             String frameworkDestinationFileName = "framework/" + frameworkJarFile.getName();
             String playVersion = frameworkJarArtifact.getVersion();
@@ -198,7 +198,7 @@ public class PlayUberZipMojo
             zipArchiver.addFile( frameworkJarFile, frameworkDestinationFileName );
             filteredArtifacts.remove( frameworkJarArtifact );
             Set<Artifact> dependencySubtree = getDependencyArtifacts( filteredArtifacts/* ?? */, frameworkJarArtifact );
-            for (Artifact classPathArtifact: dependencySubtree)
+            for ( Artifact classPathArtifact : dependencySubtree )
             {
                 File jarFile = classPathArtifact.getFile();
                 String destinationFileName = "framework/lib/" + jarFile.getName();
@@ -220,7 +220,7 @@ public class PlayUberZipMojo
                     if ( providedModuleNames.contains( moduleName ) )
                     {
                         String moduleSubDir =
-                            String.format( "modules/%s/", moduleName/* , moduleArtifact.getVersion() */);
+                            String.format( "modules/%s/", moduleName/* , moduleArtifact.getVersion() */ );
                         zipArchiver.addArchivedFileSet( moduleZipFile, moduleSubDir );
                         dependencySubtree = getModuleDependencyArtifacts( filteredArtifacts, moduleZipArtifact );
                         for ( Artifact classPathArtifact : dependencySubtree )

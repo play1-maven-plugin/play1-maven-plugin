@@ -86,7 +86,7 @@ public class PlayDependenciesMojo
      * @parameter expression="${play.dependenciesSkipJars}" default-value="false"
      * @since 1.0.0
      */
-    private boolean dependenciesSkipJars = false;//TODO-change to true
+    private boolean dependenciesSkipJars = false; // TODO-change to true
 
     /**
      * To look up Archiver/UnArchiver implementations.
@@ -125,7 +125,7 @@ public class PlayDependenciesMojo
                 Artifact playSeleniumJunit4Artifact =
                                 getDependencyArtifact( projectArtifacts, "com.google.code.maven-play-plugin",
                                                         "play-selenium-junit4", "jar" );
-                if (playSeleniumJunit4Artifact != null)
+                if ( playSeleniumJunit4Artifact != null )
                 {
                     excludedArtifacts.addAll( getDependencyArtifacts( projectArtifacts, playSeleniumJunit4Artifact ) );
                 }
@@ -182,7 +182,7 @@ public class PlayDependenciesMojo
                     UnArchiver zipUnArchiver = archiverManager.getUnArchiver( "zip" );
                     zipUnArchiver.setSourceFile( zipFile );
                     zipUnArchiver.setDestDirectory( moduleDirectory );
-                    zipUnArchiver.setOverwrite( false/* ??true */);
+                    zipUnArchiver.setOverwrite( false/* ??true */ );
                     zipUnArchiver.extract();
                     moduleDirectory.setLastModified( System.currentTimeMillis() );
                 }
@@ -220,7 +220,7 @@ public class PlayDependenciesMojo
                 File modulePath = moduleTypeArtifactEntry.getValue();
                 File moduleLibDir = new File( modulePath, "lib" );
                 createLibDirectory( moduleLibDir );
-                for (Artifact classPathArtifact: dependencySubtree)
+                for ( Artifact classPathArtifact : dependencySubtree )
                 {
                     File jarFile = classPathArtifact.getFile();
                     if ( dependenciesOverwrite )
@@ -231,7 +231,7 @@ public class PlayDependenciesMojo
                     {
                         if ( jarFile == null )
                         {
-                            getLog().info( "null file" );// TODO-???
+                            getLog().info( "null file" ); // TODO-???
                         }
                         // getLog().info(a.getGroupId()+":"+a.getArtifactId()+":"+a.getType()+":"+jarFile.getAbsolutePath());
                         FileUtils.copyFileToDirectoryIfModified( jarFile, moduleLibDir );

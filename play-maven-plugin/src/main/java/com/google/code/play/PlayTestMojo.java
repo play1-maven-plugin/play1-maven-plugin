@@ -37,7 +37,7 @@ import org.apache.tools.ant.types.Path;
  * @requiresDependencyResolution test
  */
 public class PlayTestMojo
-    extends AbstractAntJavaBasedPlayMojo
+    extends AbstractPlayServerMojo
 {
     /**
      * Play! test id (profile) used.

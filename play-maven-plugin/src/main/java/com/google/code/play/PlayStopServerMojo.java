@@ -56,6 +56,12 @@ public class PlayStopServerMojo
     protected void internalExecute()
         throws MojoExecutionException, MojoFailureException, IOException
     {
+        if ( seleniumSkip )
+        {
+            getLog().info( "Skipping execution" );
+            return;
+        }
+
         File baseDir = project.getBasedir();
         File confDir = new File( baseDir, "conf" );
         File configurationFile = new File( confDir, "application.conf" );
@@ -63,35 +69,92 @@ public class PlayStopServerMojo
         ConfigurationParser configParser = new ConfigurationParser( configurationFile, playTestId );
         configParser.parse();
 
-        int serverPort = 9000;
-        String serverPortStr = configParser.getProperty( "http.port" );
-        if ( serverPortStr != null )
+        boolean devMode = true;
+        String appModeStr = configParser.getProperty( "application.mode" );
+        if ( appModeStr != null )
         {
-            serverPort = Integer.parseInt( serverPortStr );
+            appModeStr = appModeStr.toUpperCase();
+            devMode = "DEV".equals( appModeStr );
+        }
+        
+        File buildDirectory = new File( project.getBuild().getDirectory() );
+        File logDirectory = new File( buildDirectory, "play" );
+        File pidFile = new File( logDirectory, "server.pid" );
+
+        getLog().info( "Stopping Play! Server..." );
+
+        if ( devMode )
+        {
+            int serverPort = 9000;
+            String serverPortStr = configParser.getProperty( "http.port" );
+            if ( serverPortStr != null )
+            {
+                serverPort = Integer.parseInt( serverPortStr );
+            }
+
+            URL url = new URL( String.format( "http://localhost:%d/@kill", Integer.valueOf( serverPort ) ) );
+
+            getLog().debug( String.format( "Stop request URL: %s", url ) );
+
+            try
+            {
+                url.openConnection().getContent();
+            }
+            catch ( java.net.SocketException e )
+            {
+                // ignore
+            }
+
+            getLog().info( "Stop request sent" );
+            
+            if ( pidFile.exists() )
+            {
+                if ( !pidFile.delete() )
+                {
+                    throw new IOException( String.format( "Cannot delete %s file", pidFile.getAbsolutePath() ) );
+                }
+            }
+        }
+        else
+        {
+            if ( !pidFile.exists() )
+            {
+                throw new MojoExecutionException( String.format( "Play! Server is not started (\"%s\" file not found)",
+                                                                 pidFile.getName() ) );
+            }
+
+            String pid = readFileFirstLine( pidFile ).trim();
+            if ( "unknown".equals( pid ) )
+            {
+                throw new MojoExecutionException(
+                                                  String.format( "Cannot stop Play! Server (unknown process id in \"%s\" file",
+                                                                 pidFile.getAbsolutePath() ) );
+            }
+
+            try
+            {
+                kill( pid );
+                if ( !pidFile.delete() )
+                {
+                    throw new IOException( String.format( "Cannot delete %s file", pidFile.getAbsolutePath() ) );
+                }
+            }
+            catch ( InterruptedException e )
+            {
+                throw new MojoExecutionException( "?", e );
+            }
         }
 
-        if ( seleniumSkip )
-        {
-            getLog().info( "Skipping execution" );
-            return;
-        }
-
-        getLog().info( "Stopping Play! server..." );
-
-        URL url = new URL( String.format( "http://localhost:%d/@kill", Integer.valueOf( serverPort ) ) );
-
-        getLog().debug( String.format( "Stop request URL: %s", url ) );
-
-        try
-        {
-            url.openConnection().getContent();
-        }
-        catch ( java.net.SocketException e )
-        {
-            // ignore
-        }
-
-        getLog().info( "Stop request sent" );
+        getLog().info( "Play! Server stopped" );
+    }
+    
+    // copied from Play! Framework's "play.utils.Utils" Java class
+    private void kill( String pid )
+        throws IOException, InterruptedException
+    {
+        String os = System.getProperty( "os.name" );
+        String command = ( os.startsWith( "Windows" ) ) ? "taskkill /F /PID " + pid : "kill " + pid;
+        Runtime.getRuntime().exec( command ).waitFor();
     }
 
 }

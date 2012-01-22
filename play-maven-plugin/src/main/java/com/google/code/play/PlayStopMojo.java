@@ -34,14 +34,6 @@ import org.apache.maven.plugin.MojoFailureException;
 public class PlayStopMojo
     extends AbstractPlayMojo
 {
-    /**
-     * Play! id (profile) used.
-     * 
-     * @parameter expression="${play.id}" default-value=""
-     * @since 1.0.0
-     */
-    protected String playId;
-
     @Override
     protected void internalExecute()
         throws MojoExecutionException, MojoFailureException, IOException

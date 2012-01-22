@@ -28,11 +28,7 @@ import org.apache.maven.plugin.MojoFailureException;
 
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.taskdefs.Java;
-import org.apache.tools.ant.types.Commandline;
-import org.apache.tools.ant.types.Environment;
 import org.apache.tools.ant.types.Path;
-
-import org.codehaus.plexus.util.FileUtils;
 
 /**
  * Start Play! server. Based on <a
@@ -43,7 +39,7 @@ import org.codehaus.plexus.util.FileUtils;
  * @requiresDependencyResolution test
  */
 public class PlayStartServerMojo
-    extends AbstractAntJavaBasedPlayMojo
+    extends AbstractPlayServerMojo
 {
     /**
      * Play! id (profile) used for testing.
@@ -96,6 +92,14 @@ public class PlayStartServerMojo
         ConfigurationParser configParser = new ConfigurationParser( configurationFile, playTestId );
         configParser.parse();
 
+        boolean devMode = true;
+        String appModeStr = configParser.getProperty( "application.mode" );
+        if ( appModeStr != null )
+        {
+            appModeStr = appModeStr.toUpperCase();
+            devMode = "DEV".equals( appModeStr );
+        }
+        
         int serverPort = 9000;
         String serverPortStr = configParser.getProperty( "http.port" );
         if ( serverPortStr != null )
@@ -105,25 +109,17 @@ public class PlayStartServerMojo
 
         File buildDirectory = new File( project.getBuild().getDirectory() );
         File logDirectory = new File( buildDirectory, "play" );
-        // ant.mkdir(dir: logDirectory)
         if ( !logDirectory.exists() && !logDirectory.mkdirs() )
         {
-            // ???
+            throw new MojoExecutionException( String.format( "Cannot create %s directory", logDirectory.getAbsolutePath() ) );
         }
 
-        File userExtensionsJsFile =
-            new File( playHome, "modules/testrunner/public/test-runner/selenium/scripts/user-extensions.js" );
-        if ( userExtensionsJsFile.isFile() )
+        File pidFile = new File( logDirectory, "server.pid" );
+        if ( pidFile.exists() )
         {
-            File seleniumDirectory = new File( buildDirectory, "selenium" );
-            // ant.mkdir(dir: seleniumDirectory)
-            if ( !seleniumDirectory.exists() && !seleniumDirectory.mkdirs() )
-            {
-                // ???
-            }
-            FileUtils.copyFileToDirectoryIfModified( userExtensionsJsFile, seleniumDirectory );
+            throw new MojoExecutionException( String.format( "Play! Server already started (\"%s\" file found)",
+                                                             pidFile.getName() ) );
         }
-        // else??
 
         Project antProject = createProject();
         Path classPath = getProjectClassPath( antProject, playTestId );
@@ -138,6 +134,10 @@ public class PlayStartServerMojo
         addSystemProperty( java, "play.home", playHome.getAbsolutePath() );
         addSystemProperty( java, "play.id", playTestId );
         addSystemProperty( java, "application.path", baseDir.getAbsolutePath() );
+        if ( !devMode )
+        {
+            addSystemProperty( java, "pidFile", pidFile.getAbsolutePath()/*"target/play/server.pid"*/ );
+        }
 
         // if (serverLogOutput) {
         File logFile = new File( logDirectory, "server.log" );
@@ -153,9 +153,7 @@ public class PlayStartServerMojo
                 String[] args = argLine.split( " " );
                 for ( String arg : args )
                 {
-                    Commandline.Argument jvmArg = java.createJvmarg();
-                    jvmArg.setValue( arg );
-                    // jvmarg(value: arg);
+                    java.createJvmarg().setValue( arg );
                     getLog().debug( "  Adding jvmarg '" + arg + "'" );
                 }
             }
@@ -183,11 +181,12 @@ public class PlayStartServerMojo
         
         boolean started = false;
         
-        getLog().info( "Waiting for Play! server...");
+        getLog().info( "Waiting for Play! Server..." );
 
-        URL connectUrl = new URL(String.format( "http://localhost:%d", serverPort));
+        URL connectUrl = new URL( String.format( "http://localhost:%d", serverPort ) );
         /*private*/ int verifyWaitDelay = 1000;
-        while (!started) {
+        while ( !started )
+        {
             //if (timedOut) {
             //    throw new MojoExecutionException("Unable to verify if Play! Server was started in the given time ($timeout seconds)");
             //}

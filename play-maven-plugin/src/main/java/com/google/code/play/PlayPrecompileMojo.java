@@ -39,10 +39,10 @@ import org.codehaus.plexus.util.FileUtils;
  * @requiresDependencyResolution test
  */
 public class PlayPrecompileMojo
-    extends AbstractAntJavaBasedPlayMojo
+    extends AbstractPlayServerMojo
 {
     /**
-     * Play! id (profile) used precompilation.
+     * Play! id (profile) used.
      * 
      * @parameter expression="${play.id}" default-value=""
      * @since 1.0.0
@@ -55,7 +55,7 @@ public class PlayPrecompileMojo
      * @parameter expression="${play.precompileSkip}" default-value="false"
      * @since 1.0.0
      */
-    private boolean precompileSkip;
+    private boolean precompileSkip = false;
 
     @Override
     protected void internalExecute()

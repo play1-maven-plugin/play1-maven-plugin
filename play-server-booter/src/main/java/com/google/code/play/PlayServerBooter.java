@@ -33,20 +33,29 @@ public class PlayServerBooter
     public static void main( String[] args )
         throws Exception
     {
-        String pidFile = System.getProperty( "pidFile" );
-        if ( pidFile != null )
+        String outFile = System.getProperty( "outFile" );
+        if ( outFile != null )
+        {
+            PrintStream out = new PrintStream( new File( outFile ) );
+            System.setOut( out );
+            System.setErr( out );
+            System.getProperties().remove( "outFile" );
+        }
+
+        String pidFileName = System.getProperty( "pidFile" );
+        if ( pidFileName != null )
         {
             // http://blog.igorminar.com/2007/03/how-java-application-can-discover-its.html
             String name = ManagementFactory.getRuntimeMXBean().getName();
-            // System.out.println(name);
             String pidStr = "unknown";
             int p = name.indexOf( '@' );
             if ( p > 0 )
             {
                 pidStr = name.substring( 0, p );
             }
-            // System.out.println(pidStr);
-            FileWriter fw = new FileWriter( new File( pidFile ) );
+            File pidFile = new File( pidFileName );
+            pidFile.deleteOnExit(); // Does not work, I don't know why.
+            FileWriter fw = new FileWriter( pidFile );
             try
             {
                 fw.write( pidStr );
@@ -56,15 +65,6 @@ public class PlayServerBooter
                 fw.close();
             }
             System.getProperties().remove( "pidFile" );
-        }
-
-        String outFile = System.getProperty( "outFile" );
-        if ( outFile != null )
-        {
-            PrintStream out = new PrintStream( new File( "logs/system.out" ) );
-            System.setOut( out );
-            System.setErr( out );
-            System.getProperties().remove( "outFile" );
         }
 
         Play.frameworkPath = new File( System.getProperty( "play.home" ) );

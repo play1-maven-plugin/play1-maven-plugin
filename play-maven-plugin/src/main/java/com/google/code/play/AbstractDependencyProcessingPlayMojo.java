@@ -255,7 +255,7 @@ public abstract class AbstractDependencyProcessingPlayMojo
         boolean result = false;
         if ( playId != null )
         {
-            result = "test".equals( playId ) || playId.startsWith( "test-" );
+            result = "test".equals( playId ) || ( playId.startsWith( "test-" ) && playId.length() > 5 );
         }
         return result;
     }

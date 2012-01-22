@@ -80,16 +80,18 @@ public class PlayStartMojo
         boolean redirectSysOutToFile = !( "false".equals( sysOut ) || "off".equals( sysOut ) );
 
         File logDirectory = new File( baseDir, "logs" );
-        File logFile = new File(logDirectory, "system.out");
-        if (redirectSysOutToFile) {
+        File logFile = new File( logDirectory, "system.out" );
+        if ( redirectSysOutToFile )
+        {
             if ( !logDirectory.exists() && !logDirectory.mkdirs() )
             {
-                throw new MojoExecutionException( String.format( "Cannot create %s directory", logDirectory.getAbsolutePath() ) );
+                throw new MojoExecutionException( String.format( "Cannot create %s directory",
+                                                                 logDirectory.getAbsolutePath() ) );
             }
         }
 
         Project antProject = createProject();
-        Path classPath = getProjectClassPath(antProject, playId);
+        Path classPath = getProjectClassPath( antProject, playId );
 
         Java javaTask = new Java();
         javaTask.setProject( antProject );

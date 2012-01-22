@@ -55,7 +55,7 @@ public class PlayTestMojo
         File baseDir = project.getBasedir();
 
         Project antProject = createProject();
-        Path classPath = getProjectClassPath(antProject, playTestId);
+        Path classPath = getProjectClassPath( antProject, playTestId );
 
         Java java = new Java();
         java.setProject( antProject );

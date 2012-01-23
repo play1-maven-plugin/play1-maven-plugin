@@ -213,7 +213,6 @@ public class PlayZipMojo
                 Artifact classPathArtifact = (Artifact) iter.next();
                 File jarFile = classPathArtifact.getFile();
                 archiver.addFile( jarFile, libDir + "/" + jarFile.getName() );
-                filteredArtifacts.remove( classPathArtifact );
             }
         }
     }

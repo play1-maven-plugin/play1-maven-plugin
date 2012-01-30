@@ -19,6 +19,18 @@
 
 package com.google.code.play;
 
+import java.io.File;
+import java.io.IOException;
+
+import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.MojoFailureException;
+
+import org.apache.tools.ant.Project;
+import org.apache.tools.ant.taskdefs.Java;
+import org.apache.tools.ant.types.Path;
+
+import org.codehaus.plexus.util.FileUtils;
+
 /**
  * Invoke Play! precompilation.
  * 
@@ -27,19 +39,87 @@ package com.google.code.play;
  * @requiresDependencyResolution test
  */
 public class PlayPrecompileMojo
-    extends AbstractPlayPrecompileMojo
+    extends AbstractPlayServerMojo
 {
     /**
-     * Play! id (profile) used.
+     * Play! id (profile) used when not precompiling tests.
      * 
      * @parameter expression="${play.id}" default-value=""
      * @since 1.0.0
      */
     private String playId;
 
-    protected String getPlayId()
+    /**
+     * Play! id (profile) used when precompiling tests.
+     * 
+     * @parameter expression="${play.testId}" default-value="test"
+     * @since 1.0.0
+     */
+    private String playTestId;
+
+    /**
+     * Should tests be precompiled.
+     * 
+     * @parameter expression="${play.precompileTests}" default-value="false"
+     * @since 1.0.0
+     */
+    private boolean precompileTests;
+
+    /**
+     * Allows the server startup to be skipped.
+     * 
+     * @parameter expression="${play.precompileSkip}" default-value="false"
+     * @since 1.0.0
+     */
+    private boolean precompileSkip = false;
+
+    @Override
+    protected void internalExecute()
+        throws MojoExecutionException, MojoFailureException, IOException
     {
-        return playId;
+        if ( precompileSkip )
+        {
+            getLog().info( "Skipping precompilation" );
+            return;
+        }
+
+        String precompilePlayId = (precompileTests ? playTestId : playId);
+        
+        File playHome = getPlayHome();
+        File baseDir = project.getBasedir();
+
+        FileUtils.deleteDirectory( new File( baseDir, "precompiled" ) );
+        FileUtils.deleteDirectory( new File( baseDir, "tmp" ) );
+
+        Project antProject = createProject();
+        Path classPath = getProjectClassPath( antProject, precompilePlayId );
+
+        Java java = new Java();
+        java.setProject( antProject );
+        java.setClassname( "com.google.code.play.PlayServerBooter" );
+        java.setFailonerror( true );
+        java.setClasspath( classPath );
+        addSystemProperty( java, "play.home", playHome.getAbsolutePath() );
+        addSystemProperty( java, "play.id", ( precompilePlayId != null ? precompilePlayId : "" ) );
+        addSystemProperty( java, "application.path", baseDir.getAbsolutePath() );
+        addSystemProperty( java, "precompile", Boolean.toString( true ) );
+
+        JavaRunnable runner = new JavaRunnable( java );
+        Thread t = new Thread( runner, "Play! precompilation runner" );
+        t.start();
+        try
+        {
+            t.join();
+        }
+        catch ( InterruptedException e )
+        {
+            throw new MojoExecutionException( "?", e );
+        }
+        Exception precompileException = runner.getException();
+        if ( precompileException != null )
+        {
+            throw new MojoExecutionException( "?", precompileException );
+        }
     }
 
 }

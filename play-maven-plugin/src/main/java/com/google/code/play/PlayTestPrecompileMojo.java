@@ -23,23 +23,23 @@ package com.google.code.play;
  * Invoke Play! precompilation.
  * 
  * @author <a href="mailto:gslowikowski@gmail.com">Grzegorz Slowikowski</a>
- * @goal precompile
+ * @goal test-precompile
  * @requiresDependencyResolution test
  */
-public class PlayPrecompileMojo
+public class PlayTestPrecompileMojo
     extends AbstractPlayPrecompileMojo
 {
     /**
      * Play! id (profile) used.
      * 
-     * @parameter expression="${play.id}" default-value=""
+     * @parameter expression="${play.testId}" default-value="test"
      * @since 1.0.0
      */
-    private String playId;
+    private String playTestId;
 
     protected String getPlayId()
     {
-        return playId;
+        return playTestId;
     }
 
 }

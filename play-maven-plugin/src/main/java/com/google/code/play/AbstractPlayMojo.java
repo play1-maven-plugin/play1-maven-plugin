@@ -89,7 +89,8 @@ public abstract class AbstractPlayMojo
         File playTmpHomeDir = new File( playTmpDir, "home" );
         if ( !playTmpHomeDir.exists() )
         {
-            throw new MojoExecutionException( String.format( "Play! home directory \"%s\" does not exist",
+            throw new MojoExecutionException(
+                                              String.format( "Play! home directory \"%s\" does not exist. Run \"mvn play:initialize\" first.",
                                                              playTmpHomeDir.getCanonicalPath() ) );
         }
         if ( !playTmpHomeDir.isDirectory() )

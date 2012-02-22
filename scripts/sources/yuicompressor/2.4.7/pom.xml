@@ -1,0 +1,87 @@
+<?xml version="1.0"?>
+
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                             http://maven.apache.org/maven-v4_0_0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.google.code.maven-play-plugin.com.yahoo.platform.yui</groupId>
+  <artifactId>yuicompressor</artifactId>
+  <version>2.4.7</version>
+  <packaging>jar</packaging>
+
+  <name>YUI Compressor - The Yahoo! JavaScript and CSS Compressor</name>
+  <url>http://developer.yahoo.com/yui/compressor/</url>
+
+  <description>
+    The YUI Compressor is a JavaScript compressor which, in addition to removing
+    comments and white-spaces, obfuscates local variables using the smallest
+    possible variable name. This obfuscation is safe, even when using constructs
+    such as 'eval' or 'with' (although the compression is not optimal is those
+    cases) Compared to jsmin, the average savings is around 20%.
+
+    The YUI Compressor is also able to safely compress CSS files. The decision
+    on which compressor is being used is made on the file extension (js or css)
+
+
+    YUI Compressor uses a modified version of the Rhino library
+    (http://www.mozilla.org/rhino/) The changes were made to support
+    JScript conditional comments, preserved comments, unescaped slash
+    characters in regular expressions, and to allow for the optimization
+    of escaped quotes in string literals.
+  </description>
+
+  <licenses>
+    <license>
+      <name>BSD License</name>
+      <url>http://developer.yahoo.com/yui/license.html</url>
+      <distribution>repo</distribution>
+      <comments>All code specific to YUI Compressor is issued under a BSD license. YUI Compressor extends and implements code from Mozilla's Rhino project. Rhino is issued under the Mozilla Public License (MPL), and MPL applies to the Rhino source and binaries that are distributed with YUI Compressor, including Rhino modifications made by YUI Compressor. YUI Compressor also makes use of and distributes a binary of JArgs; the JArgs BSD license applies to this binary.</comments>
+    </license>
+  </licenses>
+
+  <mailingLists>
+    <mailingList>
+      <name>ydn-javascript</name>
+      <archive>http://tech.groups.yahoo.com/group/ydn-javascript/</archive>
+    </mailingList>
+  </mailingLists>
+
+  <scm>
+    <connection>scm:git:git://github.com/yui/yuicompressor.git</connection>
+    <url>http://github.com/yui/yuicompressor</url>
+  </scm>
+
+  <organization>
+    <name>Yahoo! Developer Network</name>
+    <url>http://developer.yahoo.com/yui/compressor/</url>
+  </organization>
+
+  <developers>
+    <developer>
+      <id>julienlecomte</id>
+      <name>Julien Lecomte</name>
+    </developer>
+    <developer>
+      <id>isaacs</id>
+      <name>Isaac Z. Schlueter</name>
+    </developer>
+  </developers>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>2.3.2</version>
+        <configuration>
+          <source>1.5</source>
+          <target>1.5</target>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>
+

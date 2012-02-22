@@ -1,0 +1,8 @@
+Download YuiCompressor 2.4.7 distribution from http://yuilibrary.com/downloads/yuicompressor
+  and add it's "src" directory to "src/main/java"
+Download JArgs from http://downloads.sourceforge.net/jargs/jargs-1.0.zip
+  and add it's sources to "src/main/java"
+Download Rhino 1.6R7 from ftp://ftp.mozilla.org/pub/mozilla.org/js/rhino1_6R7.zip,
+  add it's sources to "src/main/java" (don't overwrite existing files, they are yuicompressor modified versions)
+
+

@@ -21,7 +21,6 @@ package com.google.code.play;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
@@ -102,8 +101,7 @@ public class PlayZipMojo
 
             if ( zipDependencies )
             {
-                Map<Artifact, String> moduleTypeArtifacts = processModuleDependencies( zipArchiver );
-                processJarDependencies( zipArchiver, moduleTypeArtifacts );
+                processDependencies( zipArchiver );
             }
             zipArchiver.createArchive();
 
@@ -123,97 +121,63 @@ public class PlayZipMojo
         }
     }
 
-    private Map<Artifact, String> processModuleDependencies( Archiver archiver )
-        throws ArchiverException, NoSuchArchiverException, IOException
+    private void processDependencies( Archiver zipArchiver )
+        throws DependencyTreeBuilderException, IOException
     {
-        Map<Artifact, String> moduleTypeArtifacts = new HashMap<Artifact, String>();
-
-        Set<?> artifacts = project.getArtifacts();
-        for ( Iterator<?> iter = artifacts.iterator(); iter.hasNext(); )
-        {
-            Artifact artifact = (Artifact) iter.next();
-            if ( "zip".equals( artifact.getType() ) )
-            {
-                if ( "module".equals( artifact.getClassifier() ) || "module-min".equals( artifact.getClassifier() ) )
-                {
-                    processZipDependency( artifact, archiver, moduleTypeArtifacts );
-                }
-            }
-            else if ( "play".equals( artifact.getType() ) )
-            {
-                processZipDependency( artifact, archiver, null ); // it's not necessary to add "play" type dependencies
-                                                                  // to "moduleTypeArtifacts" map
-            }
-        }
-        return moduleTypeArtifacts;
-    }
-
-    private void processZipDependency( Artifact artifact, Archiver archiver, Map<Artifact, String> moduleTypeArtifacts )
-        throws ArchiverException, NoSuchArchiverException, IOException
-    {
-        // System.out.println("module: " + artifact.getGroupId() + ":" + artifact.getArtifactId());
-
-        // System.out.println( "artifact: groupId=" + artifact.getGroupId() + ":artifactId="
-        // + artifact.getArtifactId() + ":type=" + artifact.getType() + ":classifier="
-        // + artifact.getClassifier() + ":scope=" + artifact.getScope() );
-        File zipFile = artifact.getFile();
-        String moduleName = artifact.getArtifactId();
-        if ( moduleName.startsWith( "play-" ) )
-        {
-            moduleName = moduleName.substring( "play-".length() );
-        }
-        String moduleSubDir = String.format( "%s-%s", moduleName, artifact.getVersion() );
-        archiver.addArchivedFileSet( zipFile, "modules/" + moduleSubDir + "/" );
-
-        if ( moduleTypeArtifacts != null )
-        {
-            moduleTypeArtifacts.put( artifact, moduleSubDir );
-        }
-    }
-
-    private void processJarDependencies( Archiver archiver, Map<Artifact, String> moduleTypeArtifacts )
-        throws ArchiverException, NoSuchArchiverException, IOException, DependencyTreeBuilderException
-    {
+        // preparation
         Set<?> projectArtifacts = project.getArtifacts();
-        Set<Artifact> filteredArtifacts = new HashSet<Artifact>();
+
+        Set<Artifact> excludedArtifacts = new HashSet<Artifact>();
+        /*Artifact playSeleniumJunit4Artifact =
+            getDependencyArtifact( projectArtifacts, "com.google.code.maven-play-plugin", "play-selenium-junit4",
+                                   "jar" );
+        if ( playSeleniumJunit4Artifact != null )
+        {
+            excludedArtifacts.addAll( getDependencyArtifacts( projectArtifacts, playSeleniumJunit4Artifact ) );
+        }*/
+
+        Set<Artifact> filteredArtifacts = new HashSet<Artifact>(); // TODO-rename to filteredClassPathArtifacts
         for ( Iterator<?> iter = projectArtifacts.iterator(); iter.hasNext(); )
         {
             Artifact artifact = (Artifact) iter.next();
-            if ( artifact.getArtifactHandler().isAddedToClasspath() )
+            if ( artifact.getArtifactHandler().isAddedToClasspath() && !excludedArtifacts.contains( artifact ) )
             {
-                // TODO checkPotentialReactorProblem( artifact );
+                // TODO-add checkPotentialReactorProblem( artifact );
                 filteredArtifacts.add( artifact );
             }
         }
 
         // modules/*/lib
-        for ( Map.Entry<Artifact, String> moduleTypeArtifactEntry : moduleTypeArtifacts.entrySet() )
+        Map<String, Artifact> moduleArtifacts = findAllModuleArtifacts( false );
+        for ( Map.Entry<String, Artifact> moduleArtifactEntry : moduleArtifacts.entrySet() )
         {
-            Artifact moduleZipArtifact = moduleTypeArtifactEntry.getKey();
+            String moduleName = moduleArtifactEntry.getKey();
+            Artifact moduleZipArtifact = moduleArtifactEntry.getValue();
+
+            File moduleZipFile = moduleZipArtifact.getFile();
+            String moduleSubDir = String.format( "modules/%s-%s/", moduleName, moduleZipArtifact.getVersion() );
+            zipArchiver.addArchivedFileSet( moduleZipFile, moduleSubDir );
             Set<Artifact> dependencySubtree = getModuleDependencyArtifacts( filteredArtifacts, moduleZipArtifact );
-            if ( !dependencySubtree.isEmpty() )
+            for ( Artifact classPathArtifact : dependencySubtree )
             {
-                String moduleSubDir = moduleTypeArtifactEntry.getValue();
-                String libDir = String.format( "modules/%s/lib", moduleSubDir );
-                for ( Artifact classPathArtifact : dependencySubtree )
-                {
-                    File jarFile = classPathArtifact.getFile();
-                    archiver.addFile( jarFile, libDir + "/" + jarFile.getName() );
-                    filteredArtifacts.remove( classPathArtifact );
-                }
+                File jarFile = classPathArtifact.getFile();
+                String destinationFileName = jarFile.getName();
+                String destinationPath =
+                                String.format( "modules/%s-%s/lib/%s", moduleName,
+                                               moduleZipArtifact.getVersion(), destinationFileName );
+                zipArchiver.addFile( jarFile, destinationPath );
+                filteredArtifacts.remove( classPathArtifact );
             }
+
         }
 
         // lib
-        if ( !filteredArtifacts.isEmpty() )
+        for ( Iterator<?> iter = filteredArtifacts.iterator(); iter.hasNext(); )
         {
-            String libDir = "lib";
-            for ( Iterator<?> iter = filteredArtifacts.iterator(); iter.hasNext(); )
-            {
-                Artifact classPathArtifact = (Artifact) iter.next();
-                File jarFile = classPathArtifact.getFile();
-                archiver.addFile( jarFile, libDir + "/" + jarFile.getName() );
-            }
+            Artifact artifact = (Artifact) iter.next();
+            File jarFile = artifact.getFile();
+            String destinationFileName = "lib/" + jarFile.getName();
+            zipArchiver.addFile( jarFile, destinationFileName );
         }
     }
 

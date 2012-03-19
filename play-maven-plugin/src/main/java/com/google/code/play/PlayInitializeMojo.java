@@ -127,7 +127,6 @@ public class PlayInitializeMojo
 
         getLog().debug( "Play! version: " + playVersion );
         File playHome = prepareAndGetPlayHome( playVersion );
-        playId = resolvePlayId( playHome, playId );
 
         File baseDir = project.getBasedir();
         File confDir = new File( baseDir, "conf" );

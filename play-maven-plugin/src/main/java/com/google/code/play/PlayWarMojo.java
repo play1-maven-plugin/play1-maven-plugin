@@ -308,17 +308,6 @@ public class PlayWarMojo
         }
     }
 
-    protected void/* String */resolvePlayId()
-    {
-        // String result = super.resolvePlayId();
-
-        if ( playWarId == null || "".equals( playWarId ) )
-        {
-            playWarId = "war";
-        }
-        // return result;
-    }
-
     private String getDestinationFileName()
     {
         StringBuffer buf = new StringBuffer();

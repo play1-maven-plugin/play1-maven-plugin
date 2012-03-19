@@ -167,7 +167,7 @@ public class PlayDependenciesMojo
                         // Scala module hack
                         if ( "scala".equals( moduleName ) )
                         {
-                            scalaHack( moduleDirectory, excludedArtifacts );
+                            scalaHack( moduleDirectory, filteredArtifacts );
                         }
                         if ( !dependenciesSkipJars )
                         {
@@ -269,7 +269,7 @@ public class PlayDependenciesMojo
         }
     }
 
-    private void scalaHack( File scalaModuleDirectory, Set<Artifact> excludedArtifacts ) throws IOException
+    private void scalaHack( File scalaModuleDirectory, Set<Artifact> filteredArtifacts ) throws IOException
     {
         Set<?> projectArtifacts = project.getArtifacts();
         for ( Iterator<?> iter = projectArtifacts.iterator(); iter.hasNext(); )
@@ -280,12 +280,11 @@ public class PlayDependenciesMojo
                 && "jar".equals( artifact.getType() ) )
             {
                 File jarFile = artifact.getFile();
-                //FileUtils.copyFileToDirectoryIfModified( jarFile, new File(scalaModuleDirectory, "lib" ) );
                 FileUtils.copyFileIfModified( jarFile,
                                               new File( scalaModuleDirectory, "lib/" + artifact.getArtifactId()
                                                   + ".jar" ) );
 
-                excludedArtifacts.add( artifact );
+                filteredArtifacts.remove( artifact );
             }
         }
     }

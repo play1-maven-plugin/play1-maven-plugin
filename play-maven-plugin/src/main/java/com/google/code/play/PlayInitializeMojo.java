@@ -245,7 +245,7 @@ public class PlayInitializeMojo
 
     private void decompressFrameworkAndSetPlayHome( Artifact frameworkAtifact, Map<String, Artifact> moduleArtifacts,
                                                     String playDependencyVersion, File playTmpHomeDir )
-        throws ArchiverException, MojoExecutionException, NoSuchArchiverException, IOException
+        throws MojoExecutionException, NoSuchArchiverException, IOException
     {
         File warningFile = new File( playTmpHomeDir, "WARNING.txt" );
 
@@ -324,6 +324,11 @@ public class PlayInitializeMojo
                     zipUnArchiver.setOverwrite( false/* ??true */ );
                     zipUnArchiver.extract();
                     moduleDirectory.setLastModified( System.currentTimeMillis() );
+                    // Scala module hack
+                    if ( "scala".equals( moduleName ) )
+                    {
+                        scalaHack( moduleDirectory );
+                    }
                 }
             }
         }
@@ -359,6 +364,25 @@ public class PlayInitializeMojo
             if ( !directory.mkdirs() )
             {
                 throw new IOException( String.format( "Cannot create \"%s\" directory", directory.getCanonicalPath() ) );
+            }
+        }
+    }
+
+    private void scalaHack( File scalaModuleDirectory ) throws IOException
+    {
+        Set<?> projectArtifacts = project.getArtifacts();
+        for ( Iterator<?> iter = projectArtifacts.iterator(); iter.hasNext(); )
+        {
+            Artifact artifact = (Artifact) iter.next();
+            if ( "org.scala-lang".equals( artifact.getGroupId() )
+                && ( "scala-compiler".equals( artifact.getArtifactId() ) || "scala-library".equals( artifact.getArtifactId() ) )
+                && "jar".equals( artifact.getType() ) )
+            {
+                File jarFile = artifact.getFile();
+                //FileUtils.copyFileToDirectoryIfModified( jarFile, new File(scalaModuleDirectory, "lib" ) );
+                FileUtils.copyFileIfModified( jarFile,
+                                              new File( scalaModuleDirectory, "lib/" + artifact.getArtifactId()
+                                                  + ".jar" ) );
             }
         }
     }

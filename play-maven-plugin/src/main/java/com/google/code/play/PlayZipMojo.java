@@ -162,6 +162,11 @@ public class PlayZipMojo
             {
                 File jarFile = classPathArtifact.getFile();
                 String destinationFileName = jarFile.getName();
+                // Scala module hack
+                if ( "scala".equals( moduleName ) )
+                {
+                    destinationFileName = scalaHack( classPathArtifact );
+                }
                 String destinationPath =
                                 String.format( "modules/%s-%s/lib/%s", moduleName,
                                                moduleZipArtifact.getVersion(), destinationFileName );
@@ -179,6 +184,18 @@ public class PlayZipMojo
             String destinationFileName = "lib/" + jarFile.getName();
             zipArchiver.addFile( jarFile, destinationFileName );
         }
+    }
+
+    private String scalaHack( Artifact dependencyArtifact ) throws IOException
+    {
+        String destinationFileName = dependencyArtifact.getFile().getName();
+        if ( "org.scala-lang".equals( dependencyArtifact.getGroupId() )
+            && ( "scala-compiler".equals( dependencyArtifact.getArtifactId() ) || "scala-library".equals( dependencyArtifact.getArtifactId() ) )
+            && "jar".equals( dependencyArtifact.getType() ) )
+        {
+            destinationFileName = dependencyArtifact.getArtifactId() + ".jar";
+        }
+        return destinationFileName;
     }
 
 }

@@ -20,10 +20,13 @@
 package com.google.code.play;
 
 import java.io.File;
+import java.io.InputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -32,11 +35,16 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.shared.dependency.tree.DependencyTreeBuilderException;
 
+import org.codehaus.plexus.archiver.ArchiveEntry;
 import org.codehaus.plexus.archiver.Archiver;
 import org.codehaus.plexus.archiver.ArchiverException;
+import org.codehaus.plexus.archiver.ResourceIterator;
 import org.codehaus.plexus.archiver.manager.ArchiverManager;
 import org.codehaus.plexus.archiver.manager.NoSuchArchiverException;
 import org.codehaus.plexus.archiver.war.WarArchiver;
+import org.codehaus.plexus.components.io.resources.PlexusIoResource;
+import org.codehaus.plexus.util.FileUtils;
+import org.codehaus.plexus.util.io.RawInputStreamFacade;
 
 /**
  * Package Play! framework and Play! application as a WAR achive.
@@ -123,6 +131,15 @@ public class PlayWarMojo
     private String warExcludes;
 
     /**
+     * ...
+     * 
+     * @parameter expression="${play.warZip}" default-value="true"
+     * @required
+     * @since 1.0.0
+     */
+    private boolean warZip;
+
+    /**
      * To look up Archiver/UnArchiver implementations.
      * 
      * @component role="org.codehaus.plexus.archiver.manager.ArchiverManager"
@@ -181,11 +198,15 @@ public class PlayWarMojo
 
             warArchiver.addClasses( new File( baseDir, "conf" ), confIncludes, null );
 
-            File tmpDirectory = new File( buildDirectory, "play/tmp" );
-            /* File filteredWebXml = */filterWebXml( new File( playHome, "resources/war/web.xml" ), tmpDirectory,
-                                                     configParser.getApplicationName(), playWarId );
-            File filteredWebXmlFile = new File( tmpDirectory, "filtered-web.xml" );
-            warArchiver.setWebxml( filteredWebXmlFile );
+            File webXmlFile = new File( baseDir, "war/WEB-INF/web.xml" );
+            if ( !webXmlFile.isFile() )
+            {
+                File tmpDirectory = new File( buildDirectory, "play/tmp" );
+                filterWebXml( new File( playHome, "resources/war/web.xml" ), tmpDirectory,
+                              configParser.getApplicationName(), playWarId );
+                webXmlFile = new File( tmpDirectory, "filtered-web.xml" );
+            }
+            warArchiver.setWebxml( webXmlFile );
 
             // preparation
             Set<?> projectArtifacts = project.getArtifacts();
@@ -252,6 +273,11 @@ public class PlayWarMojo
                             warArchiver.addLib( jarFile );
                             filteredArtifacts.remove( classPathArtifact );
                         }
+                        // Scala hack - NOT NEEDED, war works without it (maybe bacause precompiled == true)
+                        //if ( "scala".equals( moduleName ) )
+                        //{
+                        //    ...
+                        //}
                     }
                     else
                     {
@@ -289,10 +315,31 @@ public class PlayWarMojo
             File warDir = new File( baseDir, "war" );
             if ( warDir.isDirectory() )
             {
-                warArchiver.addDirectory( warDir );
+                if ( warZip )
+                {
+                    //warArchiver.addDirectory( warDir ); //TODO warOutputDirectory cannot be neither equal war directory nor be a child of war directory
+                    /*tmp*/warArchiver.addDirectory( warDir, "", null, new String[] { "WEB-INF/web.xml", destFile.getName()} ); //TODO warOutputDirectory cannot be neither equal war directory nor be a child of war directory
+                }
+                else
+                {
+                    String warDirCanonicalPath = warDir.getCanonicalPath();
+                    String outputDirCanonicalPath = new File( warOutputDirectory ).getCanonicalPath();
+                    if ( !warDirCanonicalPath.equals( outputDirCanonicalPath ) )
+                    {
+                        warArchiver.addDirectory( warDir );
+                    }
+                }
             }
 
-            warArchiver.createArchive();
+            if ( warZip )
+            {
+                warArchiver.createArchive();
+            }
+            else
+            {
+                getLog().info( "Building war: " + new File( warOutputDirectory ).getAbsolutePath() );
+                expandArchive( warArchiver );
+            }
         }
         catch ( ArchiverException e )
         {
@@ -324,26 +371,50 @@ public class PlayWarMojo
         return buf.toString();
     }
 
-    protected String[] concatenate( String[] array1, String[] array2 )
+    private void expandArchive( Archiver archiver )
+        throws IOException
     {
-        // System.arraycopy(src, srcPos, dest, destPos, length);
-        java.util.List<String> list1 = Arrays.asList( array1 );
-        java.util.List<String> list2 = Arrays.asList( array2 );
-        java.util.ArrayList<String> list = new java.util.ArrayList<String>( array1.length + array2.length );
-        list.addAll( list1 );
-        list.addAll( list2 );
-        return list.toArray( new String[list.size()] );
-    }
+        File destDir = archiver.getDestFile().getParentFile();
+        for ( ResourceIterator iter = archiver.getResources(); iter.hasNext(); )
+        {
+            ArchiveEntry entry = iter.next();
+            String name = entry.getName();
+            name = name.replace( File.separatorChar, '/' );
+            File destFile = new File( destDir, name );
 
-    protected String[] subtract( String[] array1, String[] array2 )
-    {
-        // System.arraycopy(src, srcPos, dest, destPos, length);
-        java.util.List<String> list1 = Arrays.asList( array1 );
-        java.util.List<String> list2 = Arrays.asList( array2 );
-        java.util.ArrayList<String> list = new java.util.ArrayList<String>( array1.length );
-        list.addAll( list1 );
-        list.removeAll( list2 );
-        return list.toArray( new String[list.size()] );
+            PlexusIoResource resource = entry.getResource();
+            boolean skip = false;
+            if ( destFile.exists() )
+            {
+                long resLastModified = resource.getLastModified();
+                if ( resLastModified != PlexusIoResource.UNKNOWN_MODIFICATION_DATE )
+                {
+                    long destFileLastModified = destFile.lastModified(); // TODO-use this
+                    if ( resLastModified <= destFileLastModified )
+                    {
+                        skip = true;
+                    }
+                }
+            }
+
+            if ( !skip )
+            {
+                switch ( entry.getType() )
+                {
+                    case ArchiveEntry.DIRECTORY:
+                        destFile.mkdirs(); // change to PlexusUtils, check result
+                        break;
+                    case ArchiveEntry.FILE:
+                        InputStream contents = resource.getContents();
+                        RawInputStreamFacade facade = new RawInputStreamFacade( contents );
+                        FileUtils.copyStreamToFile( facade, destFile );
+                        break;
+                    default:
+                        throw new RuntimeException( "Unknown archive entry type: " + entry.getType() ); // TODO-polish, what exception class?
+                }
+                // System.out.println(entry.getName());
+            }
+        }
     }
 
 }

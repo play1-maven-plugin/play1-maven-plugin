@@ -226,9 +226,15 @@ public class PlayUberZipMojo
                         for ( Artifact classPathArtifact : dependencySubtree )
                         {
                             File jarFile = classPathArtifact.getFile();
-                            String destinationFileName =
-                                String.format( "modules/%s/lib/%s", moduleName, jarFile.getName() );
-                            zipArchiver.addFile( jarFile, destinationFileName );
+                            String destinationFileName = jarFile.getName();
+                            // Scala module hack
+                            if ( "scala".equals( moduleName ) )
+                            {
+                                destinationFileName = scalaHack( classPathArtifact );
+                            }
+                            String destinationPath =
+                                String.format( "modules/%s/lib/%s", moduleName, destinationFileName );
+                            zipArchiver.addFile( jarFile, destinationPath );
                             filteredArtifacts.remove( classPathArtifact );
                         }
                     }
@@ -246,10 +252,16 @@ public class PlayUberZipMojo
                     for ( Artifact classPathArtifact : dependencySubtree )
                     {
                         File jarFile = classPathArtifact.getFile();
-                        String destinationFileName =
+                        String destinationFileName = jarFile.getName();
+                        // Scala module hack
+                        if ( "scala".equals( moduleName ) )
+                        {
+                            destinationFileName = scalaHack( classPathArtifact );
+                        }
+                        String destinationPath =
                             String.format( "application/modules/%s-%s/lib/%s", moduleName,
-                                           moduleZipArtifact.getVersion(), jarFile.getName() );
-                        zipArchiver.addFile( jarFile, destinationFileName );
+                                           moduleZipArtifact.getVersion(), destinationFileName );
+                        zipArchiver.addFile( jarFile, destinationPath );
                         filteredArtifacts.remove( classPathArtifact );
                     }
                 }
@@ -300,6 +312,18 @@ public class PlayUberZipMojo
         }
         buf.append( ".zip" );
         return buf.toString();
+    }
+
+    private String scalaHack( Artifact dependencyArtifact ) throws IOException
+    {
+        String destinationFileName = dependencyArtifact.getFile().getName();
+        if ( "org.scala-lang".equals( dependencyArtifact.getGroupId() )
+            && ( "scala-compiler".equals( dependencyArtifact.getArtifactId() ) || "scala-library".equals( dependencyArtifact.getArtifactId() ) )
+            && "jar".equals( dependencyArtifact.getType() ) )
+        {
+            destinationFileName = dependencyArtifact.getArtifactId() + ".jar";
+        }
+        return destinationFileName;
     }
 
 }

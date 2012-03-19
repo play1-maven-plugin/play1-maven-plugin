@@ -22,7 +22,6 @@ package com.google.code.play;
 import java.io.File;
 import java.io.IOException;
 import java.net.ServerSocket;
-//import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -32,7 +31,6 @@ import java.util.Set;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.MojoExecutionException;
-//import org.apache.maven.plugin.MojoFailureException;
 
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.taskdefs.Java;
@@ -45,7 +43,7 @@ public abstract class AbstractPlayServerMojo
     extends AbstractAntJavaBasedPlayMojo
 {
     /**
-     * ...
+     * Alternative server port.
      * 
      * @parameter expression="${play.httpPort}" default-value=""
      * @since 1.0.0
@@ -53,7 +51,7 @@ public abstract class AbstractPlayServerMojo
     protected String httpPort;
 
     /**
-     * ...
+     * Alternative server port for secure connection (https protocol).
      * 
      * @parameter expression="${play.httpsPort}" default-value=""
      * @since 1.0.0
@@ -61,7 +59,7 @@ public abstract class AbstractPlayServerMojo
     protected String httpsPort;
 
     /**
-     * ... (should be in args, as "-f")
+     * Disable the JPDA port checking and force the jpda.port value (Play!'s "-f" option equivalent).
      * 
      * @parameter expression="${play.disableCheckJpda}" default-value="false"
      * @since 1.0.0
@@ -124,7 +122,7 @@ public abstract class AbstractPlayServerMojo
                 if ( policyFile.isFile() )
                 {
                     getLog().info( String.format( "~ using policy file \"%s\"", policyFile.getPath() ) );
-                    addSystemProperty( javaTask, "java.security.manager", "utf-8" );
+                    addSystemProperty( javaTask, "java.security.manager", "" );
                     addSystemProperty( javaTask, "java.security.policy", policyFile );
                 }
             }

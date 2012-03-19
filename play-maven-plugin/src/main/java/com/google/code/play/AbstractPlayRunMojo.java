@@ -24,74 +24,78 @@ import java.io.IOException;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-
-import org.apache.tools.ant.Project;
 import org.apache.tools.ant.taskdefs.Java;
-import org.apache.tools.ant.types.Path;
 
 /**
- * Run Play! Server in test mode ("play test" equivalent).
+ * Run Play! Server synchronously. Base class for "run" and "test" mojos.
  * 
  * @author <a href="mailto:gslowikowski@gmail.com">Grzegorz Slowikowski</a>
- * @goal test
- * @requiresDependencyResolution test
  */
-public class PlayTestMojo
+public abstract class AbstractPlayRunMojo
     extends AbstractPlayServerMojo
 {
     /**
-     * Play! test id (profile) used.
+     * ...
      * 
-     * @parameter expression="${play.testId}" default-value="test"
+     * @parameter expression="${play.runFork}" default-value="true"
      * @since 1.0.0
      */
-    private String playTestId;
+    private boolean runFork;
+
+    abstract protected String getPlayId();
 
     @Override
     protected void internalExecute()
         throws MojoExecutionException, MojoFailureException, IOException
     {
-        File playHome = getPlayHome();
+        String playId = getPlayId();
+        
         File baseDir = project.getBasedir();
 
-        Project antProject = createProject();
-        Path classPath = getProjectClassPath( antProject, playTestId );
+        File pidFile = new File( baseDir, "server.pid" );
+        if ( pidFile.exists() )
+        {
+            throw new MojoExecutionException( String.format( "Play! Server already started (\"%s\" file found)",
+                                                             pidFile.getName() ) );
+        }
 
-        Java java = new Java();
-        java.setProject( antProject );
-        java.setClassname( "com.google.code.play.PlayServerBooter" );
-        java.setFailonerror( true );
-        java.setClasspath( classPath );
-        addSystemProperty( java, "play.home", playHome.getAbsolutePath() );
-        addSystemProperty( java, "play.id", playTestId );
-        addSystemProperty( java, "application.path", baseDir.getAbsolutePath() );
+        File confDir = new File( baseDir, "conf" );
+        File configurationFile = new File( confDir, "application.conf" );
+        ConfigurationParser configParser = new ConfigurationParser( configurationFile, playId );
+        configParser.parse();
 
-        JavaRunnable runner = new JavaRunnable( java );
+        Java javaTask = prepareAntJavaTask( configParser, playId, runFork );
+
+        JavaRunnable runner = new JavaRunnable( javaTask );
         Thread t = new Thread( runner, "Play! Server runner" );
+        getLog().info( "Launching Play! Server" );
         t.start();
         try
         {
-            t.join();
+            t.join(); // waiting for Ctrl+C if forked, joins immediately if not forking
         }
         catch ( InterruptedException e )
         {
             throw new MojoExecutionException( "?", e );
         }
-        Exception precompileException = runner.getException();
-        if ( precompileException != null )
+        Exception runException = runner.getException();
+        if ( runException != null )
         {
-            throw new MojoExecutionException( "?", precompileException );
+            throw new MojoExecutionException( "?", runException );
         }
-
-        while ( true ) // wait for Ctrl+C
+        
+        if ( !runFork )
         {
-            try
+            while ( true ) // wait for Ctrl+C
             {
-                Thread.sleep( 10000 );
-            }
-            catch ( InterruptedException e )
-            {
-                throw new MojoExecutionException( "?", e );
+                try
+                {
+                    Thread.sleep( 10000 );
+                }
+                catch ( InterruptedException e )
+                {
+                    throw new MojoExecutionException( "?", e );
+                }
             }
         }
     }

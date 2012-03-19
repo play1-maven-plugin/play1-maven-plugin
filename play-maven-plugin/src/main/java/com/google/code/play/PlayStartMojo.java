@@ -25,10 +25,7 @@ import java.io.IOException;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 
-import org.apache.tools.ant.Project;
 import org.apache.tools.ant.taskdefs.Java;
-//import org.apache.tools.ant.types.Commandline;
-import org.apache.tools.ant.types.Path;
 
 /**
  * Start Play! Server ("play start" equivalent).
@@ -48,19 +45,10 @@ public class PlayStartMojo
      */
     protected String playId;
 
-//    /**
-//     * Arbitrary JVM options to set on the command line.
-//     * 
-//     * @parameter expression="${play.serverProcessArgLine}"
-//     * @since 1.0.0
-//     */
-//    private String serverProcessArgLine;
-
     @Override
     protected void internalExecute()
         throws MojoExecutionException, MojoFailureException, IOException
     {
-        File playHome = getPlayHome();
         File baseDir = project.getBasedir();
 
         File pidFile = new File( baseDir, "server.pid" );
@@ -72,7 +60,6 @@ public class PlayStartMojo
 
         File confDir = new File( baseDir, "conf" );
         File configurationFile = new File( confDir, "application.conf" );
-
         ConfigurationParser configParser = new ConfigurationParser( configurationFile, playId );
         configParser.parse();
 
@@ -90,19 +77,9 @@ public class PlayStartMojo
             }
         }
 
-        Project antProject = createProject();
-        Path classPath = getProjectClassPath( antProject, playId );
-
-        Java javaTask = new Java();
-        javaTask.setProject( antProject );
-        javaTask.setClassname( "com.google.code.play.PlayServerBooter" );
-        javaTask.setFork( true );
+        Java javaTask = prepareAntJavaTask( configParser, playId, true );
         javaTask.setSpawn( true );
-        javaTask.setDir( baseDir );
-        javaTask.setClasspath( classPath );
-        addSystemProperty( javaTask, "play.home", playHome.getAbsolutePath() );
-        addSystemProperty( javaTask, "play.id", ( playId != null ? playId : "" ) );
-        addSystemProperty( javaTask, "application.path", baseDir.getAbsolutePath() );
+
         //because of Java limitations:
         //- cannot manipulate input/output streams of spawned process
         //- cannot get process id of spawned process
@@ -111,22 +88,6 @@ public class PlayStartMojo
         {
             addSystemProperty( javaTask, "outFile", logFile.getAbsolutePath()/*"logs/system.out"*/ );
         }
-
-// Not ready yet
-//        if ( serverProcessArgLine != null )//TODO-what should be default value??? why it does not work???
-//        {
-//            String argLine = serverProcessArgLine.trim();
-//            if ( !"".equals( argLine ) )
-//            {
-//                String[] args = argLine.split( " " );
-//                for ( String arg : args )
-//                {
-//                    Commandline.Argument jvmArg = javaTask.createJvmarg();
-//                    jvmArg.setValue( arg );
-//                    getLog().debug( "  Adding jvmarg '" + arg + "'" );
-//                }
-//            }
-//        }
 
         JavaRunnable runner = new JavaRunnable( javaTask );
         Thread t = new Thread( runner, "Play! Server runner" );

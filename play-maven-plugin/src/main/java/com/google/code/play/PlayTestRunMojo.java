@@ -20,27 +20,27 @@
 package com.google.code.play;
 
 /**
- * Run Play! Server ("play run" equivalent).
+ * Run Play! Server in test mode ("play test" equivalent).
  * 
  * @author <a href="mailto:gslowikowski@gmail.com">Grzegorz Slowikowski</a>
- * @goal run
+ * @goal test
  * @requiresDependencyResolution test
  */
-public class PlayRunMojo
+public class PlayTestRunMojo
     extends AbstractPlayRunMojo
 {
     /**
-     * Play! id (profile) used.
+     * Play! test id (profile) used.
      * 
-     * @parameter expression="${play.id}" default-value=""
+     * @parameter expression="${play.testId}" default-value="test"
      * @since 1.0.0
      */
-    private String playId;
+    private String playTestId;
 
     @Override
     protected String getPlayId()
     {
-        return playId;
+        return playTestId;
     }
 
 }

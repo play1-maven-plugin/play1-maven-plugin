@@ -22,6 +22,7 @@ package com.google.code.play;
 import java.io.File;
 import java.io.IOException;
 
+//import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 
@@ -66,6 +67,14 @@ public class PlayPrecompileMojo
     private boolean precompileTests;
 
     /**
+     * ...
+     * 
+     * @parameter expression="${play.precompileFork}" default-value="false"
+     * @since 1.0.0
+     */
+    private boolean precompileFork;
+
+    /**
      * Allows the server startup to be skipped.
      * 
      * @parameter expression="${play.precompileSkip}" default-value="false"
@@ -83,7 +92,7 @@ public class PlayPrecompileMojo
             return;
         }
 
-        String precompilePlayId = (precompileTests ? playTestId : playId);
+        String precompilePlayId = ( precompileTests ? playTestId : playId );
         
         File playHome = getPlayHome();
         File baseDir = project.getBasedir();
@@ -91,20 +100,49 @@ public class PlayPrecompileMojo
         FileUtils.deleteDirectory( new File( baseDir, "precompiled" ) );
         FileUtils.deleteDirectory( new File( baseDir, "tmp" ) );
 
+        File confDir = new File( baseDir, "conf" );
+        File configurationFile = new File( confDir, "application.conf" );
+        ConfigurationParser configParser = new ConfigurationParser( configurationFile, playId );
+        configParser.parse();
+
         Project antProject = createProject();
         Path classPath = getProjectClassPath( antProject, precompilePlayId );
 
-        Java java = new Java();
-        java.setProject( antProject );
-        java.setClassname( "com.google.code.play.PlayServerBooter" );
-        java.setFailonerror( true );
-        java.setClasspath( classPath );
-        addSystemProperty( java, "play.home", playHome.getAbsolutePath() );
-        addSystemProperty( java, "play.id", ( precompilePlayId != null ? precompilePlayId : "" ) );
-        addSystemProperty( java, "application.path", baseDir.getAbsolutePath() );
-        addSystemProperty( java, "precompile", Boolean.toString( true ) );
+        Java javaTask = new Java();
+        javaTask.setTaskName( "play" );
+        javaTask.setProject( antProject );
+        javaTask.setClassname( "com.google.code.play.PlayServerBooter" );
+        javaTask.setClasspath( classPath );
+        javaTask.setFailonerror( true );
+        javaTask.setFork( precompileFork );
+        if ( precompileFork )
+        {
+            javaTask.setDir( baseDir );
 
-        JavaRunnable runner = new JavaRunnable( java );
+            String jvmMemory = configParser.getProperty( "jvm.memory" );
+            if ( jvmMemory != null )
+            {
+                jvmMemory = jvmMemory.trim();
+                if ( !jvmMemory.isEmpty() )
+                {
+                    String[] args = jvmMemory.split( " " );
+                    for ( String arg : args )
+                    {
+                        javaTask.createJvmarg().setValue( arg );
+                        getLog().debug( "  Adding jvmarg '" + arg + "'" );
+                    }
+                }
+            }
+
+            // JDK 7 compat
+            javaTask.createJvmarg().setValue( "-XX:-UseSplitVerifier" );
+        }
+        addSystemProperty( javaTask, "play.home", playHome.getAbsolutePath() );
+        addSystemProperty( javaTask, "play.id", ( precompilePlayId != null ? precompilePlayId : "" ) );
+        addSystemProperty( javaTask, "application.path", baseDir.getAbsolutePath() );
+        addSystemProperty( javaTask, "precompile", "yes"/*Boolean.toString( true )*/ ); // any (not null) value
+
+        JavaRunnable runner = new JavaRunnable( javaTask );
         Thread t = new Thread( runner, "Play! precompilation runner" );
         t.start();
         try

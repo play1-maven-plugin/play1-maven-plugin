@@ -27,8 +27,7 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 
 /**
- * Stop Play! server. Based on <a
- * href="http://mojo.codehaus.org/selenium-maven-plugin/stop-server-mojo.html">selenium:stop-server mojo</a>
+ * Stop Play! server after integration testing.
  * 
  * @author <a href="mailto:gslowikowski@gmail.com">Grzegorz Slowikowski</a>
  * @goal stop-server
@@ -63,27 +62,22 @@ public class PlayStopServerMojo
         }
 
         File baseDir = project.getBasedir();
+
         File confDir = new File( baseDir, "conf" );
         File configurationFile = new File( confDir, "application.conf" );
-
         ConfigurationParser configParser = new ConfigurationParser( configurationFile, playTestId );
         configParser.parse();
 
-        boolean devMode = true;
-        String appModeStr = configParser.getProperty( "application.mode" );
-        if ( appModeStr != null )
-        {
-            appModeStr = appModeStr.toUpperCase();
-            devMode = "DEV".equals( appModeStr );
-        }
+        String applicationMode = configParser.getProperty( "application.mode", "dev" );
         
-        File buildDirectory = new File( project.getBuild().getDirectory() );
-        File logDirectory = new File( buildDirectory, "play" );
-        File pidFile = new File( logDirectory, "server.pid" );
+        //File buildDirectory = new File( project.getBuild().getDirectory() );
+        //File logDirectory = new File( buildDirectory, "play" );
+        //File pidFile = new File( logDirectory, "server.pid" );
+        File pidFile = new File( baseDir, "server.pid" );
 
         getLog().info( "Stopping Play! Server..." );
 
-        if ( devMode )
+        if ( "dev".equalsIgnoreCase( applicationMode ) )
         {
             int serverPort = 9000;
             String serverPortStr = configParser.getProperty( "http.port" );

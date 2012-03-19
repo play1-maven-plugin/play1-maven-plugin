@@ -58,6 +58,16 @@ public class ConfigurationParser
         return (String) value;
     }
 
+    public String getProperty( String key, String defaultValue )
+    {
+        String result = getProperty( key );
+        if ( result == null )
+        {
+            result = defaultValue;
+        }
+        return result;
+    }
+
     public String getApplicationName()
     {
         return getProperty( "application.name" );

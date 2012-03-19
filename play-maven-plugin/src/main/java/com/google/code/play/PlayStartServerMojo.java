@@ -26,13 +26,10 @@ import java.net.URL;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 
-import org.apache.tools.ant.Project;
 import org.apache.tools.ant.taskdefs.Java;
-import org.apache.tools.ant.types.Path;
 
 /**
- * Start Play! server. Based on <a
- * href="http://mojo.codehaus.org/selenium-maven-plugin/start-server-mojo.html">selenium:start-server mojo</a>
+ * Start Play! server before integration testing.
  * 
  * @author <a href="mailto:gslowikowski@gmail.com">Grzegorz Slowikowski</a>
  * @goal start-server
@@ -65,14 +62,6 @@ public class PlayStartServerMojo
      */
     private boolean seleniumSkip;
 
-    /**
-     * Arbitrary JVM options to set on the command line.
-     * 
-     * @parameter expression="${play.serverProcessArgLine}"
-     * @since 1.0.0
-     */
-    private String serverProcessArgLine;
-
     @Override
     protected void internalExecute()
         throws MojoExecutionException, MojoFailureException, IOException
@@ -83,83 +72,55 @@ public class PlayStartServerMojo
             return;
         }
 
-        File playHome = getPlayHome();
         File baseDir = project.getBasedir();
 
-        File confDir = new File( baseDir, "conf" );
-        File configurationFile = new File( confDir, "application.conf" );
-
-        ConfigurationParser configParser = new ConfigurationParser( configurationFile, playTestId );
-        configParser.parse();
-
-        boolean devMode = true;
-        String appModeStr = configParser.getProperty( "application.mode" );
-        if ( appModeStr != null )
-        {
-            appModeStr = appModeStr.toUpperCase();
-            devMode = "DEV".equals( appModeStr );
-        }
-        
-        int serverPort = 9000;
-        String serverPortStr = configParser.getProperty( "http.port" );
-        if ( serverPortStr != null )
-        {
-            serverPort = Integer.parseInt( serverPortStr );
-        }
-
-        File buildDirectory = new File( project.getBuild().getDirectory() );
-        File logDirectory = new File( buildDirectory, "play" );
-        if ( !logDirectory.exists() && !logDirectory.mkdirs() )
-        {
-            throw new MojoExecutionException( String.format( "Cannot create %s directory", logDirectory.getAbsolutePath() ) );
-        }
-
-        File pidFile = new File( logDirectory, "server.pid" );
+        File pidFile = new File( baseDir, "server.pid" );
         if ( pidFile.exists() )
         {
             throw new MojoExecutionException( String.format( "Play! Server already started (\"%s\" file found)",
                                                              pidFile.getName() ) );
         }
 
-        Project antProject = createProject();
-        Path classPath = getProjectClassPath( antProject, playTestId );
+        File confDir = new File( baseDir, "conf" );
+        File configurationFile = new File( confDir, "application.conf" );
+        ConfigurationParser configParser = new ConfigurationParser( configurationFile, playTestId );
+        configParser.parse();
 
-        Java java = new Java();
-        java.setProject( antProject );
-        java.setClassname( "com.google.code.play.PlayServerBooter" );
-        java.setFork( true );
-        java.setDir( baseDir );
-        java.setFailonerror( true );
-        java.setClasspath( classPath );
-        addSystemProperty( java, "play.home", playHome.getAbsolutePath() );
-        addSystemProperty( java, "play.id", playTestId );
-        addSystemProperty( java, "application.path", baseDir.getAbsolutePath() );
-        if ( !devMode )
+        File buildDirectory = new File( project.getBuild().getDirectory() );
+        File logDirectory = new File( buildDirectory, "play" );
+        if ( !logDirectory.exists() && !logDirectory.mkdirs() )
         {
-            addSystemProperty( java, "pidFile", pidFile.getAbsolutePath()/*"target/play/server.pid"*/ );
+            throw new MojoExecutionException( String.format( "Cannot create %s directory",
+                                                             logDirectory.getAbsolutePath() ) );
         }
 
-        // if (serverLogOutput) {
-        File logFile = new File( logDirectory, "server.log" );
-        getLog().info( String.format( "Redirecting output to: %s", logFile.getAbsoluteFile() ) );
-        java.setOutput( logFile );
-        // }
-
-        if ( serverProcessArgLine != null )
+        int serverPort = 9000;
+        if ( httpPort != null && !httpPort.isEmpty() ) // TODO-handle "https.port" parameter(?)
         {
-            String argLine = serverProcessArgLine.trim();
-            if ( !"".equals( argLine ) )
+            serverPort = Integer.parseInt( httpPort );
+        }
+        else
+        {
+            String serverPortStr = configParser.getProperty( "http.port" );
+            if ( serverPortStr != null )
             {
-                String[] args = argLine.split( " " );
-                for ( String arg : args )
-                {
-                    java.createJvmarg().setValue( arg );
-                    getLog().debug( "  Adding jvmarg '" + arg + "'" );
-                }
+                serverPort = Integer.parseInt( serverPortStr );
             }
         }
 
-        JavaRunnable runner = new JavaRunnable( java );
+        Java javaTask = prepareAntJavaTask( configParser, playTestId, true );
+
+        String applicationMode = configParser.getProperty( "application.mode", "dev" );
+        if ( "prod".equalsIgnoreCase( applicationMode ) )
+        {
+            addSystemProperty( javaTask, "pidFile", pidFile.getAbsolutePath() );
+        }
+
+        File logFile = new File( logDirectory, "server.log" );
+        getLog().info( String.format( "Redirecting output to: %s", logFile.getAbsoluteFile() ) );
+        javaTask.setOutput( logFile );
+
+        JavaRunnable runner = new JavaRunnable( javaTask );
         Thread t = new Thread( runner, "Play! Server runner" );
         getLog().info( "Launching Play! Server" );
         t.start();
@@ -184,7 +145,7 @@ public class PlayStartServerMojo
         getLog().info( "Waiting for Play! Server..." );
 
         URL connectUrl = new URL( String.format( "http://localhost:%d", serverPort ) );
-        /*private*/ int verifyWaitDelay = 1000;
+        int verifyWaitDelay = 1000;
         while ( !started )
         {
             //if (timedOut) {

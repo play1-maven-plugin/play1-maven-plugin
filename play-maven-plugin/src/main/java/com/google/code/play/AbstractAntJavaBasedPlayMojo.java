@@ -19,6 +19,7 @@
 
 package com.google.code.play;
 
+import java.io.File;
 import java.util.List;
 
 import org.apache.maven.artifact.Artifact;
@@ -111,6 +112,14 @@ public abstract class AbstractAntJavaBasedPlayMojo
         Environment.Variable sysPropPlayHome = new Environment.Variable();
         sysPropPlayHome.setKey( propertyName );
         sysPropPlayHome.setValue( propertyValue );
+        java.addSysproperty( sysPropPlayHome );
+    }
+
+    protected void addSystemProperty( Java java, String propertyName, File propertyValue )
+    {
+        Environment.Variable sysPropPlayHome = new Environment.Variable();
+        sysPropPlayHome.setKey( propertyName );
+        sysPropPlayHome.setFile( propertyValue );
         java.addSysproperty( sysPropPlayHome );
     }
 

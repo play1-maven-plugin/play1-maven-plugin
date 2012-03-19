@@ -164,6 +164,11 @@ public class PlayDependenciesMojo
                         zipUnArchiver.setOverwrite( false/* ??true */ );
                         zipUnArchiver.extract();
                         moduleDirectory.setLastModified( System.currentTimeMillis() );
+                        // Scala module hack
+                        if ( "scala".equals( moduleName ) )
+                        {
+                            scalaHack( moduleDirectory, excludedArtifacts );
+                        }
                         if ( !dependenciesSkipJars )
                         {
                             Set<Artifact> dependencySubtree = getModuleDependencyArtifacts( filteredArtifacts, moduleZipArtifact );
@@ -261,6 +266,27 @@ public class PlayDependenciesMojo
                                          String.format( "\"%s:%s:%s:%s\" dependent artifact's file is a directory, not a file. This is probably Maven reactor build problem.",
                                                         artifact.getGroupId(), artifact.getArtifactId(),
                                                         artifact.getType(), artifact.getVersion() ) );
+        }
+    }
+
+    private void scalaHack( File scalaModuleDirectory, Set<Artifact> excludedArtifacts ) throws IOException
+    {
+        Set<?> projectArtifacts = project.getArtifacts();
+        for ( Iterator<?> iter = projectArtifacts.iterator(); iter.hasNext(); )
+        {
+            Artifact artifact = (Artifact) iter.next();
+            if ( "org.scala-lang".equals( artifact.getGroupId() )
+                && ( "scala-compiler".equals( artifact.getArtifactId() ) || "scala-library".equals( artifact.getArtifactId() ) )
+                && "jar".equals( artifact.getType() ) )
+            {
+                File jarFile = artifact.getFile();
+                //FileUtils.copyFileToDirectoryIfModified( jarFile, new File(scalaModuleDirectory, "lib" ) );
+                FileUtils.copyFileIfModified( jarFile,
+                                              new File( scalaModuleDirectory, "lib/" + artifact.getArtifactId()
+                                                  + ".jar" ) );
+
+                excludedArtifacts.add( artifact );
+            }
         }
     }
 

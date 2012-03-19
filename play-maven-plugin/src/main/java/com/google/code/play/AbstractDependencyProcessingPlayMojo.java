@@ -175,16 +175,16 @@ public abstract class AbstractDependencyProcessingPlayMojo
         }
     }
     
-    private DependencyNode findArtifactNode( Artifact artifact, DependencyNode rootNode )
+    private DependencyNode findArtifactNode( Artifact artifact, DependencyNode findRootNode )
     {
         DependencyNode result = null;
-        if ( rootNode.getArtifact().equals( artifact ) )
+        if ( findRootNode.getArtifact().equals( artifact ) )
         {
-            result = rootNode;
+            result = findRootNode;
         }
         else
         {
-            List<?> childDependencyNodes = rootNode.getChildren();
+            List<?> childDependencyNodes = findRootNode.getChildren();
             for ( Iterator<?> iter = childDependencyNodes.iterator(); iter.hasNext(); )
             {
                 DependencyNode childNode = (DependencyNode) iter.next();

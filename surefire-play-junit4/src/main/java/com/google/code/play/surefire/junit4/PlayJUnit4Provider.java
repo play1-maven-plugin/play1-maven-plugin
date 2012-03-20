@@ -213,7 +213,10 @@ public class PlayJUnit4Provider
     {
         Play.frameworkPath = playHome;
         Play.init( applicationPath, playId );
-        Play.start();
+        if ( !Play.started ) // in PROD mode or ... Play! is started automatically
+        {
+            Play.start();
+        }
     }
 
     private void finalizePlayEngine()

@@ -54,7 +54,7 @@ under the License.
         <dependency>
             <groupId>org.apache.ant</groupId>
             <artifactId>ant</artifactId>
-            <version>1.8.2</version>
+            <version>1.8.3</version>
         </dependency>
 
         <!-- Maven -->
@@ -86,7 +86,7 @@ under the License.
         <dependency>
             <groupId>org.codehaus.plexus</groupId>
             <artifactId>plexus-archiver</artifactId>
-            <version>1.0</version>
+            <version>2.1</version>
         </dependency>
 
         <!-- not used yet
@@ -105,7 +105,7 @@ under the License.
         <dependency>
             <groupId>org.codehaus.plexus</groupId>
             <artifactId>plexus-utils</artifactId>
-            <version>2.0.5</version>
+            <version>3.0</version>
         </dependency>
     </dependencies>
 
@@ -170,17 +170,6 @@ under the License.
                                 </tagletArtifact>
                             </tagletArtifacts>
                         </configuration>
-                    </plugin>
-
-                    <plugin>
-                        <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>clirr-maven-plugin</artifactId>
-                        <reportSets>
-                            <reportSet>
-                                <id>html</id>
-                                <reports />
-                            </reportSet>
-                        </reportSets>
                     </plugin>
                 </plugins>
             </reporting>

@@ -33,7 +33,7 @@ import org.apache.maven.surefire.util.TestsToRun;
 /**
  * ...Scans directories looking for tests.
  * Based on Apache Maven Surefire's class DefaultDirectoryScanner
- * (http://svn.apache.org/repos/asf/maven/surefire/tags/surefire-2.9/surefire-api/src/main/java/org/apache/maven/surefire/util/DefaultDirectoryScanner.java)
+ * (http://svn.apache.org/repos/asf/maven/surefire/tags/surefire-2.11/surefire-api/src/main/java/org/apache/maven/surefire/util/DefaultDirectoryScanner.java)
  */
 public class PlayDirectoryScanner
     implements DirectoryScanner

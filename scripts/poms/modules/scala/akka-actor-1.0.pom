@@ -1,0 +1,60 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+<!--
+Based on http://repo.akka.io/releases/se/scalablesolutions/akka/akka-actor/1.0/akka-actor-1.0.pom
+Removed 8 unnecessary repository definitions:
+- http://scala-tools.org/repo-releases/
+- http://download.java.net/maven/2/
+- http://repository.jboss.org/nexus/content/groups/public/
+- http://repo1.maven.org/maven2/
+- http://repository.codehaus.org/
+- http://guiceyfruit.googlecode.com/svn/repo/releases/
+- http://databinder.net/repo/
+- http://download.java.net/maven/glassfish/
+-->
+
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.google.code.maven-play-plugin.se.scalablesolutions.akka</groupId>
+    <artifactId>akka-actor</artifactId>
+    <packaging>jar</packaging>
+    <version>1.0</version>
+    <dependencies>
+        <dependency>
+            <groupId>com.google.code.maven-play-plugin.jsr166x</groupId>
+            <artifactId>jsr166x</artifactId>
+            <version>1.0</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.fusesource.hawtdispatch</groupId>
+            <artifactId>hawtdispatch-scala</artifactId>
+            <version>1.0</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.google.code.maven-play-plugin.net.lag</groupId>
+            <artifactId>configgy</artifactId>
+            <version>2.0.2-nologgy</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>0.9.24</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.google.code.maven-play-plugin.com.eaio</groupId>
+            <artifactId>uuid</artifactId>
+            <version>3.2</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.scala-lang</groupId>
+            <artifactId>scala-library</artifactId>
+            <version>2.8.1</version>
+            <scope>compile</scope>
+        </dependency>
+    </dependencies>
+</project>

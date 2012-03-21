@@ -1,0 +1,18 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+		                    http://maven.apache.org/maven-v4_0_0.xsd">
+
+<!--
+Based on http://repo.akka.io/releases/jsr166x/jsr166x/1.0/jsr166x-1.0.pom
+-->
+
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>com.google.code.maven-play-plugin.jsr166x</groupId>
+	<artifactId>jsr166x</artifactId>
+	<version>1.0</version>
+	<packaging>jar</packaging>
+
+</project>
+

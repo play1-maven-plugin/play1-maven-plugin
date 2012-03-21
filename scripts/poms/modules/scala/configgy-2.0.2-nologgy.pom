@@ -1,0 +1,43 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+<!--
+Based on http://repo.akka.io/releases/net/lag/configgy/2.0.2-nologgy/configgy-2.0.2-nologgy.pom
+Removed 11 unnecessary repository definitions:
+- http://scala-tools.org/repo-releases/
+- https://m2proxy.atlassian.com/repository/public/
+- http://www.lag.net/repo/
+- http://scala-tools.org/repo-releases/testing/
+- http://oauth.googlecode.com/svn/code/maven/
+- http://download.java.net/maven/2/
+- http://www.lag.net/nest/
+- http://maven.twttr.com/
+- http://powermock.googlecode.com/svn/repo/
+- http://mirrors.ibiblio.org/pub/mirrors/maven2/
+- http://scala-tools.org/repo-releases/
+-->
+
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.google.code.maven-play-plugin.net.lag</groupId>
+    <artifactId>configgy</artifactId>
+    <packaging>jar</packaging>
+    <version>2.0.2-nologgy</version>
+    <name>Configgy</name>
+    <description>Configgy logging removed</description>
+    <url>http://github.com/derekjw/configgy</url>
+    <licenses>
+        <license>
+            <name>Apache 2</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+    <dependencies>
+        <dependency>
+            <groupId>org.scala-lang</groupId>
+            <artifactId>scala-library</artifactId>
+            <version>2.8.1</version>
+            <scope>compile</scope>
+        </dependency>
+    </dependencies>
+</project>

@@ -26,6 +26,15 @@
       <configuration>
         <lifecycles>
           <lifecycle>
+            <id>clean</id>
+            <phases>
+              <clean>
+                com.google.code.maven-play-plugin:play-maven-plugin:clean,
+                org.apache.maven.plugins:maven-clean-plugin:clean
+              </clean>
+            </phases>
+          </lifecycle>
+          <lifecycle>
             <id>default</id>
             <phases>
               <initialize>

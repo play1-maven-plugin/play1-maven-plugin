@@ -109,6 +109,7 @@ public class PlayStartServerMojo
         }
 
         Java javaTask = prepareAntJavaTask( configParser, playTestId, true );
+        javaTask.setFailonerror( true );
 
         String applicationMode = configParser.getProperty( "application.mode", "dev" );
         if ( "prod".equalsIgnoreCase( applicationMode ) )

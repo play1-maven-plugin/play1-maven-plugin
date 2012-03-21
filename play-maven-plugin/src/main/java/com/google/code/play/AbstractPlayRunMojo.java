@@ -65,6 +65,7 @@ public abstract class AbstractPlayRunMojo
         configParser.parse();
 
         Java javaTask = prepareAntJavaTask( configParser, playId, runFork );
+        javaTask.setFailonerror( true );
 
         JavaRunnable runner = new JavaRunnable( javaTask );
         Thread t = new Thread( runner, "Play! Server runner" );

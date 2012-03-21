@@ -80,7 +80,6 @@ public abstract class AbstractPlayServerMojo
         javaTask.setProject( antProject );
         javaTask.setClassname( "com.google.code.play.PlayServerBooter" );
         javaTask.setClasspath( classPath );
-        javaTask.setFailonerror( true );
         javaTask.setFork( fork );
         if ( fork )
         {

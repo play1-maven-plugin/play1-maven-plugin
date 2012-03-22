@@ -34,55 +34,29 @@ import org.codehaus.plexus.archiver.war.WarArchiver;
  * Package Play! framework and Play! application as a WAR achive.
  * 
  * @author <a href="mailto:gslowikowski@gmail.com">Grzegorz Slowikowski</a>
- * @goal war
+ * @goal war-inplace
  * @phase package
  * @requiresDependencyResolution test
  */
-public class PlayWarMojo
+public class PlayWarInplaceMojo
     extends AbstractPlayWarMojo
 {
 
     /**
-     * Skip War generation.
+     * Skip War inplace generation.
      * 
-     * @parameter expression="${play.warSkip}" default-value="false"
+     * @parameter expression="${play.warInplaceSkip}" default-value="false"
      * @required
      * @since 1.0.0
      */
-    private boolean warSkip = false;
-
-    /**
-     * The directory for the generated WAR file.
-     * 
-     * @parameter expression="${play.warOutputDirectory}" default-value="${project.build.directory}"
-     * @required
-     * @since 1.0.0
-     */
-    private String warOutputDirectory;
-
-    /**
-     * The name of the generated WAR file.
-     * 
-     * @parameter expression="${play.warArchiveName}" default-value="${project.build.finalName}"
-     * @required
-     * @since 1.0.0
-     */
-    private String warArchiveName;
-
-    /**
-     * Classifier to add to the generated WAR file.
-     * 
-     * @parameter expression="${play.warClassifier}" default-value=""
-     * @since 1.0.0
-     */
-    private String warClassifier;
+    private boolean warInplaceSkip = false;
 
     protected void internalExecute()
         throws MojoExecutionException, MojoFailureException, IOException
     {
-        if ( warSkip )
+        if ( warInplaceSkip )
         {
-            getLog().info( "War generation skipped" );
+            getLog().info( "Inplace war generation skipped" );
             return;
         }
 
@@ -92,18 +66,16 @@ public class PlayWarMojo
         {
             File baseDir = project.getBasedir();
 
-            File destFile = new File( warOutputDirectory, getDestinationFileName() );
-
             File confDir = new File( baseDir, "conf" );
             File configurationFile = new File( confDir, "application.conf" );
             ConfigurationParser configParser = new ConfigurationParser( configurationFile, playWarId );
             configParser.parse();
 
-            WarArchiver warArchiver = prepareArchiver( configParser, true );
-            warArchiver.setDestFile( destFile );
+            WarArchiver warArchiver = prepareArchiver( configParser, false );
 
-            getLog().info( "Building war file: " + destFile.getAbsolutePath() );
-            warArchiver.createArchive();
+            File warOutputDirectory = new File( baseDir, "war" );
+            getLog().info( "Building war directory: " + warOutputDirectory.getAbsolutePath() );
+            expandArchive( warArchiver, warOutputDirectory );
         }
         catch ( ArchiverException e )
         {
@@ -117,22 +89,6 @@ public class PlayWarMojo
         {
             throw new MojoExecutionException( "?", e );
         }
-    }
-
-    private String getDestinationFileName()
-    {
-        StringBuffer buf = new StringBuffer();
-        buf.append( warArchiveName );
-        if ( warClassifier != null && !"".equals( warClassifier ) )
-        {
-            if ( !warClassifier.startsWith( "-" ) )
-            {
-                buf.append( '-' );
-            }
-            buf.append( warClassifier );
-        }
-        buf.append( ".war" );
-        return buf.toString();
     }
 
 }

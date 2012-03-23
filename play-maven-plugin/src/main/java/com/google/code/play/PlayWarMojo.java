@@ -31,7 +31,7 @@ import org.codehaus.plexus.archiver.manager.NoSuchArchiverException;
 import org.codehaus.plexus.archiver.war.WarArchiver;
 
 /**
- * Package Play! framework and Play! application as a WAR achive.
+ * Package Play! application as a WAR achive.
  * 
  * @author <a href="mailto:gslowikowski@gmail.com">Grzegorz Slowikowski</a>
  * @goal war

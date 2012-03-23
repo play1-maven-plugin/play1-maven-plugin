@@ -102,7 +102,8 @@ public abstract class AbstractPlayWarMojo
         File precompiledDir = new File( baseDir, "precompiled" );
         if ( !precompiledDir.exists() )
         {
-            throw new MojoExecutionException( String.format( "\"precompiled\" directory %s does not exist",
+            throw new MojoExecutionException(
+                                              String.format( "\"precompiled\" directory %s does not exist. Run \"mvn play:precompile\" first.",
                                                              precompiledDir.getCanonicalPath() ) );
         }
         if ( !precompiledDir.isDirectory() )

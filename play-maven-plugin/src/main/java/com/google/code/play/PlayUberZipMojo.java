@@ -99,7 +99,7 @@ public class PlayUberZipMojo
     /**
      * Application resources include filter
      * 
-     * @parameter expression="${play.uberzipApplicationIncludes}" default-value="app/**,conf/**,public/**,tags/**,test/**,war/**"
+     * @parameter expression="${play.uberzipApplicationIncludes}" default-value="app/**,conf/**,public/**,tags/**,test/**"
      * @since 1.0.0
      */
     private String uberzipApplicationIncludes;

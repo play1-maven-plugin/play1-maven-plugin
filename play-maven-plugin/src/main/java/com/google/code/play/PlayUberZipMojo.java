@@ -48,16 +48,6 @@ public class PlayUberZipMojo
     extends AbstractDependencyProcessingPlayMojo
 {
 
-    // private final static String[] libIncludes = new String[]{"*.jar"};
-
-    // private final static String[] libExcludes = new String[]{"provided-*.jar"};
-
-    // private final static String[] confIncludes = new String[]{"application.conf", "messages", "messages.*",
-    // "routes"};
-
-    // private final static String[] moduleExcludes = new String[]{"dist/**", "documentation/**", "lib/**",
-    // "nbproject/**", "samples-and-tests/**", "src/**", "build.xml", "commands.py"};
-
     /**
      * Default Play! id (profile).
      * 

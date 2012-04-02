@@ -46,11 +46,11 @@ import org.codehaus.plexus.archiver.manager.NoSuchArchiverException;
  * Packages Play! framework and Play! application as one ZIP achive (standalone distribution).
  * 
  * @author <a href="mailto:gslowikowski@gmail.com">Grzegorz Slowikowski</a>
- * @goal uberzip
+ * @goal dist
  * @phase package
  * @requiresDependencyResolution test
  */
-public class PlayUberZipMojo
+public class PlayDistMojo
     extends AbstractDependencyProcessingPlayMojo
 {
 
@@ -65,77 +65,77 @@ public class PlayUberZipMojo
     /**
      * Skip UberZip generation.
      * 
-     * @parameter expression="${play.uberzipSkip}" default-value="false"
+     * @parameter expression="${play.distSkip}" default-value="false"
      * @required
      * @since 1.0.0
      */
-    private boolean uberzipSkip = false;
+    private boolean distSkip = false;
 
     /**
      * The directory for the generated ZIP file.
      * 
-     * @parameter expression="${play.uberzipOutputDirectory}" default-value="${project.build.directory}"
+     * @parameter expression="${play.distOutputDirectory}" default-value="${project.build.directory}"
      * @required
      * @since 1.0.0
      */
-    private String uberzipOutputDirectory;
+    private String distOutputDirectory;
 
     /**
      * The name of the generated ZIP file.
      * 
-     * @parameter expression="${play.uberzipArchiveName}" default-value="${project.build.finalName}"
+     * @parameter expression="${play.distArchiveName}" default-value="${project.build.finalName}"
      * @required
      * @since 1.0.0
      */
-    private String uberzipArchiveName;
+    private String distArchiveName;
 
     /**
      * Classifier to add to the generated ZIP file.
      * 
-     * @parameter expression="${play.uberzipClassifier}" default-value="with-framework"
+     * @parameter expression="${play.distClassifier}" default-value="with-framework"
      * @since 1.0.0
      */
-    private String uberzipClassifier;
+    private String distClassifier;
 
     /**
      * Attach generated ZIP file to project artifacts.
      * 
-     * @parameter expression="${play.uberzipAttach}" default-value="false"
+     * @parameter expression="${play.distAttach}" default-value="false"
      * @since 1.0.0
      */
-    private boolean uberzipAttach;
+    private boolean distAttach;
 
     /**
      * Application resources include filter
      * 
-     * @parameter expression="${play.uberzipApplicationIncludes}" default-value="app/**,conf/**,public/**,tags/**,test/**"
+     * @parameter expression="${play.distApplicationIncludes}" default-value="app/**,conf/**,public/**,tags/**,test/**"
      * @since 1.0.0
      */
-    private String uberzipApplicationIncludes;
+    private String distApplicationIncludes;
 
     /**
      * Application resources exclude filter.
      * 
-     * @parameter expression="${play.uberzipApplicationExcludes}" default-value=""
+     * @parameter expression="${play.distApplicationExcludes}" default-value=""
      * @since 1.0.0
      */
-    private String uberzipApplicationExcludes;
+    private String distApplicationExcludes;
 
     /**
      * Dependency include filter.
      * 
-     * @parameter expression="${play.uberzipDependencyIncludes}" default-value=""
+     * @parameter expression="${play.distDependencyIncludes}" default-value=""
      * @since 1.0.0
      */
-    private String uberzipDependencyIncludes;
+    private String distDependencyIncludes;
 
     /**
      * Dependency exclude filter.
      * 
-     * @parameter expression="${play.uberzipDependencyExcludes}" default-value=""
+     * @parameter expression="${play.distDependencyExcludes}" default-value=""
      * @since 1.0.0
      */
-    private String uberzipDependencyExcludes;
+    private String distDependencyExcludes;
 
     /**
      * To look up Archiver/UnArchiver implementations.
@@ -155,7 +155,7 @@ public class PlayUberZipMojo
     protected void internalExecute()
         throws MojoExecutionException, MojoFailureException, IOException
     {
-        if ( uberzipSkip )
+        if ( distSkip )
         {
             getLog().info( "UberZip generation skipped" );
             return;
@@ -164,7 +164,7 @@ public class PlayUberZipMojo
         try
         {
             File baseDir = project.getBasedir();
-            File destFile = new File( uberzipOutputDirectory, getDestinationFileName() );
+            File destFile = new File( distOutputDirectory, getDestinationFileName() );
 
             File confDir = new File( baseDir, "conf" );
             File configurationFile = new File( confDir, "application.conf" );
@@ -177,18 +177,18 @@ public class PlayUberZipMojo
             zipArchiver.setDestFile( destFile );
 
             // APPLICATION
-            getLog().debug( "UberZip includes: " + uberzipApplicationIncludes );
-            getLog().debug( "UberZip excludes: " + uberzipApplicationExcludes );
+            getLog().debug( "UberZip includes: " + distApplicationIncludes );
+            getLog().debug( "UberZip excludes: " + distApplicationExcludes );
             String[] applicationIncludes = null;
-            if ( uberzipApplicationIncludes != null )
+            if ( distApplicationIncludes != null )
             {
-                applicationIncludes = uberzipApplicationIncludes.split( "," );
+                applicationIncludes = distApplicationIncludes.split( "," );
             }
             // TODO-don't add "test/**" if profile is not test profile
             String[] applicationExcludes = null;
-            if ( uberzipApplicationExcludes != null )
+            if ( distApplicationExcludes != null )
             {
-                applicationExcludes = uberzipApplicationExcludes.split( "," );
+                applicationExcludes = distApplicationExcludes.split( "," );
             }
             zipArchiver.addDirectory( baseDir, "application/", applicationIncludes, applicationExcludes );
 
@@ -205,17 +205,17 @@ public class PlayUberZipMojo
             }
 
             AndArtifactFilter dependencyFilter = new AndArtifactFilter();
-            if ( uberzipDependencyIncludes != null && !uberzipDependencyIncludes.isEmpty() )
+            if ( distDependencyIncludes != null && !distDependencyIncludes.isEmpty() )
             {
-                List<String> incl = Arrays.asList( uberzipDependencyIncludes.split( "," ) ); 
+                List<String> incl = Arrays.asList( distDependencyIncludes.split( "," ) ); 
                 PatternIncludesArtifactFilter includeFilter =
                     new PatternIncludesArtifactFilter( incl, true/* actTransitively */);
 
                 dependencyFilter.add( includeFilter );
             }
-            if ( uberzipDependencyExcludes != null && !uberzipDependencyExcludes.isEmpty() )
+            if ( distDependencyExcludes != null && !distDependencyExcludes.isEmpty() )
             {
-                List<String> excl = Arrays.asList( uberzipDependencyExcludes.split( "," ) ); 
+                List<String> excl = Arrays.asList( distDependencyExcludes.split( "," ) ); 
                 PatternExcludesArtifactFilter excludeFilter =
                     new PatternExcludesArtifactFilter( excl, true/* actTransitively */);
 
@@ -345,9 +345,9 @@ public class PlayUberZipMojo
 
             zipArchiver.createArchive();
             
-            if ( uberzipAttach )
+            if ( distAttach )
             {
-                projectHelper.attachArtifact( project, "zip", uberzipClassifier, destFile );
+                projectHelper.attachArtifact( project, "zip", distClassifier, destFile );
             }
         }
         catch ( ArchiverException e )
@@ -367,14 +367,14 @@ public class PlayUberZipMojo
     private String getDestinationFileName()
     {
         StringBuffer buf = new StringBuffer();
-        buf.append( uberzipArchiveName );
-        if ( uberzipClassifier != null && !"".equals( uberzipClassifier ) )
+        buf.append( distArchiveName );
+        if ( distClassifier != null && !"".equals( distClassifier ) )
         {
-            if ( !uberzipClassifier.startsWith( "-" ) )
+            if ( !distClassifier.startsWith( "-" ) )
             {
                 buf.append( '-' );
             }
-            buf.append( uberzipClassifier );
+            buf.append( distClassifier );
         }
         buf.append( ".zip" );
         return buf.toString();

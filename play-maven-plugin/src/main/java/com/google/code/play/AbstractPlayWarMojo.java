@@ -50,17 +50,8 @@ public abstract class AbstractPlayWarMojo
     extends AbstractDependencyProcessingPlayMojo
 {
 
-    // private final static String[] libIncludes = new String[] { "*.jar" };
-
-    // private final static String[] libExcludes = new String[] { "provided-*.jar" };
-
-    private static final String[] confIncludes =
+    private static final String[] confClasspathResourcesIncludes =
         new String[] { "application.conf", "messages", "messages.*", "routes" };
-
-    // private final static String[] confIncludes = new String[]{"messages", "messages.*", "routes"};
-
-    // private final static String[] moduleExcludes = new String[] { "dist/**", "documentation/**", "lib/**",
-    // "nbproject/**", "samples-and-tests/**", "src/**", "build.xml", "commands.py" };
 
     /**
      * Play! id (profile) used for WAR packaging.
@@ -134,7 +125,7 @@ public abstract class AbstractPlayWarMojo
         String[] excludes = ( warExcludes != null ? warExcludes.split( "," ) : null );
         warArchiver.addDirectory( baseDir, "WEB-INF/application/", includes, excludes );
 
-        warArchiver.addClasses( new File( baseDir, "conf" ), confIncludes, null );
+        warArchiver.addClasses( new File( baseDir, "conf" ), confClasspathResourcesIncludes, null );
 
         File webXmlFile = new File( baseDir, "war/WEB-INF/web.xml" );
         if ( !webXmlFile.isFile() )

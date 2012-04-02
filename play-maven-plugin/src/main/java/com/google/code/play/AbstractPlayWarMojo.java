@@ -79,6 +79,14 @@ public abstract class AbstractPlayWarMojo
     private String warApplicationExcludes;
 
     /**
+     * Single directory for extra files to include in the WAR.
+     *
+     * @parameter expression="${play.warWebappDirectory}" default-value="${basedir}/war"
+     * @required
+     */
+    protected File warWebappDirectory;
+
+    /**
      * To look up Archiver/UnArchiver implementations.
      * 
      * @component role="org.codehaus.plexus.archiver.manager.ArchiverManager"
@@ -135,7 +143,7 @@ public abstract class AbstractPlayWarMojo
 
         warArchiver.addClasses( new File( baseDir, "conf" ), confClasspathResourcesIncludes, null );
 
-        File webXmlFile = new File( baseDir, "war/WEB-INF/web.xml" );
+        File webXmlFile = new File( warWebappDirectory, "WEB-INF/web.xml" );
         if ( !webXmlFile.isFile() )
         {
             File tmpDirectory = new File( buildDirectory, "play/tmp" );
@@ -251,10 +259,9 @@ public abstract class AbstractPlayWarMojo
 
         if ( addWarDirectory )
         {
-            File warDir = new File( baseDir, "war" );
-            if ( warDir.isDirectory() )
+            if ( warWebappDirectory.isDirectory() )
             {
-                warArchiver.addDirectory( warDir );
+                warArchiver.addDirectory( warWebappDirectory );
             }
         }
 

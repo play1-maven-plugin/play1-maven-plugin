@@ -19,7 +19,6 @@
 
 package com.google.code.play;
 
-import java.io.File;
 import java.io.IOException;
 
 import org.apache.maven.plugin.MojoExecutionException;
@@ -64,15 +63,12 @@ public class PlayWarInplaceMojo
 
         try
         {
-            File baseDir = project.getBasedir();
-
             ConfigurationParser configParser = getConfiguration();
 
             WarArchiver warArchiver = prepareArchiver( configParser, false );
 
-            File warOutputDirectory = new File( baseDir, "war" );
-            getLog().info( "Building war directory: " + warOutputDirectory.getAbsolutePath() );
-            expandArchive( warArchiver, warOutputDirectory );
+            getLog().info( "Building war directory: " + warWebappDirectory.getAbsolutePath() );
+            expandArchive( warArchiver, warWebappDirectory );
         }
         catch ( ArchiverException e )
         {

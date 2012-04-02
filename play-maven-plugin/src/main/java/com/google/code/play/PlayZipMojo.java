@@ -55,18 +55,18 @@ public class PlayZipMojo
     /**
      * Application resources include filter
      * 
-     * @parameter expression="${play.zipIncludes}" default-value="app/**,conf/**,public/**,tags/**"
+     * @parameter expression="${play.zipApplicationIncludes}" default-value="app/**,conf/**,public/**,tags/**"
      * @since 1.0.0
      */
-    private String zipIncludes;
+    private String zipApplicationIncludes;
 
     /**
      * Application resources exclude filter.
      * 
-     * @parameter expression="${play.zipExcludes}" default-value=""
+     * @parameter expression="${play.zipApplicationExcludes}" default-value=""
      * @since 1.0.0
      */
-    private String zipExcludes;
+    private String zipApplicationExcludes;
 
     /**
      * Should project dependencies ("lib" and "modules" directories) be packaged. No include/exclude filters.
@@ -114,10 +114,10 @@ public class PlayZipMojo
             zipArchiver.setDuplicateBehavior( Archiver.DUPLICATES_FAIL ); // Just in case
             zipArchiver.setDestFile( destFile );
 
-            getLog().debug( "Zip includes: " + zipIncludes );
-            getLog().debug( "Zip excludes: " + zipExcludes );
-            String[] includes = ( zipIncludes != null ? zipIncludes.split( "," ) : null );
-            String[] excludes = ( zipExcludes != null ? zipExcludes.split( "," ) : null );
+            getLog().debug( "Zip includes: " + zipApplicationIncludes );
+            getLog().debug( "Zip excludes: " + zipApplicationExcludes );
+            String[] includes = ( zipApplicationIncludes != null ? zipApplicationIncludes.split( "," ) : null );
+            String[] excludes = ( zipApplicationExcludes != null ? zipApplicationExcludes.split( "," ) : null );
             zipArchiver.addDirectory( baseDir, includes, excludes );
 
             if ( zipDependencies )

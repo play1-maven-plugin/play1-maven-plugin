@@ -104,18 +104,18 @@ public class PlayUberZipMojo
     /**
      * Application resources include filter
      * 
-     * @parameter expression="${play.uberzipIncludes}" default-value="app/**,conf/**,public/**,tags/**,test/**"
+     * @parameter expression="${play.uberzipApplicationIncludes}" default-value="app/**,conf/**,public/**,tags/**,test/**,war/**"
      * @since 1.0.0
      */
-    private String uberzipIncludes;
+    private String uberzipApplicationIncludes;
 
     /**
      * Application resources exclude filter.
      * 
-     * @parameter expression="${play.uberzipExcludes}" default-value=""
+     * @parameter expression="${play.uberzipApplicationExcludes}" default-value=""
      * @since 1.0.0
      */
-    private String uberzipExcludes;
+    private String uberzipApplicationExcludes;
 
     /**
      * To look up Archiver/UnArchiver implementations.
@@ -150,11 +150,20 @@ public class PlayUberZipMojo
             zipArchiver.setDestFile( destFile );
 
             // APPLICATION
-            getLog().debug( "UberZip includes: " + uberzipIncludes );
-            getLog().debug( "UberZip excludes: " + uberzipExcludes );
-            String[] includes = ( uberzipIncludes != null ? uberzipIncludes.split( "," ) : null );
-            String[] excludes = ( uberzipExcludes != null ? uberzipExcludes.split( "," ) : null );
-            zipArchiver.addDirectory( baseDir, "application/", includes, excludes );
+            getLog().debug( "UberZip includes: " + uberzipApplicationIncludes );
+            getLog().debug( "UberZip excludes: " + uberzipApplicationExcludes );
+            String[] applicationIncludes = null;
+            if ( uberzipApplicationIncludes != null )
+            {
+                applicationIncludes = uberzipApplicationIncludes.split( "," );
+            }
+            // TODO-don't add "test/**" if profile is not test profile
+            String[] applicationExcludes = null;
+            if ( uberzipApplicationExcludes != null )
+            {
+                applicationExcludes = uberzipApplicationExcludes.split( "," );
+            }
+            zipArchiver.addDirectory( baseDir, "application/", applicationIncludes, applicationExcludes );
 
             // preparation
             Set<?> projectArtifacts = project.getArtifacts();

@@ -27,7 +27,13 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.codehaus.plexus.util.FileUtils;
 
 /**
- * Clean Play! temporary directories: - "tmp"
+ * Clean Play! temporary directories:
+ *  - "db"
+ *  - "lib" and "modules"
+ *  - "logs"
+ *  - "precompiled"
+ *  - "test-result"
+ *  - "tmp"
  * 
  * @author <a href="mailto:gslowikowski@gmail.com">Grzegorz Slowikowski</a>
  * @goal clean
@@ -51,6 +57,14 @@ public class PlayCleanMojo
      * @since 1.0.0
      */
     private boolean cleanAll;
+
+    /**
+     * Should "db" directory be deleted.
+     * 
+     * @parameter expression="${play.cleanDb}" default-value="false"
+     * @since 1.0.0
+     */
+    private boolean cleanDb;
 
     /**
      * Should "lib" and "modules" directories be deleted.
@@ -85,6 +99,14 @@ public class PlayCleanMojo
     private boolean cleanTestResult;
 
     /**
+     * Should "tmp" directory be deleted.
+     * 
+     * @parameter expression="${play.cleanTmp}" default-value="true"
+     * @since 1.0.0
+     */
+    private boolean cleanTmp;
+
+    /**
      * Skip cleaning.
      * 
      * @parameter expression="${play.cleanSkip}" default-value="false"
@@ -112,25 +134,33 @@ public class PlayCleanMojo
                                                              pidFile.getName() ) );
         }
 
-        File confDir = new File( baseDir, "conf" );
-        File configurationFile = new File( confDir, "application.conf" );
-
-        ConfigurationParser configParser = new ConfigurationParser( configurationFile, playId );
-        configParser.parse();
-        String tmpDirName = configParser.getProperty( "play.tmp", "tmp" );
-
-        if ( "none".equals( tmpDirName ) )
+        if ( cleanAll || cleanTmp )
         {
-            getLog().info( "No tmp folder will be used (play.tmp is set to \"none\")" );
-        }
-        else
-        {
-            File tmpDir = new File( tmpDirName );
-            if ( !tmpDir.isAbsolute() )
+            File confDir = new File( baseDir, "conf" );
+            File configurationFile = new File( confDir, "application.conf" );
+
+            ConfigurationParser configParser = new ConfigurationParser( configurationFile, playId );
+            configParser.parse();
+            String tmpDirName = configParser.getProperty( "play.tmp", "tmp" );
+
+            if ( "none".equals( tmpDirName ) )
             {
-                tmpDir = new File( baseDir, tmpDir.getPath() );
+                getLog().info( "No tmp folder will be used (play.tmp is set to \"none\")" );
             }
-            deleteDirectory( tmpDir );
+            else
+            {
+                File tmpDir = new File( tmpDirName );
+                if ( !tmpDir.isAbsolute() )
+                {
+                    tmpDir = new File( baseDir, tmpDir.getPath() );
+                }
+                deleteDirectory( tmpDir );
+            }
+        }
+
+        if ( cleanAll || cleanDb )
+        {
+            deleteDirectory( new File( baseDir, "db" ) );
         }
 
         if ( cleanAll || cleanDependencies )

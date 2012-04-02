@@ -90,14 +90,9 @@ public class PlayWarMojo
 
         try
         {
-            File baseDir = project.getBasedir();
-
             File destFile = new File( warOutputDirectory, getDestinationFileName() );
 
-            File confDir = new File( baseDir, "conf" );
-            File configurationFile = new File( confDir, "application.conf" );
-            ConfigurationParser configParser = new ConfigurationParser( configurationFile, playWarId );
-            configParser.parse();
+            ConfigurationParser configParser = getConfiguration();
 
             WarArchiver warArchiver = prepareArchiver( configParser, true );
             warArchiver.setDestFile( destFile );

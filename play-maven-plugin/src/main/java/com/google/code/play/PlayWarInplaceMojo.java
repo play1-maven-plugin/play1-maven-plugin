@@ -66,10 +66,7 @@ public class PlayWarInplaceMojo
         {
             File baseDir = project.getBasedir();
 
-            File confDir = new File( baseDir, "conf" );
-            File configurationFile = new File( confDir, "application.conf" );
-            ConfigurationParser configParser = new ConfigurationParser( configurationFile, playWarId );
-            configParser.parse();
+            ConfigurationParser configParser = getConfiguration();
 
             WarArchiver warArchiver = prepareArchiver( configParser, false );
 

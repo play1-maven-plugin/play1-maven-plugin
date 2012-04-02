@@ -307,6 +307,17 @@ public abstract class AbstractPlayWarMojo
         }
     }
     
+    protected ConfigurationParser getConfiguration() throws IOException
+    {
+        File baseDir = project.getBasedir();
+        File confDir = new File( baseDir, "conf" );
+        File configurationFile = new File( confDir, "application.conf" );
+        ConfigurationParser configParser = new ConfigurationParser( configurationFile, playWarId );
+        configParser.parse();
+        
+        return configParser;
+    }
+    
 }
 
 // TODO

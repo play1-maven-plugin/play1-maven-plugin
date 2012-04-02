@@ -21,14 +21,19 @@ package com.google.code.play;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.resolver.filter.AndArtifactFilter;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.shared.artifact.filter.PatternExcludesArtifactFilter;
+import org.apache.maven.shared.artifact.filter.PatternIncludesArtifactFilter;
 import org.apache.maven.shared.dependency.tree.DependencyTreeBuilderException;
 
 import org.codehaus.plexus.archiver.Archiver;
@@ -108,6 +113,22 @@ public class PlayUberZipMojo
     private String uberzipApplicationExcludes;
 
     /**
+     * Dependency include filter.
+     * 
+     * @parameter expression="${play.uberzipDependencyIncludes}" default-value=""
+     * @since 1.0.0
+     */
+    private String uberzipDependencyIncludes;
+
+    /**
+     * Dependency exclude filter.
+     * 
+     * @parameter expression="${play.uberzipDependencyExcludes}" default-value=""
+     * @since 1.0.0
+     */
+    private String uberzipDependencyExcludes;
+
+    /**
      * To look up Archiver/UnArchiver implementations.
      * 
      * @component role="org.codehaus.plexus.archiver.manager.ArchiverManager"
@@ -167,6 +188,24 @@ public class PlayUberZipMojo
                 excludedArtifacts.addAll( getDependencyArtifacts( projectArtifacts, playSeleniumJunit4Artifact ) );
             }
 
+            AndArtifactFilter dependencyFilter = new AndArtifactFilter();
+            if ( uberzipDependencyIncludes != null && !uberzipDependencyIncludes.isEmpty() )
+            {
+                List<String> incl = Arrays.asList( uberzipDependencyIncludes.split( "," ) ); 
+                PatternIncludesArtifactFilter includeFilter =
+                    new PatternIncludesArtifactFilter( incl, true/* actTransitively */);
+
+                dependencyFilter.add( includeFilter );
+            }
+            if ( uberzipDependencyExcludes != null && !uberzipDependencyExcludes.isEmpty() )
+            {
+                List<String> excl = Arrays.asList( uberzipDependencyExcludes.split( "," ) ); 
+                PatternExcludesArtifactFilter excludeFilter =
+                    new PatternExcludesArtifactFilter( excl, true/* actTransitively */);
+
+                dependencyFilter.add( excludeFilter );
+            }
+
             Set<Artifact> filteredArtifacts = new HashSet<Artifact>(); // TODO-rename to filteredClassPathArtifacts
             for ( Iterator<?> iter = projectArtifacts.iterator(); iter.hasNext(); )
             {
@@ -174,7 +213,14 @@ public class PlayUberZipMojo
                 if ( artifact.getArtifactHandler().isAddedToClasspath() && !excludedArtifacts.contains( artifact ) )
                 {
                     // TODO-add checkPotentialReactorProblem( artifact );
-                    filteredArtifacts.add( artifact );
+                    if ( dependencyFilter.include( artifact ) )
+                    {
+                        filteredArtifacts.add( artifact );
+                    }
+                    else
+                    {
+                        getLog().debug( artifact.toString() + " excluded" );
+                    }
                 }
             }
 

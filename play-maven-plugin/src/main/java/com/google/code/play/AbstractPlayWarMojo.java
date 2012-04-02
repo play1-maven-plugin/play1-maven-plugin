@@ -22,13 +22,21 @@ package com.google.code.play;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.resolver.filter.AndArtifactFilter;
+//import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.plugin.MojoExecutionException;
+
+import org.apache.maven.shared.artifact.filter.PatternExcludesArtifactFilter;
+import org.apache.maven.shared.artifact.filter.PatternIncludesArtifactFilter;
+
 import org.apache.maven.shared.dependency.tree.DependencyTreeBuilderException;
 
 import org.codehaus.plexus.archiver.ArchiveEntry;
@@ -85,6 +93,22 @@ public abstract class AbstractPlayWarMojo
      * @required
      */
     protected File warWebappDirectory;
+
+    /**
+     * Dependency include filter.
+     * 
+     * @parameter expression="${play.warDependencyIncludes}" default-value=""
+     * @since 1.0.0
+     */
+    private String warDependencyIncludes;
+
+    /**
+     * Dependency exclude filter.
+     * 
+     * @parameter expression="${play.warDependencyExcludes}" default-value=""
+     * @since 1.0.0
+     */
+    private String warDependencyExcludes;
 
     /**
      * To look up Archiver/UnArchiver implementations.
@@ -165,6 +189,24 @@ public abstract class AbstractPlayWarMojo
             excludedArtifacts.addAll( getDependencyArtifacts( projectArtifacts, playSeleniumJunit4Artifact ) );
         }
 
+        AndArtifactFilter dependencyFilter = new AndArtifactFilter();
+        if ( warDependencyIncludes != null && !warDependencyIncludes.isEmpty() )
+        {
+            List<String> incl = Arrays.asList( warDependencyIncludes.split( "," ) ); 
+            PatternIncludesArtifactFilter includeFilter =
+                new PatternIncludesArtifactFilter( incl, true/* actTransitively */);
+
+            dependencyFilter.add( includeFilter );
+        }
+        if ( warDependencyExcludes != null && !warDependencyExcludes.isEmpty() )
+        {
+            List<String> excl = Arrays.asList( warDependencyExcludes.split( "," ) ); 
+            PatternExcludesArtifactFilter excludeFilter =
+                new PatternExcludesArtifactFilter( excl, true/* actTransitively */);
+
+            dependencyFilter.add( excludeFilter );
+        }
+
         Set<Artifact> filteredArtifacts = new HashSet<Artifact>();
         for ( Iterator<?> iter = projectArtifacts.iterator(); iter.hasNext(); )
         {
@@ -172,7 +214,14 @@ public abstract class AbstractPlayWarMojo
             if ( artifact.getArtifactHandler().isAddedToClasspath() && !excludedArtifacts.contains( artifact ) )
             {
                 // TODO-add checkPotentialReactorProblem( artifact );
-                filteredArtifacts.add( artifact );
+                if ( dependencyFilter.include( artifact ) )
+                {
+                    filteredArtifacts.add( artifact );
+                }
+                else
+                {
+                    getLog().debug( artifact.toString() + " excluded" );
+                }
             }
         }
 

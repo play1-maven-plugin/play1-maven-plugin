@@ -63,7 +63,7 @@ public class PlayDistMojo
     protected String playId;
 
     /**
-     * Skip UberZip generation.
+     * Skip distribution file generation.
      * 
      * @parameter expression="${play.distSkip}" default-value="false"
      * @required
@@ -72,7 +72,7 @@ public class PlayDistMojo
     private boolean distSkip = false;
 
     /**
-     * The directory for the generated ZIP file.
+     * The directory for the generated distribution file.
      * 
      * @parameter expression="${play.distOutputDirectory}" default-value="${project.build.directory}"
      * @required
@@ -81,7 +81,7 @@ public class PlayDistMojo
     private String distOutputDirectory;
 
     /**
-     * The name of the generated ZIP file.
+     * The name of the generated distribution file.
      * 
      * @parameter expression="${play.distArchiveName}" default-value="${project.build.finalName}"
      * @required
@@ -90,15 +90,15 @@ public class PlayDistMojo
     private String distArchiveName;
 
     /**
-     * Classifier to add to the generated ZIP file.
+     * Classifier to add to the generated distribution file.
      * 
-     * @parameter expression="${play.distClassifier}" default-value="with-framework"
+     * @parameter expression="${play.distClassifier}" default-value="dist"
      * @since 1.0.0
      */
     private String distClassifier;
 
     /**
-     * Attach generated ZIP file to project artifacts.
+     * Attach generated distribution file to project artifacts.
      * 
      * @parameter expression="${play.distAttach}" default-value="false"
      * @since 1.0.0
@@ -106,7 +106,7 @@ public class PlayDistMojo
     private boolean distAttach;
 
     /**
-     * Application resources include filter
+     * Distribution application resources include filter
      * 
      * @parameter expression="${play.distApplicationIncludes}" default-value="app/**,conf/**,public/**,tags/**,test/**"
      * @since 1.0.0
@@ -114,7 +114,7 @@ public class PlayDistMojo
     private String distApplicationIncludes;
 
     /**
-     * Application resources exclude filter.
+     * Distribution application resources exclude filter.
      * 
      * @parameter expression="${play.distApplicationExcludes}" default-value=""
      * @since 1.0.0
@@ -122,7 +122,7 @@ public class PlayDistMojo
     private String distApplicationExcludes;
 
     /**
-     * Dependency include filter.
+     * Distribution dependency include filter.
      * 
      * @parameter expression="${play.distDependencyIncludes}" default-value=""
      * @since 1.0.0
@@ -130,7 +130,7 @@ public class PlayDistMojo
     private String distDependencyIncludes;
 
     /**
-     * Dependency exclude filter.
+     * Distribution dependency exclude filter.
      * 
      * @parameter expression="${play.distDependencyExcludes}" default-value=""
      * @since 1.0.0

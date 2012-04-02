@@ -194,7 +194,7 @@ public abstract class AbstractPlayWarMojo
         {
             List<String> incl = Arrays.asList( warDependencyIncludes.split( "," ) ); 
             PatternIncludesArtifactFilter includeFilter =
-                new PatternIncludesArtifactFilter( incl, true/* actTransitively */);
+                new PatternIncludesArtifactFilter( incl, true/* actTransitively */ );
 
             dependencyFilter.add( includeFilter );
         }
@@ -202,7 +202,7 @@ public abstract class AbstractPlayWarMojo
         {
             List<String> excl = Arrays.asList( warDependencyExcludes.split( "," ) ); 
             PatternExcludesArtifactFilter excludeFilter =
-                new PatternExcludesArtifactFilter( excl, true/* actTransitively */);
+                new PatternExcludesArtifactFilter( excl, true/* actTransitively */ );
 
             dependencyFilter.add( excludeFilter );
         }

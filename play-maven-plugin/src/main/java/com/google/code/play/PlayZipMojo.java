@@ -162,7 +162,7 @@ public class PlayZipMojo
         {
             List<String> incl = Arrays.asList( zipDependencyIncludes.split( "," ) ); 
             PatternIncludesArtifactFilter includeFilter =
-                new PatternIncludesArtifactFilter( incl, true/* actTransitively */);
+                new PatternIncludesArtifactFilter( incl, true/* actTransitively */ );
 
             dependencyFilter.add( includeFilter );
         }
@@ -170,7 +170,7 @@ public class PlayZipMojo
         {
             List<String> excl = Arrays.asList( zipDependencyExcludes.split( "," ) ); 
             PatternExcludesArtifactFilter excludeFilter =
-                new PatternExcludesArtifactFilter( excl, true/* actTransitively */);
+                new PatternExcludesArtifactFilter( excl, true/* actTransitively */ );
 
             dependencyFilter.add( excludeFilter );
         }

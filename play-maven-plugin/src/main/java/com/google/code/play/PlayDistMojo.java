@@ -209,7 +209,7 @@ public class PlayDistMojo
             {
                 List<String> incl = Arrays.asList( distDependencyIncludes.split( "," ) ); 
                 PatternIncludesArtifactFilter includeFilter =
-                    new PatternIncludesArtifactFilter( incl, true/* actTransitively */);
+                    new PatternIncludesArtifactFilter( incl, true/* actTransitively */ );
 
                 dependencyFilter.add( includeFilter );
             }
@@ -217,7 +217,7 @@ public class PlayDistMojo
             {
                 List<String> excl = Arrays.asList( distDependencyExcludes.split( "," ) ); 
                 PatternExcludesArtifactFilter excludeFilter =
-                    new PatternExcludesArtifactFilter( excl, true/* actTransitively */);
+                    new PatternExcludesArtifactFilter( excl, true/* actTransitively */ );
 
                 dependencyFilter.add( excludeFilter );
             }

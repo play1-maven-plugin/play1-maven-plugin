@@ -162,10 +162,13 @@ public class PlayCleanMojo
         {
             //TODO - this is temporary solution to avoid deleting "db/evolutions" subdirectory, improve it
             File dbDir = new File( baseDir, "db" );
-            deleteDirectory( new File( dbDir, "h2" ) );
-            if ( dbDir.list().length == 0 ) // empty directory
+            if ( dbDir.exists() )
             {
-                deleteDirectory( dbDir );
+                deleteDirectory( new File( dbDir, "h2" ) );
+                if ( dbDir.list().length == 0 ) // empty directory
+                {
+                    deleteDirectory( dbDir );
+                }
             }
         }
 

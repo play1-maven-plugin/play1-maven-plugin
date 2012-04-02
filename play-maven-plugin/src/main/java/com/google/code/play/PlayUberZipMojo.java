@@ -32,6 +32,7 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.resolver.filter.AndArtifactFilter;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.project.MavenProjectHelper;
 import org.apache.maven.shared.artifact.filter.PatternExcludesArtifactFilter;
 import org.apache.maven.shared.artifact.filter.PatternIncludesArtifactFilter;
 import org.apache.maven.shared.dependency.tree.DependencyTreeBuilderException;
@@ -97,6 +98,14 @@ public class PlayUberZipMojo
     private String uberzipClassifier;
 
     /**
+     * Attach generated ZIP file to project artifacts.
+     * 
+     * @parameter expression="${play.uberzipAttach}" default-value="false"
+     * @since 1.0.0
+     */
+    private boolean uberzipAttach;
+
+    /**
      * Application resources include filter
      * 
      * @parameter expression="${play.uberzipApplicationIncludes}" default-value="app/**,conf/**,public/**,tags/**,test/**"
@@ -135,6 +144,13 @@ public class PlayUberZipMojo
      * @required
      */
     private ArchiverManager archiverManager;
+
+    /**
+     * Maven ProjectHelper.
+     * 
+     * @component
+     */
+    private MavenProjectHelper projectHelper;
 
     protected void internalExecute()
         throws MojoExecutionException, MojoFailureException, IOException
@@ -328,6 +344,11 @@ public class PlayUberZipMojo
             }
 
             zipArchiver.createArchive();
+            
+            if ( uberzipAttach )
+            {
+                projectHelper.attachArtifact( project, "zip", uberzipClassifier, destFile );
+            }
         }
         catch ( ArchiverException e )
         {

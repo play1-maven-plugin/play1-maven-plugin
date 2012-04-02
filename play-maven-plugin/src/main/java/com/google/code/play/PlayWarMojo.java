@@ -24,6 +24,7 @@ import java.io.IOException;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.project.MavenProjectHelper;
 import org.apache.maven.shared.dependency.tree.DependencyTreeBuilderException;
 
 import org.codehaus.plexus.archiver.ArchiverException;
@@ -78,6 +79,14 @@ public class PlayWarMojo
     private String warClassifier;
 
     /**
+     * Attach generated WAR file to project artifacts.
+     * 
+     * @parameter expression="${play.warAttach}" default-value="false"
+     * @since 1.0.0
+     */
+    private boolean warAttach;
+
+    /**
      * WAR webapp directory include filter.
      * 
      * @parameter expression="${play.warWebappIncludes}" default-value="**"
@@ -92,6 +101,13 @@ public class PlayWarMojo
      * @since 1.0.0
      */
     private String warWebappExcludes;
+
+    /**
+     * Maven ProjectHelper.
+     * 
+     * @component
+     */
+    private MavenProjectHelper projectHelper;
 
     protected void internalExecute()
         throws MojoExecutionException, MojoFailureException, IOException
@@ -115,6 +131,11 @@ public class PlayWarMojo
 
             getLog().info( "Building war file: " + destFile.getAbsolutePath() );
             warArchiver.createArchive();
+            
+            if ( warAttach )
+            {
+                projectHelper.attachArtifact( project, "war", warClassifier, destFile );
+            }
         }
         catch ( ArchiverException e )
         {

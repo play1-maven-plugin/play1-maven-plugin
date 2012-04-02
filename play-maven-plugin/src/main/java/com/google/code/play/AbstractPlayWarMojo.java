@@ -261,7 +261,17 @@ public abstract class AbstractPlayWarMojo
         {
             if ( warWebappDirectory.isDirectory() )
             {
-                warArchiver.addDirectory( warWebappDirectory );
+                String[] webappIncludes = null;
+                if ( getWebappIncludes() != null )
+                {
+                    webappIncludes = getWebappIncludes().split( "," );
+                }
+                String[] webappExcludes = null;
+                if ( getWebappExcludes() != null )
+                {
+                    webappExcludes = getWebappExcludes().split( "," );
+                }
+                warArchiver.addDirectory( warWebappDirectory, webappIncludes, webappExcludes );
             }
         }
 
@@ -313,6 +323,16 @@ public abstract class AbstractPlayWarMojo
         }
     }
     
+    protected String getWebappIncludes()
+    {
+        return null;
+    }
+
+    protected String getWebappExcludes()
+    {
+        return null;
+    }
+
     protected ConfigurationParser getConfiguration() throws IOException
     {
         File baseDir = project.getBasedir();

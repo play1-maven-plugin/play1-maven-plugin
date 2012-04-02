@@ -77,6 +77,22 @@ public class PlayWarMojo
      */
     private String warClassifier;
 
+    /**
+     * WAR webapp directory include filter.
+     * 
+     * @parameter expression="${play.warWebappIncludes}" default-value="**"
+     * @since 1.0.0
+     */
+    private String warWebappIncludes;
+
+    /**
+     * WAR webapp directory exclude filter.
+     * 
+     * @parameter expression="${play.warWebappExcludes}" default-value=""
+     * @since 1.0.0
+     */
+    private String warWebappExcludes;
+
     protected void internalExecute()
         throws MojoExecutionException, MojoFailureException, IOException
     {
@@ -128,6 +144,16 @@ public class PlayWarMojo
         }
         buf.append( ".war" );
         return buf.toString();
+    }
+
+    protected String getWebappIncludes()
+    {
+        return warWebappIncludes;
+    }
+
+    protected String getWebappExcludes()
+    {
+        return warWebappExcludes;
     }
 
 }

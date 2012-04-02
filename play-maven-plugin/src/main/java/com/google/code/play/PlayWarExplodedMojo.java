@@ -51,6 +51,22 @@ public class PlayWarExplodedMojo
      */
     private boolean warExplodedSkip = false;
 
+    /**
+     * WAR webapp directory include filter.
+     * 
+     * @parameter expression="${play.warWebappIncludes}" default-value="**"
+     * @since 1.0.0
+     */
+    private String warWebappIncludes;
+
+    /**
+     * WAR webapp directory exclude filter.
+     * 
+     * @parameter expression="${play.warWebappExcludes}" default-value=""
+     * @since 1.0.0
+     */
+    private String warWebappExcludes;
+
     protected void internalExecute()
         throws MojoExecutionException, MojoFailureException, IOException
     {
@@ -84,6 +100,16 @@ public class PlayWarExplodedMojo
         {
             throw new MojoExecutionException( "?", e );
         }
+    }
+
+    protected String getWebappIncludes()
+    {
+        return warWebappIncludes;
+    }
+
+    protected String getWebappExcludes()
+    {
+        return warWebappExcludes;
     }
 
 }

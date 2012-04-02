@@ -64,19 +64,19 @@ public abstract class AbstractPlayWarMojo
     /**
      * Application resources include filter
      * 
-     * @parameter expression="${play.warIncludes}"
+     * @parameter expression="${play.warApplicationIncludes}"
      *            default-value="app/**,conf/**,precompiled/**,public/**,tags/**,test/**"
      * @since 1.0.0
      */
-    private String warIncludes;
+    private String warApplicationIncludes;
 
     /**
      * Application resources exclude filter.
      * 
-     * @parameter expression="${play.warExcludes}" default-value=""
+     * @parameter expression="${play.warApplicationExcludes}" default-value="war/**"
      * @since 1.0.0
      */
-    private String warExcludes;
+    private String warApplicationExcludes;
 
     /**
      * To look up Archiver/UnArchiver implementations.
@@ -118,12 +118,20 @@ public abstract class AbstractPlayWarMojo
         Set<String> providedModuleNames = getProvidedModuleNames( configParser, playWarId, true );
 
         // APPLICATION
-        getLog().debug( "War includes: " + warIncludes );
-        getLog().debug( "War excludes: " + warExcludes );
-        String[] includes = ( warIncludes != null ? warIncludes.split( "," ) : null );
+        getLog().debug( "War application includes: " + warApplicationIncludes );
+        getLog().debug( "War application excludes: " + warApplicationExcludes );
+        String[] applicationIncludes = null;
+        if ( warApplicationIncludes != null )
+        {
+            applicationIncludes = warApplicationIncludes.split( "," );
+        }
         // TODO-don't add "test/**" if profile is not test profile
-        String[] excludes = ( warExcludes != null ? warExcludes.split( "," ) : null );
-        warArchiver.addDirectory( baseDir, "WEB-INF/application/", includes, excludes );
+        String[] applicationExcludes = null;
+        if ( warApplicationExcludes != null )
+        {
+            applicationExcludes = warApplicationExcludes.split( "," );
+        }
+        warArchiver.addDirectory( baseDir, "WEB-INF/application/", applicationIncludes, applicationExcludes );
 
         warArchiver.addClasses( new File( baseDir, "conf" ), confClasspathResourcesIncludes, null );
 

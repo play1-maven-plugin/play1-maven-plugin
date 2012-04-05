@@ -91,6 +91,7 @@ public abstract class AbstractPlayWarMojo
      *
      * @parameter expression="${play.warWebappDirectory}" default-value="${basedir}/war"
      * @required
+     * @since 1.0.0
      */
     protected File warWebappDirectory;
 

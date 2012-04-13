@@ -202,6 +202,7 @@ public abstract class AbstractPlayServerMojo
     {
         Path classPath = new Path( antProject );
 
+        classPath.createPathElement().setLocation( new File( project.getBasedir(), "conf" ) );
         Set<?> classPathArtifacts = project.getArtifacts();
         Collection<Artifact> excludedArtifacts = getExcludedArtifacts( classPathArtifacts, playId );
         for ( Iterator<?> iter = classPathArtifacts.iterator(); iter.hasNext(); )

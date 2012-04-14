@@ -1,0 +1,107 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
+package com.google.code.play;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+
+import org.codehaus.plexus.archiver.ArchiveEntry;
+import org.codehaus.plexus.archiver.Archiver;
+import org.codehaus.plexus.archiver.ResourceIterator;
+import org.codehaus.plexus.archiver.manager.ArchiverManager;
+import org.codehaus.plexus.components.io.resources.PlexusIoResource;
+import org.codehaus.plexus.util.FileUtils;
+import org.codehaus.plexus.util.io.RawInputStreamFacade;
+
+/**
+ * Base class for Play! packaging mojos.
+ * 
+ * @author <a href="mailto:gslowikowski@gmail.com">Grzegorz Slowikowski</a>
+ */
+public abstract class AbstractArchivingMojo
+    extends AbstractDependencyProcessingPlayMojo
+{
+
+    /**
+     * To look up Archiver/UnArchiver implementations.
+     * 
+     * @component role="org.codehaus.plexus.archiver.manager.ArchiverManager"
+     * @required
+     */
+    protected ArchiverManager archiverManager;
+
+    protected void expandArchive( Archiver archiver, File destDirectory )
+        throws IOException
+    {
+        for ( ResourceIterator iter = archiver.getResources(); iter.hasNext(); )
+        {
+            ArchiveEntry entry = iter.next();
+            String name = entry.getName();
+            name = name.replace( File.separatorChar, '/' );
+            File destFile = new File( destDirectory, name );
+
+            PlexusIoResource resource = entry.getResource();
+            boolean skip = false;
+            if ( destFile.exists() )
+            {
+                long resLastModified = resource.getLastModified();
+                if ( resLastModified != PlexusIoResource.UNKNOWN_MODIFICATION_DATE )
+                {
+                    long destFileLastModified = destFile.lastModified(); // TODO-use this
+                    if ( resLastModified <= destFileLastModified )
+                    {
+                        skip = true;
+                    }
+                }
+            }
+
+            if ( !skip )
+            {
+                switch ( entry.getType() )
+                {
+                    case ArchiveEntry.DIRECTORY:
+                        destFile.mkdirs(); // change to PlexusUtils, check result
+                        break;
+                    case ArchiveEntry.FILE:
+                        InputStream contents = resource.getContents();
+                        RawInputStreamFacade facade = new RawInputStreamFacade( contents );
+                        FileUtils.copyStreamToFile( facade, destFile );
+                        break;
+                    default:
+                        throw new RuntimeException( "Unknown archive entry type: " + entry.getType() ); // TODO-polish, what exception class?
+                }
+                // System.out.println(entry.getName());
+            }
+        }
+    }
+    
+    protected ConfigurationParser getConfiguration( String playId ) throws IOException
+    {
+        File baseDir = project.getBasedir();
+        File confDir = new File( baseDir, "conf" );
+        File configurationFile = new File( confDir, "application.conf" );
+        ConfigurationParser configParser = new ConfigurationParser( configurationFile, playId );
+        configParser.parse();
+        
+        return configParser;
+    }
+    
+}

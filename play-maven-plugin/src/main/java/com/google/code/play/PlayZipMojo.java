@@ -38,8 +38,8 @@ import org.apache.maven.shared.dependency.tree.DependencyTreeBuilderException;
 
 import org.codehaus.plexus.archiver.Archiver;
 import org.codehaus.plexus.archiver.ArchiverException;
-import org.codehaus.plexus.archiver.manager.ArchiverManager;
 import org.codehaus.plexus.archiver.manager.NoSuchArchiverException;
+import org.codehaus.plexus.archiver.zip.ZipArchiver;
 
 /**
  * Package Play! application as a ZIP achive.
@@ -50,7 +50,7 @@ import org.codehaus.plexus.archiver.manager.NoSuchArchiverException;
  * @requiresDependencyResolution runtime
  */
 public class PlayZipMojo
-    extends AbstractDependencyProcessingPlayMojo
+    extends AbstractArchivingMojo
 {
     /**
      * Application resources include filter
@@ -92,14 +92,6 @@ public class PlayZipMojo
      */
     private String zipDependencyExcludes;
 
-    /**
-     * To look up Archiver/UnArchiver implementations.
-     * 
-     * @component role="org.codehaus.plexus.archiver.manager.ArchiverManager"
-     * @required
-     */
-    private ArchiverManager archiverManager;
-
     protected void internalExecute()
         throws MojoExecutionException, MojoFailureException, IOException
     {
@@ -110,7 +102,7 @@ public class PlayZipMojo
             String zipName = project.getBuild().getFinalName();
             File destFile = new File( zipOutputDirectory, zipName + ".zip" );
 
-            Archiver zipArchiver = archiverManager.getArchiver( "zip" );
+            ZipArchiver zipArchiver = (ZipArchiver) archiverManager.getArchiver( "zip" );
             zipArchiver.setDuplicateBehavior( Archiver.DUPLICATES_FAIL ); // Just in case
             zipArchiver.setDestFile( destFile );
 
@@ -142,7 +134,7 @@ public class PlayZipMojo
         }
     }
 
-    private void processDependencies( Archiver zipArchiver )
+    private void processDependencies( ZipArchiver zipArchiver )
         throws DependencyTreeBuilderException, IOException
     {
         // preparation

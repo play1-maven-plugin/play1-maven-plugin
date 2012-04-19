@@ -44,21 +44,13 @@ public class PlayDistMojo
 {
 
     /**
-     * Default Play! id (profile).
-     * 
-     * @parameter expression="${play.id}" default-value=""
-     * @since 1.0.0
-     */
-    protected String playId;
-
-    /**
      * Skip distribution file generation.
      * 
      * @parameter expression="${play.distSkip}" default-value="false"
      * @required
      * @since 1.0.0
      */
-    private boolean distSkip = false;
+    private boolean distSkip;
 
     /**
      * The directory for the generated distribution file.

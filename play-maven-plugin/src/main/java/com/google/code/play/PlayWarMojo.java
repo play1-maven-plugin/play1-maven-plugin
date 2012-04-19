@@ -50,7 +50,7 @@ public class PlayWarMojo
      * @required
      * @since 1.0.0
      */
-    private boolean warSkip = false;
+    private boolean warSkip;
 
     /**
      * The directory for the generated WAR file.

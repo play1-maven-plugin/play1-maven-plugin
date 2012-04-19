@@ -63,7 +63,7 @@ public class PlayInitializeMojo
      * @parameter expression="${play.id}" default-value=""
      * @since 1.0.0
      */
-    protected String playId;
+    private String playId;
 
     /**
      * Should application classes be compiled.
@@ -71,7 +71,7 @@ public class PlayInitializeMojo
      * @parameter expression="${play.compileApp}" default-value="true"
      * @since 1.0.0
      */
-    private boolean compileApp = true;
+    private boolean compileApp;
 
     /**
      * Should test classes be compiled.
@@ -79,7 +79,7 @@ public class PlayInitializeMojo
      * @parameter expression="${play.compileTest}" default-value="true"
      * @since 1.0.0
      */
-    private boolean compileTest = true;
+    private boolean compileTest;
 
     /**
      * Should temporary Play! home directory be cleaned before it's reinitializing.
@@ -88,7 +88,7 @@ public class PlayInitializeMojo
      * @parameter expression="${play.homeClean}" default-value="false"
      * @since 1.0.0
      */
-    private boolean homeClean = false;
+    private boolean homeClean;
 
     /**
      * Should existing temporary Play! home content be overwritten.
@@ -96,7 +96,7 @@ public class PlayInitializeMojo
      * @parameter expression="${play.homeOverwrite}" default-value="false"
      * @since 1.0.0
      */
-    private boolean homeOverwrite = false;
+    private boolean homeOverwrite;
 
     /**
      * To look up Archiver/UnArchiver implementations.

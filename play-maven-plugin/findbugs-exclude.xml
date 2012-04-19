@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FindBugsFilter>
+    <Match>
+        <Class name="com.google.code.play.AbstractAntJavaBasedPlayMojo" />
+        <Field name="pluginArtifacts" />
+        <Bug pattern="UWF_UNWRITTEN_FIELD" />
+    </Match>
+
+    <Match>
+        <Class name="com.google.code.play.AbstractArchivingMojo" />
+        <Field name="archiverManager" />
+        <Or>
+            <Bug pattern="NP_UNWRITTEN_FIELD" />
+            <Bug pattern="UWF_UNWRITTEN_FIELD" />
+        </Or>
+    </Match>
+
+    <Match>
+        <Class name="com.google.code.play.AbstractPlayRunMojo" />
+        <Field name="runFork" />
+        <Bug pattern="UWF_UNWRITTEN_FIELD" />
+    </Match>
+
+    <Match>
+        <Class name="com.google.code.play.AbstractPlayServerMojo" />
+        <Or>
+            <Field name="httpPort" />
+            <Field name="httpsPort" />
+            <Field name="disableCheckJpda" />
+        </Or>
+        <Bug pattern="UWF_UNWRITTEN_FIELD" />
+    </Match>
+
+    <Match>
+        <Class name="com.google.code.play.PlayDistExplodedMojo" />
+        <Field name="distExplodedSkip" />
+        <Bug pattern="UWF_UNWRITTEN_FIELD" />
+    </Match>
+
+    <Match>
+        <Class name="com.google.code.play.PlayGenerateSeleniumJunit4SourcesMojo" />
+        <Field name="seleniumSkip" />
+        <Bug pattern="UWF_UNWRITTEN_FIELD" />
+    </Match>
+
+    <Match>
+        <Class name="com.google.code.play.PlayRunMojo" />
+        <Field name="playId" />
+        <Bug pattern="UWF_UNWRITTEN_FIELD" />
+    </Match>
+
+    <Match>
+        <Class name="com.google.code.play.PlayStartMojo" />
+        <Field name="playId" />
+        <Bug pattern="UWF_UNWRITTEN_FIELD" />
+    </Match>
+
+    <Match>
+        <Class name="com.google.code.play.PlayStartServerMojo" />
+        <Or>
+            <Field name="playTestId" />
+            <Field name="seleniumSkip" />
+        </Or>
+        <Bug pattern="UWF_UNWRITTEN_FIELD" />
+    </Match>
+
+    <Match>
+        <Class name="com.google.code.play.PlayStopServerMojo" />
+        <Field name="seleniumSkip" />
+        <Bug pattern="UWF_UNWRITTEN_FIELD" />
+    </Match>
+
+    <Match>
+        <Class name="com.google.code.play.PlayTestRunMojo" />
+        <Field name="playTestId" />
+        <Bug pattern="UWF_UNWRITTEN_FIELD" />
+    </Match>
+
+    <Match>
+        <Class name="com.google.code.play.PlayWarExplodedMojo" />
+        <Or>
+            <Field name="warExplodedSkip" />
+            <Field name="warWebappExcludes" />
+            <Field name="warWebappIncludes" />
+        </Or>
+        <Bug pattern="UWF_UNWRITTEN_FIELD" />
+    </Match>
+
+    <Match>
+        <Class name="com.google.code.play.PlayWarInplaceMojo" />
+        <Field name="warInplaceSkip" />
+        <Bug pattern="UWF_UNWRITTEN_FIELD" />
+    </Match>
+
+    <Match>
+        <Class name="com.google.code.play.PlayWarSupportMojo" />
+        <Or>
+            <Field name="playWarId" />
+            <Field name="warWebappDirectory" />
+        </Or>
+        <Bug pattern="UWF_UNWRITTEN_FIELD" />
+    </Match>
+</FindBugsFilter>

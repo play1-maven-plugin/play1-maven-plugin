@@ -48,7 +48,7 @@ public class PlayGenerateSeleniumJunit4SourcesMojo
      * @parameter expression="${play.seleniumSkip}" default-value="false"
      * @since 1.0.0
      */
-    private boolean seleniumSkip = false;
+    private boolean seleniumSkip;
 
     protected void internalExecute()
         throws MojoExecutionException, MojoFailureException, IOException

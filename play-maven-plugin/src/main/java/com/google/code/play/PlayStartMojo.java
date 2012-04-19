@@ -43,7 +43,7 @@ public class PlayStartMojo
      * @parameter expression="${play.id}" default-value=""
      * @since 1.0.0
      */
-    protected String playId;
+    private String playId;
 
     @Override
     protected void internalExecute()

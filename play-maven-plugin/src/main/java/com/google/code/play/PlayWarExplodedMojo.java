@@ -49,7 +49,7 @@ public class PlayWarExplodedMojo
      * @required
      * @since 1.0.0
      */
-    private boolean warExplodedSkip = false;
+    private boolean warExplodedSkip;
 
     /**
      * WAR webapp directory include filter.

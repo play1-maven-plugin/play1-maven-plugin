@@ -19,9 +19,7 @@
 
 package com.google.code.play;
 
-import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -33,16 +31,8 @@ import org.apache.maven.plugin.MojoFailureException;
  * @goal stop-server
  */
 public class PlayStopServerMojo
-    extends AbstractPlayMojo
+    extends AbstractPlayStopServerMojo
 {
-    /**
-     * Play! id (profile) used for testing.
-     * 
-     * @parameter expression="${play.testId}" default-value="test"
-     * @since 1.0.0
-     */
-    protected String playTestId;
-
     /**
      * Skip goal execution
      * 
@@ -61,94 +51,11 @@ public class PlayStopServerMojo
             return;
         }
 
-        File baseDir = project.getBasedir();
-
-        File confDir = new File( baseDir, "conf" );
-        File configurationFile = new File( confDir, "application.conf" );
-        ConfigurationParser configParser = new ConfigurationParser( configurationFile, playTestId );
-        configParser.parse();
-
-        String applicationMode = configParser.getProperty( "application.mode", "dev" );
-        
-        //File buildDirectory = new File( project.getBuild().getDirectory() );
-        //File logDirectory = new File( buildDirectory, "play" );
-        //File pidFile = new File( logDirectory, "server.pid" );
-        File pidFile = new File( baseDir, "server.pid" );
-
         getLog().info( "Stopping Play! Server..." );
 
-        if ( "dev".equalsIgnoreCase( applicationMode ) )
-        {
-            int serverPort = 9000;
-            String serverPortStr = configParser.getProperty( "http.port" );
-            if ( serverPortStr != null )
-            {
-                serverPort = Integer.parseInt( serverPortStr );
-            }
-
-            URL url = new URL( String.format( "http://localhost:%d/@kill", Integer.valueOf( serverPort ) ) );
-
-            getLog().debug( String.format( "Stop request URL: %s", url ) );
-
-            try
-            {
-                url.openConnection().getContent();
-            }
-            catch ( java.net.SocketException e )
-            {
-                // ignore
-            }
-
-            getLog().info( "Stop request sent" );
-            
-            if ( pidFile.exists() )
-            {
-                if ( !pidFile.delete() )
-                {
-                    throw new IOException( String.format( "Cannot delete %s file", pidFile.getAbsolutePath() ) );
-                }
-            }
-        }
-        else
-        {
-            if ( !pidFile.exists() )
-            {
-                throw new MojoExecutionException( String.format( "Play! Server is not started (\"%s\" file not found)",
-                                                                 pidFile.getName() ) );
-            }
-
-            String pid = readFileFirstLine( pidFile ).trim();
-            if ( "unknown".equals( pid ) )
-            {
-                throw new MojoExecutionException(
-                                                  String.format( "Cannot stop Play! Server (unknown process id in \"%s\" file",
-                                                                 pidFile.getAbsolutePath() ) );
-            }
-
-            try
-            {
-                kill( pid );
-                if ( !pidFile.delete() )
-                {
-                    throw new IOException( String.format( "Cannot delete %s file", pidFile.getAbsolutePath() ) );
-                }
-            }
-            catch ( InterruptedException e )
-            {
-                throw new MojoExecutionException( "?", e );
-            }
-        }
+        stopServer();
 
         getLog().info( "Play! Server stopped" );
-    }
-    
-    // copied from Play! Framework's "play.utils.Utils" Java class
-    private void kill( String pid )
-        throws IOException, InterruptedException
-    {
-        String os = System.getProperty( "os.name" );
-        String command = ( os.startsWith( "Windows" ) ) ? "taskkill /F /PID " + pid : "kill " + pid;
-        Runtime.getRuntime().exec( command ).waitFor();
     }
 
 }

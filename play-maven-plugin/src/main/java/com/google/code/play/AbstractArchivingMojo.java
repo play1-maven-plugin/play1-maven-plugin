@@ -27,6 +27,9 @@ import org.codehaus.plexus.archiver.ArchiveEntry;
 import org.codehaus.plexus.archiver.Archiver;
 import org.codehaus.plexus.archiver.ResourceIterator;
 import org.codehaus.plexus.archiver.manager.ArchiverManager;
+import org.codehaus.plexus.archiver.manager.NoSuchArchiverException;
+import org.codehaus.plexus.archiver.war.WarArchiver;
+import org.codehaus.plexus.archiver.zip.ZipArchiver;
 import org.codehaus.plexus.components.io.resources.PlexusIoResource;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.io.RawInputStreamFacade;
@@ -45,8 +48,9 @@ public abstract class AbstractArchivingMojo
      * 
      * @component role="org.codehaus.plexus.archiver.manager.ArchiverManager"
      * @required
+     * @readonly
      */
-    protected ArchiverManager archiverManager;
+    private ArchiverManager archiverManager;
 
     protected void expandArchive( Archiver archiver, File destDirectory )
         throws IOException
@@ -78,7 +82,7 @@ public abstract class AbstractArchivingMojo
                 switch ( entry.getType() )
                 {
                     case ArchiveEntry.DIRECTORY:
-                        destFile.mkdirs(); // change to PlexusUtils, check result
+                        destFile.mkdirs(); // TODO-change to PlexusUtils, check result
                         break;
                     case ArchiveEntry.FILE:
                         InputStream contents = resource.getContents();
@@ -91,6 +95,20 @@ public abstract class AbstractArchivingMojo
                 // System.out.println(entry.getName());
             }
         }
+    }
+    
+    protected ZipArchiver getZipArchiver() throws NoSuchArchiverException
+    {
+        ZipArchiver result = (ZipArchiver) archiverManager.getArchiver( "zip" );
+        result.setDuplicateBehavior( Archiver.DUPLICATES_FAIL ); // Just in case
+        return result;
+    }
+    
+    protected WarArchiver getWarArchiver() throws NoSuchArchiverException
+    {
+        WarArchiver result = (WarArchiver) archiverManager.getArchiver( "war" );
+        result.setDuplicateBehavior( Archiver.DUPLICATES_FAIL ); // Just in case
+        return result;
     }
     
     protected ConfigurationParser getConfiguration( String playId ) throws IOException

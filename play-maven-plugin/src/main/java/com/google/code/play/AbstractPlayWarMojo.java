@@ -37,7 +37,6 @@ import org.apache.maven.shared.artifact.filter.PatternIncludesArtifactFilter;
 
 import org.apache.maven.shared.dependency.tree.DependencyTreeBuilderException;
 
-import org.codehaus.plexus.archiver.Archiver;
 import org.codehaus.plexus.archiver.manager.NoSuchArchiverException;
 import org.codehaus.plexus.archiver.war.WarArchiver;
 
@@ -59,7 +58,7 @@ public abstract class AbstractPlayWarMojo
      * @parameter expression="${play.warId}" default-value="war"
      * @since 1.0.0
      */
-    protected String playWarId;
+    private String playWarId;
 
     /**
      * Application resources include filter
@@ -85,7 +84,7 @@ public abstract class AbstractPlayWarMojo
      * @required
      * @since 1.0.0
      */
-    protected File warWebappDirectory;
+    private File warWebappDirectory;
 
     /**
      * Dependency include filter.
@@ -124,8 +123,7 @@ public abstract class AbstractPlayWarMojo
     protected WarArchiver prepareArchiver( ConfigurationParser configParser, boolean addWarDirectory )
         throws DependencyTreeBuilderException, IOException, MojoExecutionException, NoSuchArchiverException
     {
-        WarArchiver warArchiver = (WarArchiver) archiverManager.getArchiver( "war" );
-        warArchiver.setDuplicateBehavior( Archiver.DUPLICATES_FAIL ); // Just in case
+        WarArchiver warArchiver = getWarArchiver();
 
         File playHome = getPlayHome();
 
@@ -325,6 +323,11 @@ public abstract class AbstractPlayWarMojo
     protected ConfigurationParser getConfiguration() throws IOException
     {
         return getConfiguration( playWarId );
+    }
+
+    protected File getWebappDirectory()
+    {
+        return warWebappDirectory;
     }
     
 }

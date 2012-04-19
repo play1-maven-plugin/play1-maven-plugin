@@ -49,7 +49,7 @@ public class PlayDistExplodedMojo
      * @required
      * @since 1.0.0
      */
-    private boolean distExplodedSkip = false;
+    private boolean distExplodedSkip;
 
     protected void internalExecute()
         throws MojoExecutionException, MojoFailureException, IOException

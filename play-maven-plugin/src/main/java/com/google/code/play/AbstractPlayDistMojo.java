@@ -35,7 +35,6 @@ import org.apache.maven.shared.artifact.filter.PatternExcludesArtifactFilter;
 import org.apache.maven.shared.artifact.filter.PatternIncludesArtifactFilter;
 import org.apache.maven.shared.dependency.tree.DependencyTreeBuilderException;
 
-import org.codehaus.plexus.archiver.Archiver;
 import org.codehaus.plexus.archiver.manager.NoSuchArchiverException;
 import org.codehaus.plexus.archiver.zip.ZipArchiver;
 
@@ -54,7 +53,7 @@ public abstract class AbstractPlayDistMojo
      * @parameter expression="${play.id}" default-value=""
      * @since 1.0.0
      */
-    protected String playId;
+    private String playId;
 
     /**
      * Distribution application resources include filter
@@ -91,8 +90,7 @@ public abstract class AbstractPlayDistMojo
     protected ZipArchiver prepareArchiver( ConfigurationParser configParser )
         throws DependencyTreeBuilderException, IOException, MojoExecutionException, NoSuchArchiverException
     {
-        ZipArchiver zipArchiver = (ZipArchiver) archiverManager.getArchiver( "zip" );
-        zipArchiver.setDuplicateBehavior( Archiver.DUPLICATES_FAIL ); // Just in case
+        ZipArchiver zipArchiver = getZipArchiver();
 
         File baseDir = project.getBasedir();
 

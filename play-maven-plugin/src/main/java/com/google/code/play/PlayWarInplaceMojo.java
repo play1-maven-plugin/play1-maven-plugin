@@ -48,7 +48,7 @@ public class PlayWarInplaceMojo
      * @required
      * @since 1.0.0
      */
-    private boolean warInplaceSkip = false;
+    private boolean warInplaceSkip;
 
     protected void internalExecute()
         throws MojoExecutionException, MojoFailureException, IOException
@@ -67,8 +67,8 @@ public class PlayWarInplaceMojo
 
             WarArchiver warArchiver = prepareArchiver( configParser, false );
 
-            getLog().info( "Building war directory: " + warWebappDirectory.getAbsolutePath() );
-            expandArchive( warArchiver, warWebappDirectory );
+            getLog().info( "Building war directory: " + getWebappDirectory().getAbsolutePath() );
+            expandArchive( warArchiver, getWebappDirectory() );
         }
         catch ( ArchiverException e )
         {

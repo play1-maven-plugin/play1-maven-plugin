@@ -296,48 +296,6 @@ public abstract class AbstractPlayMojo
         return result;
     }
 
-/*not used
-    // used by "war" and "war-support" mojos
-    protected File filterApplicationConf( File applicationConf, Map<String, File> modules )
-        throws IOException
-    {
-        File resultDir = new File( project.getBuild().getDirectory(), "play/tmp" );
-        if ( !resultDir.exists() )
-        {
-            resultDir.mkdirs();
-        }
-        File result = new File( resultDir, "filtered-application.conf" );
-        BufferedReader reader = createBufferedFileReader( applicationConf, "UTF-8" );
-        try
-        {
-            BufferedWriter writer = createBufferedFileWriter( result, "UTF-8" );
-            try
-            {
-                String line = reader.readLine();
-                while ( line != null )
-                {
-                    if ( !line.trim().startsWith( "#" ) && line.contains( "${play.path}" ) )
-                    {
-                        line = line.replace( "${play.path}", ".." );
-                    }
-                    writer.write( line );
-                    writer.newLine();
-                    line = reader.readLine();
-                }
-            }
-            finally
-            {
-                writer.close();
-            }
-        }
-        finally
-        {
-            reader.close();
-        }
-        return result;
-    }
-*/
-
     protected void createModuleDirectory( File moduleDirectory, boolean overwrite )
         throws IOException
     {

@@ -58,7 +58,7 @@ public class PlayDependenciesMojo
      * @required
      * @since 1.0.0
      */
-    private boolean dependenciesSkip = false;
+    private boolean dependenciesSkip;
 
     /**
      * Should project's "lib" and "modules" subdirectories be cleaned before dependency resolution.
@@ -67,7 +67,7 @@ public class PlayDependenciesMojo
      * @parameter expression="${play.dependenciesClean}" default-value="false"
      * @since 1.0.0
      */
-    private boolean dependenciesClean = false;
+    private boolean dependenciesClean;
 
     /**
      * Should existing dependencies be overwritten.
@@ -75,7 +75,7 @@ public class PlayDependenciesMojo
      * @parameter expression="${play.dependenciesOverwrite}" default-value="false"
      * @since 1.0.0
      */
-    private boolean dependenciesOverwrite = false;
+    private boolean dependenciesOverwrite;
 
     /**
      * Should jar dependencies be processed. They are necessary for Play! Framework,
@@ -84,13 +84,14 @@ public class PlayDependenciesMojo
      * @parameter expression="${play.dependenciesSkipJars}" default-value="false"
      * @since 1.0.0
      */
-    private boolean dependenciesSkipJars = false; // TODO-change to true
+    private boolean dependenciesSkipJars; // TODO-change default value to true
 
     /**
      * To look up Archiver/UnArchiver implementations.
      * 
      * @component role="org.codehaus.plexus.archiver.manager.ArchiverManager"
      * @required
+     * @readonly
      */
     private ArchiverManager archiverManager;
 

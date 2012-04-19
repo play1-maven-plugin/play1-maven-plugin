@@ -36,7 +36,6 @@ import org.apache.maven.shared.artifact.filter.PatternExcludesArtifactFilter;
 import org.apache.maven.shared.artifact.filter.PatternIncludesArtifactFilter;
 import org.apache.maven.shared.dependency.tree.DependencyTreeBuilderException;
 
-import org.codehaus.plexus.archiver.Archiver;
 import org.codehaus.plexus.archiver.ArchiverException;
 import org.codehaus.plexus.archiver.manager.NoSuchArchiverException;
 import org.codehaus.plexus.archiver.zip.ZipArchiver;
@@ -102,8 +101,7 @@ public class PlayZipMojo
             String zipName = project.getBuild().getFinalName();
             File destFile = new File( zipOutputDirectory, zipName + ".zip" );
 
-            ZipArchiver zipArchiver = (ZipArchiver) archiverManager.getArchiver( "zip" );
-            zipArchiver.setDuplicateBehavior( Archiver.DUPLICATES_FAIL ); // Just in case
+            ZipArchiver zipArchiver = getZipArchiver();
             zipArchiver.setDestFile( destFile );
 
             getLog().debug( "Zip includes: " + zipApplicationIncludes );

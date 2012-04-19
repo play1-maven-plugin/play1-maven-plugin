@@ -48,7 +48,7 @@ public abstract class AbstractPlayServerMojo
      * @parameter expression="${play.httpPort}" default-value=""
      * @since 1.0.0
      */
-    protected String httpPort;
+    private String httpPort;
 
     /**
      * Alternative server port for secure connection (https protocol).
@@ -56,7 +56,7 @@ public abstract class AbstractPlayServerMojo
      * @parameter expression="${play.httpsPort}" default-value=""
      * @since 1.0.0
      */
-    protected String httpsPort;
+    private String httpsPort;
 
     /**
      * Disable the JPDA port checking and force the jpda.port value (Play!'s "-f" option equivalent).
@@ -64,7 +64,7 @@ public abstract class AbstractPlayServerMojo
      * @parameter expression="${play.disableCheckJpda}" default-value="false"
      * @since 1.0.0
      */
-    protected boolean disableCheckJpda;
+    private boolean disableCheckJpda;
 
     protected Java prepareAntJavaTask( ConfigurationParser configParser, String playId, boolean fork )
         throws MojoExecutionException, IOException
@@ -259,6 +259,16 @@ public abstract class AbstractPlayServerMojo
             result = 0;
         }
         return result;
+    }
+    
+    protected String getHttpPort()
+    {
+        return httpPort;
+    }
+
+    protected String getHttpsPort()
+    {
+        return httpsPort;
     }
 
 }

@@ -80,7 +80,7 @@ public class PlayPrecompileMojo
      * @parameter expression="${play.precompileSkip}" default-value="false"
      * @since 1.0.0
      */
-    private boolean precompileSkip = false;
+    private boolean precompileSkip;
 
     @Override
     protected void internalExecute()

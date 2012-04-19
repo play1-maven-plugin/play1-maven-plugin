@@ -44,15 +44,7 @@ public class PlayStartServerMojo
      * @parameter expression="${play.testId}" default-value="test"
      * @since 1.0.0
      */
-    protected String playTestId;
-
-//    /**
-//     * Enable logging mode.
-//     *
-//     * @parameter expression="${play.serverLogOutput}" default-value="true"
-//     * @since 1.0.0
-//     */
-//    private boolean serverLogOutput;
+    private String playTestId;
 
     /**
      * Skip goal execution
@@ -95,13 +87,13 @@ public class PlayStartServerMojo
         }
 
         int serverPort = 9000;
-        if ( httpPort != null && !httpPort.isEmpty() ) // TODO-handle "https.port" parameter(?)
+        if ( getHttpPort() != null && !getHttpPort().isEmpty() ) // TODO-handle "https.port" parameter(?)
         {
-            serverPort = Integer.parseInt( httpPort );
+            serverPort = Integer.parseInt( getHttpPort() );
         }
         else
         {
-            String serverPortStr = configParser.getProperty( "http.port" );
+            String serverPortStr = configParser.getProperty( "http.port" );//FIXME-oprogramowac to w ServerStop
             if ( serverPortStr != null )
             {
                 serverPort = Integer.parseInt( serverPortStr );
@@ -111,11 +103,7 @@ public class PlayStartServerMojo
         Java javaTask = prepareAntJavaTask( configParser, playTestId, true );
         javaTask.setFailonerror( true );
 
-        String applicationMode = configParser.getProperty( "application.mode", "dev" );
-        if ( "prod".equalsIgnoreCase( applicationMode ) )
-        {
-            addSystemProperty( javaTask, "pidFile", pidFile.getAbsolutePath() );
-        }
+        addSystemProperty( javaTask, "pidFile", pidFile.getAbsolutePath() );
 
         File logFile = new File( logDirectory, "server.log" );
         getLog().info( String.format( "Redirecting output to: %s", logFile.getAbsoluteFile() ) );

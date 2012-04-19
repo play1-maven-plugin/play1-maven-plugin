@@ -42,7 +42,16 @@ public class PlayWarSupportMojo
      * @parameter expression="${play.warId}" default-value="war"
      * @since 1.0.0
      */
-    protected String playWarId;
+    private String playWarId;
+
+    /**
+     * Single directory for extra files to include in the WAR.
+     *
+     * @parameter expression="${play.warWebappDirectory}" default-value="${basedir}/war"
+     * @required
+     * @since 1.0.0
+     */
+    private File warWebappDirectory;
 
     @Override
     protected void internalExecute()
@@ -56,16 +65,16 @@ public class PlayWarSupportMojo
 
         ConfigurationParser configParser = new ConfigurationParser( configurationFile, playWarId );
         configParser.parse();
-        // Map<String, File> modules = configParser.getModules();
 
-        /*
-         * File filteredApplicationConf =
-         */// filterApplicationConf( new File( baseDir, "conf/application.conf" ), modules );
-
-        File buildDirectory = new File( project.getBuild().getDirectory() );
-        File tmpDirectory = new File( buildDirectory, "play/tmp" );
-        /* File filteredWebXml = */filterWebXml( new File( playHome, "resources/war/web.xml" ), tmpDirectory,
-                                                 configParser.getApplicationName(), playWarId );
+        File webXmlFile = new File( warWebappDirectory, "WEB-INF/web.xml" );
+        if ( !webXmlFile.isFile() )
+        {
+            File buildDirectory = new File( project.getBuild().getDirectory() );
+            File tmpDirectory = new File( buildDirectory, "play/tmp" );
+            filterWebXml( new File( playHome, "resources/war/web.xml" ), tmpDirectory,
+                          configParser.getApplicationName(), playWarId );
+//            webXmlFile = new File( tmpDirectory, "filtered-web.xml" );
+        }
     }
 
 }

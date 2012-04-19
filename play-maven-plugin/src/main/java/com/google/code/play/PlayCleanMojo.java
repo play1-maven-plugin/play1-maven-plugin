@@ -48,7 +48,7 @@ public class PlayCleanMojo
      * @parameter expression="${play.id}" default-value=""
      * @since 1.0.0
      */
-    protected String playId;
+    private String playId;
 
     /**
      * Should all "cleanable" directories be deleted. If "true", overrides all "cleanXXX" property values.
@@ -113,7 +113,7 @@ public class PlayCleanMojo
      * @required
      * @since 1.0.0
      */
-    private boolean cleanSkip = false;
+    private boolean cleanSkip;
 
     protected void internalExecute()
         throws MojoExecutionException, MojoFailureException, IOException

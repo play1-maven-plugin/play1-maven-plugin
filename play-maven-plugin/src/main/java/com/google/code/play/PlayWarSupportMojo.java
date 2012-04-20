@@ -59,12 +59,7 @@ public class PlayWarSupportMojo
     {
         File playHome = getPlayHome();
 
-        File baseDir = project.getBasedir();
-        File confDir = new File( baseDir, "conf" );
-        File configurationFile = new File( confDir, "application.conf" );
-
-        ConfigurationParser configParser = new ConfigurationParser( configurationFile, playWarId );
-        configParser.parse();
+        ConfigurationParser configParser =  getConfiguration( playWarId );
 
         File webXmlFile = new File( warWebappDirectory, "WEB-INF/web.xml" );
         if ( !webXmlFile.isFile() )

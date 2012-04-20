@@ -19,7 +19,6 @@
 
 package com.google.code.play;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.HashSet;
@@ -214,12 +213,7 @@ public abstract class AbstractDependencyProcessingPlayMojo
     protected Set<String> getProvidedModuleNames( String playId )
         throws IOException
     {
-        File baseDir = project.getBasedir();
-        File confDir = new File( baseDir, "conf" );
-        File configurationFile = new File( confDir, "application.conf" );
-
-        ConfigurationParser configParser = new ConfigurationParser( configurationFile, playId );
-        configParser.parse();
+        ConfigurationParser configParser =  getConfiguration( playId );
         return getProvidedModuleNames( configParser, playId, false );
     }
 

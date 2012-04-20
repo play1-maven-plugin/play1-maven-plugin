@@ -136,11 +136,7 @@ public class PlayCleanMojo
 
         if ( cleanAll || cleanTmp )
         {
-            File confDir = new File( baseDir, "conf" );
-            File configurationFile = new File( confDir, "application.conf" );
-
-            ConfigurationParser configParser = new ConfigurationParser( configurationFile, playId );
-            configParser.parse();
+            ConfigurationParser configParser =  getConfiguration( playId );
             String tmpDirName = configParser.getProperty( "play.tmp", "tmp" );
 
             if ( "none".equals( tmpDirName ) )

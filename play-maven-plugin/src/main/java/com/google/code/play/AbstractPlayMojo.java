@@ -330,4 +330,15 @@ public abstract class AbstractPlayMojo
         }
     }
 
+    protected ConfigurationParser getConfiguration( String playId ) throws IOException
+    {
+        File baseDir = project.getBasedir();
+        File confDir = new File( baseDir, "conf" );
+        File configurationFile = new File( confDir, "application.conf" );
+        ConfigurationParser configParser = new ConfigurationParser( configurationFile, playId );
+        configParser.parse();
+        
+        return configParser;
+    }
+    
 }

@@ -129,11 +129,8 @@ public class PlayInitializeMojo
         File playHome = prepareAndGetPlayHome( playVersion );
 
         File baseDir = project.getBasedir();
-        File confDir = new File( baseDir, "conf" );
-        File configurationFile = new File( confDir, "application.conf" );
 
-        ConfigurationParser configParser = new ConfigurationParser( configurationFile, playId );
-        configParser.parse();
+        ConfigurationParser configParser =  getConfiguration( playId );
         // Get modules
         Map<String, File> modules = new HashMap<String, File>();
 

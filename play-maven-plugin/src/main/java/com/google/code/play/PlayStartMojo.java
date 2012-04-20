@@ -58,10 +58,7 @@ public class PlayStartMojo
                                                              pidFile.getName() ) );
         }
 
-        File confDir = new File( baseDir, "conf" );
-        File configurationFile = new File( confDir, "application.conf" );
-        ConfigurationParser configParser = new ConfigurationParser( configurationFile, playId );
-        configParser.parse();
+        ConfigurationParser configParser =  getConfiguration( playId );
 
         String sysOut = configParser.getProperty( "application.log.system.out" );
         boolean redirectSysOutToFile = !( "false".equals( sysOut ) || "off".equals( sysOut ) );

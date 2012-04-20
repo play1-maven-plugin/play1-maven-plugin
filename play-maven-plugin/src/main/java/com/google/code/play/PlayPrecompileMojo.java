@@ -100,10 +100,7 @@ public class PlayPrecompileMojo
         FileUtils.deleteDirectory( new File( baseDir, "precompiled" ) );
         FileUtils.deleteDirectory( new File( baseDir, "tmp" ) );
 
-        File confDir = new File( baseDir, "conf" );
-        File configurationFile = new File( confDir, "application.conf" );
-        ConfigurationParser configParser = new ConfigurationParser( configurationFile, playId );
-        configParser.parse();
+        ConfigurationParser configParser =  getConfiguration( playId );
 
         Project antProject = createProject();
         Path classPath = getProjectClassPath( antProject, precompilePlayId );

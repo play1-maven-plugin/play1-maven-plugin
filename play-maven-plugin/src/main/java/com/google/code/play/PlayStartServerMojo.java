@@ -73,10 +73,7 @@ public class PlayStartServerMojo
                                                              pidFile.getName() ) );
         }
 
-        File confDir = new File( baseDir, "conf" );
-        File configurationFile = new File( confDir, "application.conf" );
-        ConfigurationParser configParser = new ConfigurationParser( configurationFile, playTestId );
-        configParser.parse();
+        ConfigurationParser configParser =  getConfiguration( playTestId );
 
         File buildDirectory = new File( project.getBuild().getDirectory() );
         File logDirectory = new File( buildDirectory, "play" );

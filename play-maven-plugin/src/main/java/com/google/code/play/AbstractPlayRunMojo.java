@@ -59,10 +59,7 @@ public abstract class AbstractPlayRunMojo
                                                              pidFile.getName() ) );
         }
 
-        File confDir = new File( baseDir, "conf" );
-        File configurationFile = new File( confDir, "application.conf" );
-        ConfigurationParser configParser = new ConfigurationParser( configurationFile, playId );
-        configParser.parse();
+        ConfigurationParser configParser =  getConfiguration( playId );
 
         Java javaTask = prepareAntJavaTask( configParser, playId, runFork );
         javaTask.setFailonerror( true );

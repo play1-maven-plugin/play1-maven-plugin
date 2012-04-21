@@ -1,0 +1,1 @@
+Change oryginal "pom.xml" file name to "pom.xml-orig" before copying these files to module directory.

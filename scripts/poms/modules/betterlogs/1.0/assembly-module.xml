@@ -43,6 +43,10 @@ under the License.
                 <include>README.markdown</include>
             </includes>
         </fileSet>
+        <fileSet>
+            <directory>${project.build.directory}/apidocs</directory>
+            <outputDirectory>documentation/api</outputDirectory>
+        </fileSet>
     </fileSets>
 
     <files>

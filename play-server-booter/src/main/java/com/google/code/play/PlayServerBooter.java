@@ -54,7 +54,6 @@ public class PlayServerBooter
                 pidStr = name.substring( 0, p );
             }
             File pidFile = new File( pidFileName );
-            pidFile.deleteOnExit(); // Does not work, I don't know why.
             FileWriter fw = new FileWriter( pidFile );
             try
             {
@@ -70,4 +69,5 @@ public class PlayServerBooter
         Play.frameworkPath = new File( System.getProperty( "play.home" ) );
         Server.main( args );
     }
+
 }

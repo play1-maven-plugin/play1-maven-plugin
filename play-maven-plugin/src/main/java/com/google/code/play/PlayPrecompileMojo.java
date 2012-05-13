@@ -67,7 +67,7 @@ public class PlayPrecompileMojo
     private boolean precompileTests;
 
     /**
-     * ...
+     * Precompile in forked Java process.
      * 
      * @parameter expression="${play.precompileFork}" default-value="false"
      * @since 1.0.0
@@ -75,7 +75,7 @@ public class PlayPrecompileMojo
     private boolean precompileFork;
 
     /**
-     * Allows the server startup to be skipped.
+     * Allows precompilation to be skipped.
      * 
      * @parameter expression="${play.precompileSkip}" default-value="false"
      * @since 1.0.0

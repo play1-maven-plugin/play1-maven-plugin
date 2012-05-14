@@ -54,6 +54,14 @@ public class PlayStartMojo
     private String playTestId;
 
     /**
+     * Allows the server startup to be skipped.
+     * 
+     * @parameter expression="${play.startSkip}" default-value="false"
+     * @since 1.0.0
+     */
+    private boolean startSkip;
+
+    /**
      * Start server with test profile.
      * 
      * @parameter expression="${play.startWithTests}" default-value="false"
@@ -81,6 +89,12 @@ public class PlayStartMojo
     protected void internalExecute()
         throws MojoExecutionException, MojoFailureException, IOException
     {
+        if ( startSkip )
+        {
+            getLog().info( "Skipping execution" );
+            return;
+        }
+        
         String startPlayId = ( startWithTests ? playTestId : playId );
         
         File baseDir = project.getBasedir();

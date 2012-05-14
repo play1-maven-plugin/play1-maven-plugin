@@ -34,6 +34,15 @@ import org.apache.tools.ant.taskdefs.Java;
 public abstract class AbstractPlayRunMojo
     extends AbstractPlayServerMojo
 {
+
+    /**
+     * Allows the server startup to be skipped.
+     * 
+     * @parameter expression="${play.runSkip}" default-value="false"
+     * @since 1.0.0
+     */
+    private boolean runSkip;
+
     /**
      * ...
      * 
@@ -48,6 +57,12 @@ public abstract class AbstractPlayRunMojo
     protected void internalExecute()
         throws MojoExecutionException, MojoFailureException, IOException
     {
+        if ( runSkip )
+        {
+            getLog().info( "Skipping execution" );
+            return;
+        }
+        
         String playId = getPlayId();
         
         File baseDir = project.getBasedir();

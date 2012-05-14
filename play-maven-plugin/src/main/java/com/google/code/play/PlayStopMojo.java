@@ -33,10 +33,27 @@ import org.apache.maven.plugin.MojoFailureException;
 public class PlayStopMojo
     extends AbstractPlayStopServerMojo
 {
+
+    /**
+     * Skip goal execution
+     * 
+     * @parameter expression="${play.stopSkip}" default-value="false"
+     * @since 1.0.0
+     */
+    private boolean stopSkip;
+
     @Override
     protected void internalExecute()
         throws MojoExecutionException, MojoFailureException, IOException
     {
+        if ( stopSkip )
+        {
+            getLog().info( "Skipping execution" );
+            return;
+        }
+        
+        getLog().info( "Stopping Play! Server" );
+
         stopServer();
 
         getLog().info( "Play! Server stopped" );

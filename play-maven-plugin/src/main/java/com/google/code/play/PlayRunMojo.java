@@ -37,10 +37,26 @@ public class PlayRunMojo
      */
     private String playId;
 
+    /**
+     * Play! id (profile) used when running server with tests.
+     * 
+     * @parameter expression="${play.testId}" default-value="test"
+     * @since 1.0.0
+     */
+    private String playTestId;
+
+    /**
+     * Run server with test profile.
+     * 
+     * @parameter expression="${play.runWithTests}" default-value="false"
+     * @since 1.0.0
+     */
+    private boolean runWithTests;
+
     @Override
     protected String getPlayId()
     {
-        return playId;
+        return ( runWithTests ? playTestId : playId );
     }
 
 }

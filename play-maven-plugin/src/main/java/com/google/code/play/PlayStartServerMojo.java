@@ -21,7 +21,6 @@ package com.google.code.play;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -36,7 +35,7 @@ import org.apache.tools.ant.taskdefs.Java;
  * @requiresDependencyResolution test
  */
 public class PlayStartServerMojo
-    extends AbstractPlayServerMojo
+    extends AbstractPlayStartServerMojo
 {
     /**
      * Play! id (profile) used for testing.
@@ -64,120 +63,36 @@ public class PlayStartServerMojo
             return;
         }
 
-        File baseDir = project.getBasedir();
-
-        File pidFile = new File( baseDir, "server.pid" );
-        if ( pidFile.exists() )
-        {
-            throw new MojoExecutionException( String.format( "Play! Server already started (\"%s\" file found)",
-                                                             pidFile.getName() ) );
-        }
-
-        ConfigurationParser configParser =  getConfiguration( playTestId );
+        String startPlayId = playTestId;
 
         File buildDirectory = new File( project.getBuild().getDirectory() );
         File logDirectory = new File( buildDirectory, "play" );
-        if ( !logDirectory.exists() && !logDirectory.mkdirs() )
-        {
-            throw new MojoExecutionException( String.format( "Cannot create %s directory",
-                                                             logDirectory.getAbsolutePath() ) );
-        }
-
-        int serverPort = 9000;
-        if ( getHttpPort() != null && !getHttpPort().isEmpty() ) // TODO-handle "https.port" parameter(?)
-        {
-            serverPort = Integer.parseInt( getHttpPort() );
-        }
-        else
-        {
-            String serverPortStr = configParser.getProperty( "http.port" );//FIXME-oprogramowac to w ServerStop
-            if ( serverPortStr != null )
-            {
-                serverPort = Integer.parseInt( serverPortStr );
-            }
-        }
-
-        Java javaTask = prepareAntJavaTask( configParser, playTestId, true );
-        javaTask.setFailonerror( true );
-
-        addSystemProperty( javaTask, "pidFile", pidFile.getAbsolutePath() );
-
         File logFile = new File( logDirectory, "server.log" );
-        getLog().info( String.format( "Redirecting output to: %s", logFile.getAbsoluteFile() ) );
-        javaTask.setOutput( logFile );
+
+        ConfigurationParser configParser =  getConfiguration( startPlayId );
+
+        getLog().info( String.format( "Starting Play! Server, output is redirected to %s", logFile.getPath() ) );
+
+        Java javaTask = getStartServerTask( configParser, startPlayId, logFile, false );
 
         JavaRunnable runner = new JavaRunnable( javaTask );
         Thread t = new Thread( runner, "Play! Server runner" );
-        getLog().info( "Launching Play! Server" );
         t.start();
+        //don't invoke t.join(), it will lead to deadlock
 
-        // boolean timedOut = false;
-        
-        /*TimerTask timeoutTask = null;
-        if (timeout > 0) {
-            TimerTask task = new TimerTask() {
-                public void run() {
-                    timedOut = true;
-                }
-            };
-            timer.schedule( task, timeout * 1000 );
-            //timeoutTask = timer.runAfter(timeout * 1000, {
-            //    timedOut = true;
-            //})
-        }*/
-        
-        boolean started = false;
-        
-        getLog().info( "Waiting for Play! Server..." );
+        String rootUrl = getRootUrl( configParser );
 
-        URL connectUrl = new URL( String.format( "http://localhost:%d", serverPort ) );
-        int verifyWaitDelay = 1000;
-        while ( !started )
-        {
-            //if (timedOut) {
-            //    throw new MojoExecutionException("Unable to verify if Play! Server was started in the given time ($timeout seconds)");
-            //}
-            
-            Exception runnerException = runner.getException();
-            if ( runnerException != null )
-            {
-                throw new MojoExecutionException( "Failed to start Play! Server", runnerException );
-            }
+        getLog().info( String.format( "Waiting for %s", rootUrl ) );
 
-            try
-            {
-                connectUrl.openConnection().getContent();
-                started = true;
-            }
-            catch ( Exception e )
-            {
-                // return false;
-            }
+        waitForServerStarted( rootUrl, runner );
 
-            if ( !started )
-            {
-                try
-                {
-                    Thread.sleep( verifyWaitDelay );
-                }
-                catch ( InterruptedException e )
-                {
-                    throw new MojoExecutionException( "?", e );
-                }
-            }
-        }
-        
-        /*if (timeoutTask != null) {
-            timeoutTask.cancel();
-        }*/
-
-        getLog().info( "Play! Server started" );
-        
         Exception startServerException = runner.getException();
         if ( startServerException != null )
         {
             throw new MojoExecutionException( "?", startServerException );
         }
+
+        getLog().info( "Play! Server started" );
     }
 
 }

@@ -60,12 +60,13 @@ public abstract class AbstractPlayStopServerMojo
             {
                 throw new IOException( String.format( "Cannot delete %s file", pidFile.getAbsolutePath() ) );
             }
-            getLog().info( "Play! Server stopped" );
         }
         catch ( InterruptedException e )
         {
             throw new MojoExecutionException( "?", e );
         }
+        
+        PidFileDeleter.getInstance().remove( pidFile );
     }
     
     // copied from Play! Framework's "play.utils.Utils" Java class

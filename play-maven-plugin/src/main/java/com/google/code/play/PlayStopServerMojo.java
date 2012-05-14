@@ -51,7 +51,7 @@ public class PlayStopServerMojo
             return;
         }
 
-        getLog().info( "Stopping Play! Server..." );
+        getLog().info( "Stopping Play! Server" );
 
         stopServer();
 

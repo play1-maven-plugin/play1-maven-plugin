@@ -35,56 +35,78 @@ import org.apache.tools.ant.taskdefs.Java;
  * @requiresDependencyResolution test
  */
 public class PlayStartMojo
-    extends AbstractPlayServerMojo
+    extends AbstractPlayStartServerMojo
 {
     /**
-     * Play! id (profile) used for testing.
+     * Play! id (profile) used when starting server without tests.
      * 
      * @parameter expression="${play.id}" default-value=""
      * @since 1.0.0
      */
     private String playId;
 
+    /**
+     * Play! id (profile) used when starting server with tests.
+     * 
+     * @parameter expression="${play.testId}" default-value="test"
+     * @since 1.0.0
+     */
+    private String playTestId;
+
+    /**
+     * Start server with test profile.
+     * 
+     * @parameter expression="${play.startWithTests}" default-value="false"
+     * @since 1.0.0
+     */
+    private boolean startWithTests;
+
+    /**
+     * Spawns started JVM process. See <a href="http://ant.apache.org/manual/Tasks/java.html">Ant Java task documentation</a> for details.
+     * 
+     * @parameter expression="${play.startSpawn}" default-value="true"
+     * @since 1.0.0
+     */
+    private boolean startSpawn;
+
+    /**
+     * After starting server wait for "http://localhost:${httpPort}/" URL to be available.
+     * 
+     * @parameter expression="${play.startSynchro}" default-value="false"
+     * @since 1.0.0
+     */
+    private boolean startSynchro;
+
     @Override
     protected void internalExecute()
         throws MojoExecutionException, MojoFailureException, IOException
     {
+        String startPlayId = ( startWithTests ? playTestId : playId );
+        
         File baseDir = project.getBasedir();
 
-        File pidFile = new File( baseDir, "server.pid" );
-        if ( pidFile.exists() )
-        {
-            throw new MojoExecutionException( String.format( "Play! Server already started (\"%s\" file found)",
-                                                             pidFile.getName() ) );
-        }
-
-        ConfigurationParser configParser =  getConfiguration( playId );
+        ConfigurationParser configParser =  getConfiguration( startPlayId );
 
         String sysOut = configParser.getProperty( "application.log.system.out" );
         boolean redirectSysOutToFile = !( "false".equals( sysOut ) || "off".equals( sysOut ) );
 
-        File logDirectory = new File( baseDir, "logs" );
-        File logFile = new File( logDirectory, "system.out" );
+        File logFile = null;
         if ( redirectSysOutToFile )
         {
-            if ( !logDirectory.exists() && !logDirectory.mkdirs() )
-            {
-                throw new MojoExecutionException( String.format( "Cannot create %s directory",
-                                                                 logDirectory.getAbsolutePath() ) );
-            }
+            File logDirectory = new File( baseDir, "logs" );
+            logFile = new File( logDirectory, "system.out" );
         }
 
-        Java javaTask = prepareAntJavaTask( configParser, playId, true );
-        javaTask.setSpawn( true );
-
-        //because of Java limitations:
-        //- cannot manipulate input/output streams of spawned process
-        //- cannot get process id of spawned process
-        addSystemProperty( javaTask, "pidFile", pidFile.getAbsolutePath()/*"server.pid"*/ );
         if ( redirectSysOutToFile )
         {
-            addSystemProperty( javaTask, "outFile", logFile.getAbsolutePath()/*"logs/system.out"*/ );
+            getLog().info( String.format( "Starting Play! Server, output is redirected to %s", logFile.getPath() ) );
         }
+        else
+        {
+            getLog().info( "Starting Play! Server" );
+        }
+
+        Java javaTask = getStartServerTask( configParser, startPlayId, logFile, startSpawn );
 
         JavaRunnable runner = new JavaRunnable( javaTask );
         Thread t = new Thread( runner, "Play! Server runner" );
@@ -103,14 +125,16 @@ public class PlayStartMojo
             throw new MojoExecutionException( "?", startServerException );
         }
         
-        if ( redirectSysOutToFile )
+        if ( startSynchro )
         {
-            getLog().info( String.format( "Play! Server started, output is redirected to %s", logFile.getPath() ) );
+            String rootUrl = getRootUrl( configParser );
+
+            getLog().info( String.format( "Waiting for %s", rootUrl ) );
+
+            waitForServerStarted( rootUrl, runner );
         }
-        else
-        {
-            getLog().info( "Play! Server started" );
-        }
+        
+        getLog().info( "Play! Server started" );
     }
 
 }

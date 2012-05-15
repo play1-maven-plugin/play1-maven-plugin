@@ -62,7 +62,6 @@ public abstract class AbstractPlayStartServerMojo
         if ( spawn )
         {
             javaTask.setSpawn( true );
-            //addSystemProperty( javaTask, "pidFile", pidFile.getAbsolutePath() );//FIXME-tu tez nie jest dobrze, bo play:stop uruchomione w tym samym procesie nie zlapie
         }
         else
         {
@@ -103,7 +102,7 @@ public abstract class AbstractPlayStartServerMojo
             }
         }
 
-        return String.format( "http://localhost:%d", serverPort );
+        return String.format( "http://localhost:%d/", serverPort );
     }
 
     protected void waitForServerStarted( String rootUrl, JavaRunnable runner )
@@ -160,8 +159,6 @@ public abstract class AbstractPlayStartServerMojo
         /*
          * if (timeoutTask != null) { timeoutTask.cancel(); }
          */
-
-//        getLog().info( "Play! Server started" );
     }
 
 }

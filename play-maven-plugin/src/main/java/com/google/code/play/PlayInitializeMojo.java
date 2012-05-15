@@ -118,7 +118,7 @@ public class PlayInitializeMojo
             if ( "play".equals( artifact.getArtifactId() ) )
             {
                 // temporary solution, maybe use zip to unzip resource from a jar file
-                playVersion = artifact.getVersion();
+                playVersion = artifact.getBaseVersion();
                 // System.out.println("Play version: " + playVersion);
                 // java.net.URL artifactUrl = artifact.getFile().toURI().toURL();
                 break;

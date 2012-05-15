@@ -153,7 +153,7 @@ public class PlayDependenciesMojo
 
                     File moduleZipFile = moduleZipArtifact.getFile();
                     String moduleSubDir =
-                                    String.format( "modules/%s-%s/", moduleName, moduleZipArtifact.getVersion() );
+                                    String.format( "modules/%s-%s/", moduleName, moduleZipArtifact.getBaseVersion() );
                     File moduleDirectory = new File( baseDir, moduleSubDir );
                     createModuleDirectory( moduleDirectory, dependenciesOverwrite
                                            || moduleDirectory.lastModified() < moduleZipFile.lastModified() );
@@ -266,7 +266,7 @@ public class PlayDependenciesMojo
             throw new ArchiverException(
                                          String.format( "\"%s:%s:%s:%s\" dependent artifact's file is a directory, not a file. This is probably Maven reactor build problem.",
                                                         artifact.getGroupId(), artifact.getArtifactId(),
-                                                        artifact.getType(), artifact.getVersion() ) );
+                                                        artifact.getType(), artifact.getBaseVersion() ) );
         }
     }
 

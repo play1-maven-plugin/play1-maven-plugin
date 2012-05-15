@@ -169,7 +169,7 @@ public abstract class AbstractPlayDistMojo
         // TODO-validate not null
         File frameworkJarFile = frameworkJarArtifact.getFile();
         String frameworkDestinationFileName = "framework/" + frameworkJarFile.getName();
-        String playVersion = frameworkJarArtifact.getVersion();
+        String playVersion = frameworkJarArtifact.getBaseVersion();
         if ( "1.2".compareTo( playVersion ) > 0 )
         {
             // Play 1.1.x
@@ -224,7 +224,7 @@ public abstract class AbstractPlayDistMojo
             else
             {
                 String moduleSubDir =
-                    String.format( "application/modules/%s-%s/", moduleName, moduleZipArtifact.getVersion() );
+                    String.format( "application/modules/%s-%s/", moduleName, moduleZipArtifact.getBaseVersion() );
                 zipArchiver.addArchivedFileSet( moduleZipFile, moduleSubDir );
                 dependencySubtree = getModuleDependencyArtifacts( filteredArtifacts, moduleZipArtifact );
                 for ( Artifact classPathArtifact : dependencySubtree )
@@ -237,7 +237,7 @@ public abstract class AbstractPlayDistMojo
                         destinationFileName = scalaHack( classPathArtifact );
                     }
                     String destinationPath =
-                        String.format( "application/modules/%s-%s/lib/%s", moduleName, moduleZipArtifact.getVersion(),
+                        String.format( "application/modules/%s-%s/lib/%s", moduleName, moduleZipArtifact.getBaseVersion(),
                                        destinationFileName );
                     zipArchiver.addFile( jarFile, destinationPath );
                     filteredArtifacts.remove( classPathArtifact );

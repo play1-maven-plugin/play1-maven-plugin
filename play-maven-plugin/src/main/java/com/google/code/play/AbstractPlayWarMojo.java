@@ -235,7 +235,7 @@ public abstract class AbstractPlayWarMojo
 
             File moduleZipFile = moduleZipArtifact.getFile();
             String moduleSubDir =
-                String.format( "WEB-INF/application/modules/%s-%s/", moduleName, moduleZipArtifact.getVersion() );
+                String.format( "WEB-INF/application/modules/%s-%s/", moduleName, moduleZipArtifact.getBaseVersion() );
             if ( Artifact.SCOPE_PROVIDED.equals( moduleZipArtifact.getScope() ) )
             {
                 if ( providedModuleNames.contains( moduleName ) )

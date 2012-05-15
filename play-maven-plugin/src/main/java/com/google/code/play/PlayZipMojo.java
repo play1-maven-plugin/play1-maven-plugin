@@ -191,7 +191,7 @@ public class PlayZipMojo
             Artifact moduleZipArtifact = moduleArtifactEntry.getValue();
 
             File moduleZipFile = moduleZipArtifact.getFile();
-            String moduleSubDir = String.format( "modules/%s-%s/", moduleName, moduleZipArtifact.getVersion() );
+            String moduleSubDir = String.format( "modules/%s-%s/", moduleName, moduleZipArtifact.getBaseVersion() );
             zipArchiver.addArchivedFileSet( moduleZipFile, moduleSubDir );
             Set<Artifact> dependencySubtree = getModuleDependencyArtifacts( filteredArtifacts, moduleZipArtifact );
             for ( Artifact classPathArtifact : dependencySubtree )
@@ -205,7 +205,7 @@ public class PlayZipMojo
                 }
                 String destinationPath =
                                 String.format( "modules/%s-%s/lib/%s", moduleName,
-                                               moduleZipArtifact.getVersion(), destinationFileName );
+                                               moduleZipArtifact.getBaseVersion(), destinationFileName );
                 zipArchiver.addFile( jarFile, destinationPath );
                 filteredArtifacts.remove( classPathArtifact );
             }

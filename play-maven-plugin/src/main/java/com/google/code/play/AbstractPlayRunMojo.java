@@ -51,6 +51,14 @@ public abstract class AbstractPlayRunMojo
      */
     private boolean runFork;
 
+    /**
+     * Pass "precompiled" system property to Play! Server
+     * 
+     * @parameter expression="${play.startUsePrecompiled}" default-value="false"
+     * @since 1.0.0
+     */
+    private boolean runUsePrecompiled;
+
     abstract protected String getPlayId();
 
     @Override
@@ -79,6 +87,11 @@ public abstract class AbstractPlayRunMojo
         Java javaTask = prepareAntJavaTask( configParser, playId, runFork );
         javaTask.setFailonerror( true );
 
+        if ( runUsePrecompiled )
+        {
+            addSystemProperty( javaTask, "precompiled", "true" );
+        }
+        
         JavaRunnable runner = new JavaRunnable( javaTask );
         Thread t = new Thread( runner, "Play! Server runner" );
         getLog().info( "Launching Play! Server" );

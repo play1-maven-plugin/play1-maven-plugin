@@ -85,6 +85,14 @@ public class PlayStartMojo
      */
     private boolean startSynchro;
 
+    /**
+     * Pass "precompiled" system property to Play! Server
+     * 
+     * @parameter expression="${play.startUsePrecompiled}" default-value="false"
+     * @since 1.0.0
+     */
+    private boolean startUsePrecompiled;
+
     @Override
     protected void internalExecute()
         throws MojoExecutionException, MojoFailureException, IOException
@@ -122,6 +130,11 @@ public class PlayStartMojo
 
         Java javaTask = getStartServerTask( configParser, startPlayId, logFile, startSpawn );
 
+        if ( startUsePrecompiled )
+        {
+            addSystemProperty( javaTask, "precompiled", "true" );
+        }
+        
         JavaRunnable runner = new JavaRunnable( javaTask );
         Thread t = new Thread( runner, "Play! Server runner" );
         t.start();

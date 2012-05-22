@@ -182,6 +182,38 @@ public abstract class AbstractPlayServerMojo
             javaTask.createJvmarg().setValue( String.format( "-javaagent:%s",
                                                              frameworkJarArtifact.getFile().getAbsoluteFile() ) );
         }
+        else
+        {
+            //find and add all system properties in "serverJvmArgs"
+            String serverJvmArgs = getServerJvmArgs();
+            if ( serverJvmArgs != null )
+            {
+                serverJvmArgs.trim();
+                if ( !serverJvmArgs.isEmpty() )
+                {
+                    String[] args = serverJvmArgs.split( " " );
+                    for ( String arg : args )
+                    {
+                        if ( arg.startsWith( "-D" ) )
+                        {
+                            arg = arg.substring( 2 );
+                            int p = arg.indexOf( '=' );
+                            if (p >= 0)
+                            {
+                                String key = arg.substring( 0, p );
+                                String value = arg.substring( p+1 );
+                                getLog().debug( "  Adding system property '" + arg + "'" );
+                                addSystemProperty( javaTask, key, value );
+                            }
+                            else
+                            {
+                                // TODO - throw an exception
+                            }
+                        }
+                    }
+                }
+            }
+        }
         addSystemProperty( javaTask, "play.home", playHome.getAbsolutePath() );
         addSystemProperty( javaTask, "play.id", ( playId != null ? playId : "" ) );
         addSystemProperty( javaTask, "application.path", baseDir.getAbsolutePath() );

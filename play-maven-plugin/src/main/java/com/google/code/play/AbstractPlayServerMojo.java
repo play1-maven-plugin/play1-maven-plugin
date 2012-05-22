@@ -66,6 +66,14 @@ public abstract class AbstractPlayServerMojo
      */
     private boolean disableCheckJpda;
 
+    /**
+     * Additional JVM arguments passed to Play! server's JVM
+     * 
+     * @parameter expression="${play.serverJvmArgs}" default-value=""
+     * @since 1.0.0
+     */
+    private String serverJvmArgs;
+
     protected Java prepareAntJavaTask( ConfigurationParser configParser, String playId, boolean fork )
         throws MojoExecutionException, IOException
     {
@@ -85,17 +93,39 @@ public abstract class AbstractPlayServerMojo
         {
             javaTask.setDir( baseDir );
 
-            String jvmMemory = configParser.getProperty( "jvm.memory" );
-            if ( jvmMemory != null )
+            boolean memoryInArgs = false;
+            if ( serverJvmArgs != null )
             {
-                jvmMemory = jvmMemory.trim();
-                if ( !jvmMemory.isEmpty() )
+                serverJvmArgs.trim();
+                if ( !serverJvmArgs.isEmpty() )
                 {
-                    String[] args = jvmMemory.split( " " );
+                    String[] args = serverJvmArgs.split( " " );
                     for ( String arg : args )
                     {
                         javaTask.createJvmarg().setValue( arg );
                         getLog().debug( "  Adding jvmarg '" + arg + "'" );
+                        if ( arg.startsWith( "-Xm" ) )
+                        {
+                            memoryInArgs = true;
+                        }
+                    }
+                }
+            }
+            
+            if ( !memoryInArgs )
+            {
+                String jvmMemory = configParser.getProperty( "jvm.memory" );
+                if ( jvmMemory != null )
+                {
+                    jvmMemory = jvmMemory.trim();
+                    if ( !jvmMemory.isEmpty() )
+                    {
+                        String[] args = jvmMemory.split( " " );
+                        for ( String arg : args )
+                        {
+                            javaTask.createJvmarg().setValue( arg );
+                            getLog().debug( "  Adding jvmarg '" + arg + "'" );
+                        }
                     }
                 }
             }
@@ -271,4 +301,9 @@ public abstract class AbstractPlayServerMojo
         return httpsPort;
     }
 
+    protected String getServerJvmArgs()
+    {
+        return serverJvmArgs;
+    }
+    
 }

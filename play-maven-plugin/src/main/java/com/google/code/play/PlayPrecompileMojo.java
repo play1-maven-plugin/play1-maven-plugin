@@ -116,17 +116,40 @@ public class PlayPrecompileMojo
         {
             javaTask.setDir( baseDir );
 
-            String jvmMemory = configParser.getProperty( "jvm.memory" );
-            if ( jvmMemory != null )
+            boolean memoryInArgs = false;
+            String serverJvmArgs = getServerJvmArgs();
+            if ( serverJvmArgs != null )
             {
-                jvmMemory = jvmMemory.trim();
-                if ( !jvmMemory.isEmpty() )
+                serverJvmArgs.trim();
+                if ( !serverJvmArgs.isEmpty() )
                 {
-                    String[] args = jvmMemory.split( " " );
+                    String[] args = serverJvmArgs.split( " " );
                     for ( String arg : args )
                     {
                         javaTask.createJvmarg().setValue( arg );
                         getLog().debug( "  Adding jvmarg '" + arg + "'" );
+                        if ( arg.startsWith( "-Xm" ) )
+                        {
+                            memoryInArgs = true;
+                        }
+                    }
+                }
+            }
+            
+            if ( !memoryInArgs )
+            {
+                String jvmMemory = configParser.getProperty( "jvm.memory" );
+                if ( jvmMemory != null )
+                {
+                    jvmMemory = jvmMemory.trim();
+                    if ( !jvmMemory.isEmpty() )
+                    {
+                        String[] args = jvmMemory.split( " " );
+                        for ( String arg : args )
+                        {
+                            javaTask.createJvmarg().setValue( arg );
+                            getLog().debug( "  Adding jvmarg '" + arg + "'" );
+                        }
                     }
                 }
             }

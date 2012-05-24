@@ -97,7 +97,7 @@ public class PlayWarMojo
     /**
      * WAR webapp directory exclude filter.
      * 
-     * @parameter expression="${play.warWebappExcludes}" default-value=""
+     * @parameter expression="${play.warWebappExcludes}" default-value="WEB-INF/web.xml"
      * @since 1.0.0
      */
     private String warWebappExcludes;

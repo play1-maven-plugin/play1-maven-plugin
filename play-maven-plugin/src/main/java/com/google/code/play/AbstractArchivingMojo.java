@@ -110,5 +110,18 @@ public abstract class AbstractArchivingMojo
         result.setDuplicateBehavior( Archiver.DUPLICATES_FAIL ); // Just in case
         return result;
     }
-    
+
+    /**
+     * Check for potential "Duplicate file" exception before archive processing starts
+     * 
+     * @param archiver
+     */
+    protected void checkArchiverForProblems( Archiver archiver )
+    {
+        for ( ResourceIterator iter = archiver.getResources(); iter.hasNext(); )
+        {
+            iter.next();
+        }
+    }
+
 }

@@ -260,6 +260,8 @@ public abstract class AbstractPlayDistMojo
             zipArchiver.addFile( jarFile, destinationFileName );
         }
 
+        checkArchiverForProblems( zipArchiver );
+        
         return zipArchiver;
     }
 

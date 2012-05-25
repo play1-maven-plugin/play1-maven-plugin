@@ -114,6 +114,7 @@ public class PlayZipMojo
             {
                 processDependencies( zipArchiver );
             }
+            checkArchiverForProblems( zipArchiver );
             zipArchiver.createArchive();
 
             project.getArtifact().setFile( destFile );

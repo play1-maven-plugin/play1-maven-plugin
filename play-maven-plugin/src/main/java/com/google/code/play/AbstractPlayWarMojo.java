@@ -307,6 +307,8 @@ public abstract class AbstractPlayWarMojo
             }
         }
 
+        checkArchiverForProblems( warArchiver );
+        
         return warArchiver;
     }
 

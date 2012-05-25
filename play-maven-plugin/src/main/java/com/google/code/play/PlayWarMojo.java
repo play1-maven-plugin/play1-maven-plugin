@@ -96,6 +96,9 @@ public class PlayWarMojo
 
     /**
      * WAR webapp directory exclude filter.
+     * "WEB-INF/web.xml" must be included here if this file is present
+     * in "warWebappDirectory" directory, because it is processed separately
+     * from other "warWebappDirectory" directory content.
      * 
      * @parameter expression="${play.warWebappExcludes}" default-value="WEB-INF/web.xml"
      * @since 1.0.0

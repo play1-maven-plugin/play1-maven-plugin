@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project 
+    xmlns="http://maven.apache.org/POM/4.0.0" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    
+<!--
+Based on http://mbknor.github.com/m2repo/releases/kjetland/gt-engine_2.9.1/0.2/gt-engine_2.9.1-0.2.pom
+-->
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.google.code.maven-play-plugin.com.kjetland</groupId>
+    <artifactId>gt-engine_2.9.1</artifactId>
+    <packaging>jar</packaging>
+    <version>0.2</version>
+
+    <name>Faster Groovy Templates Engine</name>
+    <description>Standalone implementation of the groovy template engine used in Play framework 1.x</description>
+    <url>http://github.com/mbknor/gt-engine</url>
+    
+    <scm>
+        <url>http://github.com/mbknor/gt-engine</url>
+        <connection>scm:git:git://github.com/mbknor/gt-engine.git</connection>
+    </scm>
+    
+    <dependencies>
+        <dependency>
+            <groupId>com.google.code.maven-play-plugin.org.eclipse.jdt</groupId>
+            <artifactId>org.eclipse.jdt.core</artifactId>
+            <version>3.8.0.v_C03</version>
+        </dependency>
+
+        <dependency>
+            <groupId>commons-collections</groupId>
+            <artifactId>commons-collections</artifactId>
+            <version>3.2.1</version>
+        </dependency>
+
+        <dependency>
+            <groupId>commons-lang</groupId>
+            <artifactId>commons-lang</artifactId>
+            <version>2.6</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.codehaus.groovy</groupId>
+            <artifactId>groovy</artifactId>
+            <version>1.8.6</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.easytesting</groupId>
+            <artifactId>fest-assert</artifactId>
+            <version>1.4</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.novocode</groupId>
+            <artifactId>junit-interface</artifactId>
+            <version>0.7</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+    
+</project>

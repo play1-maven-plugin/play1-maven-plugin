@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.google.code.maven-play-plugin.com.javaregex.pat</groupId>
+    <artifactId>pat</artifactId>
+    <packaging>jar</packaging>
+    <version>1.5.3</version>
+
+    <name>Regular Expressions in Java</name>
+    <description>Regular Expressions in Java</description>
+    <url>http://javaregex.com/</url>
+    
+    <licenses>
+        <license>
+            <name>Lesser Gnu Public License</name>
+            <url>http://www.gnu.org/copyleft/lesser.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+    
+</project>

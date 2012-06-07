@@ -132,7 +132,6 @@ public class PlayWarMojo
             WarArchiver warArchiver = prepareArchiver( configParser, true );
             warArchiver.setDestFile( destFile );
 
-            getLog().info( "Building war file: " + destFile.getAbsolutePath() );
             warArchiver.createArchive();
             
             if ( warAttach )

@@ -111,7 +111,6 @@ public class PlayDistMojo
             ZipArchiver zipArchiver = prepareArchiver( configParser );
             zipArchiver.setDestFile( destFile );
 
-            getLog().info( "Building zip file: " + destFile.getAbsolutePath() );
             zipArchiver.createArchive();
             
             if ( distAttach )

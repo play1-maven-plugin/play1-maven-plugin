@@ -200,7 +200,12 @@ public abstract class AbstractPlayDistMojo
             {
                 if ( providedModuleNames.contains( moduleName ) )
                 {
-                    String moduleSubDir = String.format( "modules/%s/", moduleName/* , moduleArtifact.getVersion() */ );
+                    String moduleSubDir =
+                        String.format( "modules/%s-%s/", moduleName, moduleZipArtifact.getBaseVersion() );
+                    if ( isFrameworkEmbeddedModule( moduleName ) )
+                    {
+                        moduleSubDir = String.format( "modules/%s/", moduleName );
+                    }
                     zipArchiver.addArchivedFileSet( moduleZipFile, moduleSubDir );
                     dependencySubtree = getModuleDependencyArtifacts( filteredArtifacts, moduleZipArtifact );
                     for ( Artifact classPathArtifact : dependencySubtree )
@@ -212,7 +217,7 @@ public abstract class AbstractPlayDistMojo
                         {
                             destinationFileName = scalaHack( classPathArtifact );
                         }
-                        String destinationPath = String.format( "modules/%s/lib/%s", moduleName, destinationFileName );
+                        String destinationPath = String.format( "%slib/%s", moduleSubDir, destinationFileName );
                         zipArchiver.addFile( jarFile, destinationPath );
                         filteredArtifacts.remove( classPathArtifact );
                     }

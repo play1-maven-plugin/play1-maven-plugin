@@ -306,11 +306,17 @@ public class PlayInitializeMojo
         {
             String moduleName = moduleArtifactEntry.getKey();
             Artifact moduleArtifact = moduleArtifactEntry.getValue();
-            File zipFile = moduleArtifact.getFile();
 
             if ( Artifact.SCOPE_PROVIDED.equals( moduleArtifact.getScope() ) )
             {
-                File moduleDirectory = new File( modulesDirectory, moduleName );
+                File zipFile = moduleArtifact.getFile();
+                String moduleSubDir =
+                                String.format( "%s-%s", moduleName, moduleArtifact.getBaseVersion() );
+                if ( isFrameworkEmbeddedModule( moduleName ) )
+                {
+                    moduleSubDir = moduleName;
+                }
+                File moduleDirectory = new File( modulesDirectory, moduleSubDir );
                 createModuleDirectory( moduleDirectory,
                                        homeOverwrite || moduleDirectory.lastModified() < zipFile.lastModified() );
                 if ( moduleDirectory.list().length == 0 )

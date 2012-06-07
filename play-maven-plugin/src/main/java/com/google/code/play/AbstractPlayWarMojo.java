@@ -242,7 +242,11 @@ public abstract class AbstractPlayWarMojo
                 if ( providedModuleNames.contains( moduleName ) )
                 {
                     moduleSubDir =
-                        String.format( "WEB-INF/modules/%s/", moduleName/* , moduleArtifact.getVersion() */ );
+                        String.format( "WEB-INF/modules/%s-%s/", moduleName, moduleZipArtifact.getBaseVersion() );
+                    if ( isFrameworkEmbeddedModule( moduleName ) )
+                    {
+                        moduleSubDir = String.format( "WEB-INF/modules/%s/", moduleName );
+                    }
                     warArchiver.addArchivedFileSet( moduleZipFile, moduleSubDir );
                     dependencySubtree = getModuleDependencyArtifacts( filteredArtifacts, moduleZipArtifact );
                     for ( Artifact classPathArtifact : dependencySubtree )

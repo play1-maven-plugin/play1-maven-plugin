@@ -340,5 +340,13 @@ public abstract class AbstractPlayMojo
         
         return configParser;
     }
+
+    protected boolean isFrameworkEmbeddedModule( String moduleName )
+    {
+        boolean result =
+            "crud".equals( moduleName ) || "docviewer".equals( moduleName ) || "grizzly".equals( moduleName )
+                || "secure".equals( moduleName ) || "testrunner".equals( moduleName );
+        return result;
+    }
     
 }

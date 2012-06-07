@@ -161,6 +161,7 @@ public abstract class AbstractPlayDistMojo
 
         // framework
         Artifact frameworkZipArtifact = findFrameworkArtifact( false );
+        // TODO-validate not null
         File frameworkZipFile = frameworkZipArtifact.getFile();
         zipArchiver.addArchivedFileSet( frameworkZipFile );
         Artifact frameworkJarArtifact =
@@ -177,7 +178,7 @@ public abstract class AbstractPlayDistMojo
         }
         zipArchiver.addFile( frameworkJarFile, frameworkDestinationFileName );
         filteredArtifacts.remove( frameworkJarArtifact );
-        Set<Artifact> dependencySubtree = getDependencyArtifacts( filteredArtifacts/* ?? */, frameworkJarArtifact );
+        Set<Artifact> dependencySubtree = getFrameworkDependencyArtifacts( filteredArtifacts, frameworkJarArtifact );
         for ( Artifact classPathArtifact : dependencySubtree )
         {
             File jarFile = classPathArtifact.getFile();

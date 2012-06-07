@@ -95,19 +95,18 @@ public abstract class AbstractDependencyProcessingPlayMojo
      */
     private DependencyNode rootNode;
 
-    //shortcut
+    protected Set<Artifact> getFrameworkDependencyArtifacts( Set<?> classPathArtifacts, Artifact frameworkJarArtifact )
+        throws DependencyTreeBuilderException
+    {
+        Set<Artifact> result = getDependencyArtifactsExt( classPathArtifacts, frameworkJarArtifact );
+        return result;
+    }
+                
     protected Set<Artifact> getModuleDependencyArtifacts( Set<?> classPathArtifacts, Artifact moduleZipArtifact )
         throws DependencyTreeBuilderException
     {
-        Artifact moduleJarArtifact =
-            getDependencyArtifact( classPathArtifacts, moduleZipArtifact.getGroupId(),
-                                   moduleZipArtifact.getArtifactId(), "jar" );
-        Artifact dependencyRootArtifact = moduleZipArtifact;
-        if ( moduleJarArtifact != null )
-        {
-            dependencyRootArtifact = moduleJarArtifact;
-        }
-        Set<Artifact> result = getDependencyArtifacts( classPathArtifacts, dependencyRootArtifact );
+        Set<Artifact> result =
+            getDependencyArtifactsExt( classPathArtifacts, moduleZipArtifact );
         return result;
     }
     
@@ -146,7 +145,41 @@ public abstract class AbstractDependencyProcessingPlayMojo
 
         return result;
     }
-    
+                
+    private Set<Artifact> getDependencyArtifactsExt( Set<?> classPathArtifacts, Artifact rootArtifact )
+        throws DependencyTreeBuilderException
+    {
+        Set<Artifact> result = null;
+
+        buildDependencyTree();
+        DependencyNode artifactNode = findArtifactNode( rootArtifact, rootNode );
+        if ( artifactNode != null )
+        {
+            result = new HashSet<Artifact>();
+            addDependencyArtifacts( result, classPathArtifacts, artifactNode );
+            if ( result.isEmpty() )
+            {
+                Set<?> projectArtifacts = project.getArtifacts();
+                for ( Iterator<?> iter = projectArtifacts.iterator(); iter.hasNext(); )
+                {
+                    Artifact artifact = (Artifact) iter.next();
+                    if ( artifact != rootArtifact && artifact.getGroupId().equals( rootArtifact.getGroupId() )
+                        && artifact.getArtifactId().equals( rootArtifact.getArtifactId() ) )
+                    {
+                        Set<Artifact> tmp = getDependencyArtifacts( classPathArtifacts, artifact );
+                        result.addAll( tmp );
+                    }
+                }
+            }
+        }
+        else
+        {
+            result = Collections.emptySet();
+        }
+
+        return result;
+    }
+
     private void addDependencyArtifacts( Set<Artifact> collection, Set<?> classPathArtifacts, DependencyNode artifactNode )
     {
         if ( artifactNode.getState() == DependencyNode.INCLUDED )
@@ -158,8 +191,7 @@ public abstract class AbstractDependencyProcessingPlayMojo
             for ( Iterator<?> iter = classPathArtifacts.iterator(); iter.hasNext(); )
             {
                 Artifact a = (Artifact) iter.next();
-                if ( a.getGroupId().equals( artifact.getGroupId() )
-                    && a.getArtifactId().equals( artifact.getArtifactId() ) && a.getType().equals( artifact.getType() ) )
+                if ( areArtifactsEqual( artifact, a ) )
                 {
                     collection.add( a );
                     break;
@@ -173,7 +205,7 @@ public abstract class AbstractDependencyProcessingPlayMojo
             }
         }
     }
-    
+
     private DependencyNode findArtifactNode( Artifact artifact, DependencyNode findRootNode )
     {
         DependencyNode result = null;
@@ -195,6 +227,17 @@ public abstract class AbstractDependencyProcessingPlayMojo
                 }
             }
         }
+        return result;
+    }
+
+    private boolean areArtifactsEqual( Artifact a1, Artifact a2 )
+    {
+        boolean result =
+            a1.getGroupId().equals( a2.getGroupId() )
+                && a1.getArtifactId().equals( a2.getArtifactId() )
+                && a1.getType().equals( a2.getType() )
+                && ( a1.getClassifier() == null ? a2.getClassifier() == null
+                                : a1.getClassifier().equals( a2.getClassifier() ) );
         return result;
     }
 

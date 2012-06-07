@@ -210,6 +210,7 @@ public abstract class AbstractPlayWarMojo
 
         // framework
         Artifact frameworkZipArtifact = findFrameworkArtifact( true );
+        // TODO-validate not null
         File frameworkZipFile = frameworkZipArtifact.getFile();
         warArchiver.addArchivedFileSet( frameworkZipFile, "WEB-INF/",
                                         "framework/templates/**,resources/messages".split( "," ), null );
@@ -217,7 +218,7 @@ public abstract class AbstractPlayWarMojo
             getDependencyArtifact( filteredArtifacts, frameworkZipArtifact.getGroupId(),
                                    frameworkZipArtifact.getArtifactId(), "jar" );
         // TODO-validate not null
-        Set<Artifact> dependencySubtree = getDependencyArtifacts( filteredArtifacts/* ?? */, frameworkJarArtifact );
+        Set<Artifact> dependencySubtree = getFrameworkDependencyArtifacts( filteredArtifacts, frameworkJarArtifact );
         for ( Artifact classPathArtifact : dependencySubtree )
         {
             File jarFile = classPathArtifact.getFile();

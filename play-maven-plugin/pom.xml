@@ -37,11 +37,11 @@ under the License.
     </description>
 
     <prerequisites>
-        <maven>2.0.3</maven> <!-- check -->
+        <maven>2.2.1</maven>
     </prerequisites>
 
     <properties>
-        <maven.version>2.0</maven.version> <!-- check -->
+        <maven.version>2.2.1</maven.version>
     </properties>
 
     <dependencies>

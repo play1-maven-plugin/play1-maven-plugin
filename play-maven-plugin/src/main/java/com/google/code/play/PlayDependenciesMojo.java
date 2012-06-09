@@ -199,6 +199,17 @@ public class PlayDependenciesMojo
                             }
                         }
                     }
+                    else // just remove dependency tree from "filteredArtifacts" collection 
+                    {
+                        if ( !dependenciesSkipJars )
+                        {
+                            Set<Artifact> dependencySubtree = getModuleDependencyArtifacts( filteredArtifacts, moduleZipArtifact );
+                            for ( Artifact classPathArtifact : dependencySubtree )
+                            {
+                                filteredArtifacts.remove( classPathArtifact );
+                            }
+                        }
+                    }
                 }
             }
 

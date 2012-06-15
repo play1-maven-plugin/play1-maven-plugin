@@ -66,12 +66,35 @@ public abstract class PlaySeleniumTest
         {
             seleniumBrowser = "*chrome";
         }
+
         seleniumUrl = System.getProperty( "selenium.url" );//TODO-remove this property
         if ( seleniumUrl == null )
         {
             seleniumUrl = "http://localhost:9000";//TODO-read protocol and port from "conf/application.conf"
         }
-        commandProcessor = new HttpCommandProcessor( "localhost", 4444, seleniumBrowser, seleniumUrl );
+
+        String seleniumServerHost = System.getProperty( "selenium.server.host" );
+        if ( seleniumServerHost == null )
+        {
+            seleniumServerHost = "localhost";
+        }
+
+        int seleniumServerPort = 4444;
+        String seleniumServerPortStr = System.getProperty( "selenium.server.port" );
+        if ( seleniumServerPortStr != null )
+        {
+            try
+            {
+                seleniumServerPort = Integer.valueOf( seleniumServerPortStr );
+            }
+            catch ( NumberFormatException e )
+            {
+                // ignore?
+            }
+        }
+
+        commandProcessor =
+            new HttpCommandProcessor( seleniumServerHost, seleniumServerPort, seleniumBrowser, seleniumUrl );
         selenium = new DefaultSelenium( commandProcessor );
         selenium.start();
         // There are no cookies by default

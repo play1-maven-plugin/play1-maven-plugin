@@ -1,0 +1,45 @@
+<?xml version="1.0" ?>
+<project>
+
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>com.google.code.maven-play-plugin.org.allcolor.shanidom</groupId>
+  <artifactId>shani-xml-apis</artifactId>
+  <version>1.4.17</version>
+
+  <url>http://freecode.com/projects/shanidom</url>
+
+  <build>
+    <sourceDirectory>src</sourceDirectory>
+    <resources>
+      <resource>
+        <directory>${basedir}</directory>
+        <includes>
+          <include>META-INF/services/**</include>
+        </includes>
+      </resource>
+    </resources>
+
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>1.5</source>
+          <target>1.5</target>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <configuration>
+          <archive>
+            <manifestFile>${basedir}/META-INF/MANIFEST.MF</manifestFile>
+          </archive>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>

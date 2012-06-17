@@ -1,0 +1,23 @@
+<?xml version="1.0" ?>
+<project>
+
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>com.google.code.maven-play-plugin.org.allcolor.yahp</groupId>
+  <artifactId>yahp</artifactId>
+  <version>1.3</version>
+  <name>Yet another Html to Pdf converter</name>
+
+  <description>YaHP is a java library which permits to convert an html document into a pdf document.</description>
+
+  <url>http://www.allcolor.org/YaHPConverter</url>
+
+  <licenses>
+    <license>
+      <name>The GNU Lesser General Public License, Version 2.1</name>
+      <url>http://www.gnu.org/licenses/lgpl-2.1.html</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+
+</project>

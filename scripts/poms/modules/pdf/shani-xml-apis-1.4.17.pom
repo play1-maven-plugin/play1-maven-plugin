@@ -1,0 +1,12 @@
+<?xml version="1.0" ?>
+<project>
+
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>com.google.code.maven-play-plugin.org.allcolor.shanidom</groupId>
+  <artifactId>shani-xml-apis</artifactId>
+  <version>1.4.17</version>
+
+  <url>http://freecode.com/projects/shanidom</url>
+
+</project>

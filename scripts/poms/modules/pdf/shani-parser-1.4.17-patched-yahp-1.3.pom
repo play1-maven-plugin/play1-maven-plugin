@@ -1,0 +1,41 @@
+<?xml version="1.0" ?>
+<project>
+
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>com.google.code.maven-play-plugin.org.allcolor.shanidom</groupId>
+  <artifactId>shani-parser</artifactId>
+  <version>1.4.17-patched-yahp-1.3</version>
+  <name>Shani Xml Parser</name>
+
+  <description>
+ShaniXmlParser is an XML/HTML DOM/SAX parser. It can parse not well formed XML/HTML files. 
+It can parse files with inverted tags and bad escaped &amp;,&amp;lt;,&amp;gt; and &amp;quot;. 
+It expands all XHTML entities by default. It is well suited to parse HTML files, 
+and is fast with low memory usage. It is compliant with the jaxp/w3c DOM1/2/3 interfaces.
+  </description>
+
+  <url>http://shanidom.sourceforge.net</url>
+
+  <licenses>
+    <license>
+      <name>The GNU Lesser General Public License, Version 2.1</name>
+      <url>http://www.gnu.org/licenses/lgpl-2.1.html</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+
+  <dependencies>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>shani-xml-apis</artifactId>
+      <version>1.4.17</version>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>jaxen</artifactId>
+      <version>1.1.1-patched-shani-1.4.17</version>
+    </dependency>
+  </dependencies>
+
+</project>

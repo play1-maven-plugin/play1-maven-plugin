@@ -21,10 +21,10 @@ package com.google.code.play.selenium;
 
 public interface Step
 {
-    public void execute()
+    void execute()
         throws Exception;
 
-    public long getExecutionTimeMillis();
+    long getExecutionTimeMillis();
 
-    // public String toString();
+    // String toString();
 }

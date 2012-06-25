@@ -23,6 +23,6 @@ import java.util.List;
 
 public interface SeleneseParser
 {
-    public List<List<String>> parseSeleneseContent( String content )
+    List<List<String>> parseSeleneseContent( String content )
         throws Exception;
 }

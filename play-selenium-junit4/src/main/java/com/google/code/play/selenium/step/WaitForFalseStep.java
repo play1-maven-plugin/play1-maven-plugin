@@ -58,7 +58,9 @@ public class WaitForFalseStep
             {
                 boolean innerCommandResult = !innerCommand.getBoolean();
                 if ( innerCommandResult )
+                {
                     break;
+                }
             }
             catch ( Exception e )
             {

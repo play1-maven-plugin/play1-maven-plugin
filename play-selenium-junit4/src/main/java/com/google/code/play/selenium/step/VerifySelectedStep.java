@@ -27,7 +27,7 @@ public class VerifySelectedStep
 {
     public VerifySelectedStep( StoredVars storedVars, CommandProcessor commandProcessor, String param1, String param2 )
     {
-        super(new StringSeleniumCommand( storedVars, commandProcessor, "getSelectedLabel", param1 ), param2);
+        super( new StringSeleniumCommand( storedVars, commandProcessor, "getSelectedLabel", param1 ), param2 );
     }
 
     public String toString()

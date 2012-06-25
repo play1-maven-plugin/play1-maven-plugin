@@ -34,10 +34,12 @@ public class Verify
      * @param message the identifying message for the {@link VerificationError} (<code>null</code> okay)
      * @param condition condition to be checked
      */
-    static public void verifyTrue( String message, boolean condition )
+    public static void verifyTrue( String message, boolean condition )
     {
         if ( !condition )
+        {
             fail( message );
+        }
     }
 
     /**
@@ -45,7 +47,7 @@ public class Verify
      * 
      * @param condition condition to be checked
      */
-    static public void verifyTrue( boolean condition )
+    public static void verifyTrue( boolean condition )
     {
         verifyTrue( null, condition );
     }
@@ -56,7 +58,7 @@ public class Verify
      * @param message the identifying message for the {@link VerificationError} (<code>null</code> okay)
      * @param condition condition to be checked
      */
-    static public void verifyFalse( String message, boolean condition )
+    public static void verifyFalse( String message, boolean condition )
     {
         verifyTrue( message, !condition );
     }
@@ -66,7 +68,7 @@ public class Verify
      * 
      * @param condition condition to be checked
      */
-    static public void verifyFalse( boolean condition )
+    public static void verifyFalse( boolean condition )
     {
         verifyFalse( null, condition );
     }
@@ -77,7 +79,7 @@ public class Verify
      * @param message the identifying message for the {@link VerificationError} (<code>null</code> okay)
      * @see VerificationError
      */
-    static public void fail( String message )
+    public static void fail( String message )
     {
         throw new VerificationError( message == null ? "" : message );
     }
@@ -85,7 +87,7 @@ public class Verify
     /**
      * Fails a test with no message.
      */
-    static public void fail()
+    public static void fail()
     {
         fail( null );
     }

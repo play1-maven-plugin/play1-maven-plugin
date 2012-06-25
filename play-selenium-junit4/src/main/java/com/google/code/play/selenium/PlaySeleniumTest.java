@@ -67,10 +67,10 @@ public abstract class PlaySeleniumTest
             seleniumBrowser = "*chrome";
         }
 
-        seleniumUrl = System.getProperty( "selenium.url" );//TODO-remove this property
+        seleniumUrl = System.getProperty( "selenium.url" ); //TODO-remove this property
         if ( seleniumUrl == null )
         {
-            seleniumUrl = "http://localhost:9000";//TODO-read protocol and port from "conf/application.conf"
+            seleniumUrl = "http://localhost:9000"; //TODO-read protocol and port from "conf/application.conf"
         }
 
         String seleniumServerHost = System.getProperty( "selenium.server.host" );
@@ -79,7 +79,7 @@ public abstract class PlaySeleniumTest
             seleniumServerHost = "localhost";
         }
 
-        int seleniumServerPort = 4444;
+        int seleniumServerPort = 4444; //TODO-add constant
         String seleniumServerPortStr = System.getProperty( "selenium.server.port" );
         if ( seleniumServerPortStr != null )
         {
@@ -197,8 +197,7 @@ public abstract class PlaySeleniumTest
             // System.out.println( "Content:" );
             // System.out.println( content );
             // System.out.println( "End of content." );
-            throw new RuntimeException( content/* "Template rendering error, check Play! server log" */);// TODO-add all
-                                                                                                         // fields here?
+            throw new RuntimeException( content/* "Template rendering error, check Play! server log" */ ); // TODO-add all fields here?
         }
     }
 

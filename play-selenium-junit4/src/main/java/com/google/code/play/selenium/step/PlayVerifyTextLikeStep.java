@@ -19,8 +19,6 @@
 
 package com.google.code.play.selenium.step;
 
-import org.junit.Assert;
-
 import com.google.code.play.selenium.StoredVars;
 
 public class PlayVerifyTextLikeStep
@@ -40,32 +38,23 @@ public class PlayVerifyTextLikeStep
         this.param2 = param2;
     }
 
-/*
-// assertTextLike seems to NOT assert on errors in Chrome
-Selenium.prototype.assertTextLike = function(a, b) {
-    a = a.replace(/\n/g, '').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ')
-    b = b.replace(/\n/g, '').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ')
-    if(a == b) {
-        Assert.fail(a+' == '+b);
-    }
-};
-*/
     public void doExecute()
         throws Exception
     {
-        String param1Filtered = regexpFilter( param1 );
-        String param2Filtered = regexpFilter( param2 );
-//      String param1Filtered = storedVars.fillValues( param1 );
-//      String param2Filtered = storedVars.fillValues( param2 );
+        String param1Filtered = storedVars.fillValues( param1 );
+        String param2Filtered = storedVars.fillValues( param2 );
 
-        if (param1Filtered.equals( param2Filtered ))
+        param1Filtered = regexpFilter( param1Filtered );
+        param2Filtered = regexpFilter( param2Filtered );
+
+        if ( param1Filtered.equals( param2Filtered ) )
         {
-            String assertMessage = String.format("%s == %s", param1Filtered, param2Filtered);
+            String assertMessage = String.format( "%s == %s", param1Filtered, param2Filtered );
             Verify.fail( assertMessage );
         }
     }
 
-    private String regexpFilter(String param)
+    private String regexpFilter( String param )
     {
         String result = param;
         result = result.replaceAll( "\n", "" );

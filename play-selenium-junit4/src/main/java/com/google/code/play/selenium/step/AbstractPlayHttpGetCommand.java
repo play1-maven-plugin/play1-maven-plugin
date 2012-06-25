@@ -32,9 +32,9 @@ public abstract class AbstractPlayHttpGetCommand
 {
 
     private String applicationRootUrl;
-    
+
     public AbstractPlayHttpGetCommand( StoredVars storedVars, CommandProcessor commandProcessor, String command,
-                                  String param1, String applicationRootUrl )
+                                       String param1, String applicationRootUrl )
     {
         super( storedVars, commandProcessor, command, param1 );
         this.applicationRootUrl = applicationRootUrl;
@@ -44,28 +44,28 @@ public abstract class AbstractPlayHttpGetCommand
         throws Exception
     {
         String result = null;
-        
+
         String commandRelativeUrl = getCommandRelativeUrl();
         String urlStr = String.format( "%s/%s", applicationRootUrl, commandRelativeUrl );
-        //String urlStr = String.format( "%s/%s@tests/cache?key=%s", applicationRootUrl, param1 );
         URL connectUrl = new URL( urlStr );
         URLConnection conn = connectUrl.openConnection();
-        Map<String,List<String>> maps = conn.getHeaderFields();
+        Map<String, List<String>> maps = conn.getHeaderFields();
         List<String> l = maps.get( null );
-        if (l.size() > 0) {
+        if ( l.size() > 0 )
+        {
             String s0 = l.get( 0 );
-            if (s0.contains( "200 OK" ))
+            if ( s0.contains( "200 OK" ) )
             {
                 int contentLength = conn.getContentLength();
                 byte[] content = new byte[contentLength];
                 conn.getInputStream().read( content, 0, contentLength );
-                //String contentType = conn.getContentType();
-                result = new String(content, "UTF-8");//TODO - get from contentType
+                // String contentType = conn.getContentType();
+                result = new String( content, "UTF-8" ); // TODO - get from contentType
             }
         }
         return result;
     }
 
-    abstract protected String getCommandRelativeUrl();
-    
+    protected abstract String getCommandRelativeUrl();
+
 }

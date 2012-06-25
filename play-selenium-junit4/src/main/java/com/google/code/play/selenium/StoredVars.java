@@ -37,7 +37,9 @@ public class StoredVars
     {
         String result = storedVars.get( name );
         if ( result == null )
-            result = "";// ???
+        {
+            result = ""; // ???
+        }
         return result;
     }
 
@@ -54,7 +56,7 @@ public class StoredVars
             String value = storedVars.get( name );
             if ( value == null )
             {
-                value = "";// ??
+                value = ""; // ??
             }
             result = result.replace( "$[" + name + "]", value );
         }

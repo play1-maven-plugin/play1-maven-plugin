@@ -39,7 +39,7 @@ public class JSoupSeleneseParser
     {
         List<List<String>> result = new ArrayList<List<String>>();
 
-        Document doc = Jsoup.parseBodyFragment(content);
+        Document doc = Jsoup.parseBodyFragment( content );
         Element body = doc.body();
         Elements tables = body.getElementsByTag( "TABLE" );
         for ( Element table : tables )
@@ -60,13 +60,13 @@ public class JSoupSeleneseParser
     {
         List<String> result = new ArrayList<String>();
         Elements trChildNodes = trNode.getElementsByTag( "TD" );
-        for (Element trChild: trChildNodes)
+        for ( Element trChild : trChildNodes )
         {
             result.add( getTableDataValue( trChild ) );
         }
-        if (result.size() != 1 && result.size() != 3)
+        if ( result.size() != 1 && result.size() != 3 )
         {
-            throw new RuntimeException( "Something strange" );// FIXME
+            throw new RuntimeException( "Something strange" ); // FIXME
         }
         return result;
     }
@@ -77,16 +77,16 @@ public class JSoupSeleneseParser
         //return tdNode.html();
         StringBuffer buf = new StringBuffer();
         List<Node> childNodes = tdNode.childNodes();
-        for (Node tdChild: childNodes)
+        for ( Node tdChild : childNodes )
         {
-            if (tdChild instanceof TextNode)
+            if ( tdChild instanceof TextNode )
             {
-                buf.append( ((TextNode)tdChild).text() );
+                buf.append( ( (TextNode) tdChild ).text() );
             }
-            else if (tdChild instanceof Element)
+            else if ( tdChild instanceof Element )
             {
-                Element tdChildElement = (Element)tdChild;
-                if ("br".equals( tdChildElement.tagName()))
+                Element tdChildElement = (Element) tdChild;
+                if ( "br".equals( tdChildElement.tagName() ) )
                 {
                     buf.append( "<br />" );
                 }
@@ -99,7 +99,8 @@ public class JSoupSeleneseParser
     {
         Element result = null;
         Elements childNodes = parent.getElementsByTag( tagName );
-        if (childNodes != null && !childNodes.isEmpty()) {
+        if ( childNodes != null && !childNodes.isEmpty() )
+        {
             result = childNodes.get( 0 );
         }
         return result;

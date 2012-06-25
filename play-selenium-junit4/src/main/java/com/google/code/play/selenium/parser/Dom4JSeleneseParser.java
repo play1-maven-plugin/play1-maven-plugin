@@ -43,7 +43,7 @@ public class Dom4JSeleneseParser
         Document xmlDoc = DocumentHelper.parseText( content );
         Element root = xmlDoc.getRootElement();
         List<Element> tables = root.elements( "table" );
-        for (Element table: tables)
+        for ( Element table: tables )
         {
             Element tbody = table.element( "tbody" );
             List<Element> rows = tbody.elements( "tr" );
@@ -71,7 +71,7 @@ public class Dom4JSeleneseParser
                 }
                 else
                 {
-                    throw new RuntimeException( "Something strange" );// FIXME
+                    throw new RuntimeException( "Something strange" ); // FIXME
                 }
             }
         }

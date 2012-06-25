@@ -82,9 +82,9 @@ public class NekoHtmlSeleneseParser
                 result.add( getTableDataValue( trChild ) );
             }
         }
-        if (result.size() != 1 && result.size() != 3)
+        if ( result.size() != 1 && result.size() != 3 )
         {
-            throw new RuntimeException( "Something strange" );// FIXME
+            throw new RuntimeException( "Something strange" ); // FIXME
         }
         return result;
     }
@@ -142,7 +142,7 @@ public class NekoHtmlSeleneseParser
             Node child = childNodes.item( i );
             if ( child.getNodeType() == nodeType && nodeName.equals( child.getNodeName() ) )
             {
-                result.add(child);
+                result.add( child );
             }
         }
         return result;

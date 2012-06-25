@@ -38,7 +38,7 @@ public class WaitForEqualsStep
     protected void doExecute()
         throws Exception
     {
-        String innerCommandResult = null;// tmp
+        String innerCommandResult = null; // tmp
         String xexpected = innerCommand.storedVars.fillValues( expected );
         xexpected = MultiLineHelper.brToNewLine( xexpected );
         for ( int second = 0;; second++ )
@@ -54,7 +54,9 @@ public class WaitForEqualsStep
                 /* tmpString */innerCommandResult = innerCommand.getString();
                 boolean seleniumEqualsResult = EqualsHelper.seleniumEquals( xexpected, innerCommandResult );
                 if ( seleniumEqualsResult )
+                {
                     break;
+                }
             }
             catch ( Exception e )
             {

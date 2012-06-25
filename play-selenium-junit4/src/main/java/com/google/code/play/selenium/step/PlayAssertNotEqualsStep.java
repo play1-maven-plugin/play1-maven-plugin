@@ -46,9 +46,9 @@ public class PlayAssertNotEqualsStep
         String param1Filtered = storedVars.fillValues( param1 );
         String param2Filtered = storedVars.fillValues( param2 );
 
-        if (param1Filtered.equals( param2Filtered ))
+        if ( param1Filtered.equals( param2Filtered ) )
         {
-            String assertMessage = String.format("%s == %s", param1Filtered, param2Filtered);
+            String assertMessage = String.format( "%s == %s", param1Filtered, param2Filtered );
             Assert.fail( assertMessage );
         }
     }

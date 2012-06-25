@@ -312,22 +312,31 @@ public abstract class PlaySeleniumTest
                     else
                     {
                         String innerCmd = verifyWhat;
-                        if ( isParameterLessCommand( innerCmd ) )
+                        if ( "Selected".equals( innerCmd ) )
                         {
-                            param2 = param1; // value to compare with
-                            param1 = ""; // parameterless command
-                        }
-                        if ( isBooleanCommand( innerCmd ) )
-                        {
-                            cmd =
-                                new VerifyTrueStep( new BooleanSeleniumCommand( storedVars, commandProcessor, "is"
-                                    + innerCmd, param1 ) );
+                            // deprecated, but still works in Play! Test Runner
+                            cmd = new VerifySelectedStep( storedVars, commandProcessor, param1, param2 );
                         }
                         else
                         {
-                            cmd =
-                                new VerifyEqualsStep( new StringSeleniumCommand( storedVars, commandProcessor, "get"
-                                    + innerCmd, param1 ), param2 );
+                            // standard Selenium commands
+                            if ( isParameterLessCommand( innerCmd ) )
+                            {
+                                param2 = param1; // value to compare with
+                                param1 = ""; // parameterless command
+                            }
+                            if ( isBooleanCommand( innerCmd ) )
+                            {
+                                cmd =
+                                    new VerifyTrueStep( new BooleanSeleniumCommand( storedVars, commandProcessor, "is"
+                                        + innerCmd, param1 ) );
+                            }
+                            else
+                            {
+                                cmd =
+                                    new VerifyEqualsStep( new StringSeleniumCommand( storedVars, commandProcessor,
+                                                                                     "get" + innerCmd, param1 ), param2 );
+                            }
                         }
                     }
                 }
@@ -365,22 +374,31 @@ public abstract class PlaySeleniumTest
                     else
                     {
                         String innerCmd = assertWhat;
-                        if ( isParameterLessCommand( innerCmd ) )
+                        if ( "Selected".equals( innerCmd ) )
                         {
-                            param2 = param1; // value to compare with
-                            param1 = ""; // parameterless command
-                        }
-                        if ( isBooleanCommand( innerCmd ) )
-                        {
-                            cmd =
-                                new AssertTrueStep( new BooleanSeleniumCommand( storedVars, commandProcessor, "is"
-                                    + innerCmd, param1 ) );
+                            // deprecated, but still works in Play! Test Runner
+                            cmd = new AssertSelectedStep( storedVars, commandProcessor, param1, param2 );
                         }
                         else
                         {
-                            cmd =
-                                new AssertEqualsStep( new StringSeleniumCommand( storedVars, commandProcessor, "get"
-                                    + innerCmd, param1 ), param2 );
+                            // standard Selenium commands
+                            if ( isParameterLessCommand( innerCmd ) )
+                            {
+                                param2 = param1; // value to compare with
+                                param1 = ""; // parameterless command
+                            }
+                            if ( isBooleanCommand( innerCmd ) )
+                            {
+                                cmd =
+                                    new AssertTrueStep( new BooleanSeleniumCommand( storedVars, commandProcessor, "is"
+                                        + innerCmd, param1 ) );
+                            }
+                            else
+                            {
+                                cmd =
+                                    new AssertEqualsStep( new StringSeleniumCommand( storedVars, commandProcessor,
+                                                                                     "get" + innerCmd, param1 ), param2 );
+                            }
                         }
                     }
                 }

@@ -44,6 +44,6 @@ public class CommentStep
 
     public String toString()
     {
-        return "//" + comment;
+        return comment;
     }
 }

@@ -19,11 +19,10 @@
 
 package com.google.code.play.selenium.step;
 
-import com.google.code.play.selenium.Step;
 import com.google.code.play.selenium.StoredVars;
 
 public class EchoStep
-    implements Step
+    extends AbstractSeleniumStep
 {
 
     private StoredVars storedVars;
@@ -36,16 +35,11 @@ public class EchoStep
         this.param = param;
     }
 
-    public void execute()
+    public void doExecute()
         throws Exception
     {
         String result = storedVars.fillValues( param );
         System.out.println( "echo:" + result );
-    }
-
-    public long getExecutionTimeMillis()
-    {
-        return 0L;
     }
 
     public String toString()

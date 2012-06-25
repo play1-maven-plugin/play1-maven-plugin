@@ -235,8 +235,7 @@ public abstract class PlaySeleniumTest
             if ( row.size() == 1 )
             { // comment
                 String cmt = row.get( 0 );
-                cmt = cmt.trim(); // comments are not trimmed (Selenium commands are)
-                cmt = cmt.substring( "//".length() );
+                cmt = cmt.trim();
                 cmd = new CommentStep( cmt );
             }
             else
@@ -290,29 +289,47 @@ public abstract class PlaySeleniumTest
                     else if ( verifyWhat.startsWith( "Not" ) )
                     {
                         String innerCmd = verifyWhat.substring( "Not".length() );
-                        if ( isParameterLessCommand( innerCmd ) )
+                        if ( "Equals".equals( innerCmd ) )
                         {
-                            param2 = param1; // value to compare with
-                            param1 = ""; // parameterless command
-                        }
-                        if ( isBooleanCommand( innerCmd ) )
-                        {
-                            cmd =
-                                new VerifyFalseStep( new BooleanSeleniumCommand( storedVars, commandProcessor, "is"
-                                    + innerCmd, param1 ) );
+                            // Play! extension (see "user-extensions.js" file)
+                            cmd = new PlayVerifyNotEqualsStep( storedVars, param1, param2 );
                         }
                         else
                         {
-                            cmd =
-                                new VerifyNotEqualsStep( new StringSeleniumCommand( storedVars, commandProcessor, "get"
-                                    + innerCmd, param1 ), param2 );
-
+                            // standard Selenium commands
+                            if ( isParameterLessCommand( innerCmd ) )
+                            {
+                                param2 = param1; // value to compare with
+                                param1 = ""; // parameterless command
+                            }
+                            if ( isBooleanCommand( innerCmd ) )
+                            {
+                                cmd =
+                                    new VerifyFalseStep( new BooleanSeleniumCommand( storedVars, commandProcessor, "is"
+                                        + innerCmd, param1 ) );
+                            }
+                            else
+                            {
+                                StringSeleniumCommand innerCommand =
+                                    getInnerStringCommandByName( innerCmd, storedVars, commandProcessor, param1 );
+                                cmd = new VerifyNotEqualsStep( innerCommand, param2 );
+                            }
                         }
                     }
                     else
                     {
                         String innerCmd = verifyWhat;
-                        if ( "Selected".equals( innerCmd ) )
+                        if ( "Equals".equals( innerCmd ) )
+                        {
+                            // Play! extension (see "user-extensions.js" file)
+                            cmd = new PlayVerifyEqualsStep( storedVars, param1, param2 );
+                        }
+                        else if ( "TextLike".equals( innerCmd ) )
+                        {
+                            // Play! extension (see "user-extensions.js" file)
+                            cmd = new PlayVerifyTextLikeStep( storedVars, param1, param2 );
+                        }
+                        else if ( "Selected".equals( innerCmd ) )
                         {
                             // deprecated, but still works in Play! Test Runner
                             cmd = new VerifySelectedStep( storedVars, commandProcessor, param1, param2 );
@@ -333,9 +350,9 @@ public abstract class PlaySeleniumTest
                             }
                             else
                             {
-                                cmd =
-                                    new VerifyEqualsStep( new StringSeleniumCommand( storedVars, commandProcessor,
-                                                                                     "get" + innerCmd, param1 ), param2 );
+                                StringSeleniumCommand innerCommand =
+                                    getInnerStringCommandByName( innerCmd, storedVars, commandProcessor, param1 );
+                                cmd = new VerifyEqualsStep( innerCommand, param2 );
                             }
                         }
                     }
@@ -353,28 +370,47 @@ public abstract class PlaySeleniumTest
                     else if ( assertWhat.startsWith( "Not" ) )
                     {
                         String innerCmd = assertWhat.substring( "Not".length() );
-                        if ( isParameterLessCommand( innerCmd ) )
+                        if ( "Equals".equals( innerCmd ) )
                         {
-                            param2 = param1; // value to compare with
-                            param1 = ""; // parameterless command
-                        }
-                        if ( isBooleanCommand( innerCmd ) )
-                        {
-                            cmd =
-                                new AssertFalseStep( new BooleanSeleniumCommand( storedVars, commandProcessor, "is"
-                                    + innerCmd, param1 ) );
+                            // Play! extension (see "user-extensions.js" file)
+                            cmd = new PlayAssertNotEqualsStep( storedVars, param1, param2 );
                         }
                         else
                         {
-                            cmd =
-                                new AssertNotEqualsStep( new StringSeleniumCommand( storedVars, commandProcessor, "get"
-                                    + innerCmd, param1 ), param2 );
+                            // standard Selenium commands
+                            if ( isParameterLessCommand( innerCmd ) )
+                            {
+                                param2 = param1; // value to compare with
+                                param1 = ""; // parameterless command
+                            }
+                            if ( isBooleanCommand( innerCmd ) )
+                            {
+                                cmd =
+                                    new AssertFalseStep( new BooleanSeleniumCommand( storedVars, commandProcessor, "is"
+                                        + innerCmd, param1 ) );
+                            }
+                            else
+                            {
+                                StringSeleniumCommand innerCommand =
+                                    getInnerStringCommandByName( innerCmd, storedVars, commandProcessor, param1 );
+                                cmd = new AssertNotEqualsStep( innerCommand, param2 );
+                            }
                         }
                     }
                     else
                     {
                         String innerCmd = assertWhat;
-                        if ( "Selected".equals( innerCmd ) )
+                        if ( "Equals".equals( innerCmd ) )
+                        {
+                            // Play! extension (see "user-extensions.js" file)
+                            cmd = new PlayAssertEqualsStep( storedVars, param1, param2 );
+                        }
+                        else if ( "TextLike".equals( innerCmd ) )
+                        {
+                            // Play! extension (see "user-extensions.js" file)
+                            cmd = new PlayAssertTextLikeStep( storedVars, param1, param2 );
+                        }
+                        else if ( "Selected".equals( innerCmd ) )
                         {
                             // deprecated, but still works in Play! Test Runner
                             cmd = new AssertSelectedStep( storedVars, commandProcessor, param1, param2 );
@@ -395,9 +431,9 @@ public abstract class PlaySeleniumTest
                             }
                             else
                             {
-                                cmd =
-                                    new AssertEqualsStep( new StringSeleniumCommand( storedVars, commandProcessor,
-                                                                                     "get" + innerCmd, param1 ), param2 );
+                                StringSeleniumCommand innerCommand =
+                                    getInnerStringCommandByName( innerCmd, storedVars, commandProcessor, param1 );
+                                cmd = new AssertEqualsStep( innerCommand, param2 );
                             }
                         }
                     }
@@ -437,10 +473,9 @@ public abstract class PlaySeleniumTest
                             }
                             else
                             {
-                                cmd =
-                                    new WaitForNotEqualsStep( new StringSeleniumCommand( storedVars, commandProcessor,
-                                                                                         "get" + innerCmd, param1 ),
-                                                              param2 );
+                                StringSeleniumCommand innerCommand =
+                                    getInnerStringCommandByName( innerCmd, storedVars, commandProcessor, param1 );
+                                cmd = new WaitForNotEqualsStep( innerCommand, param2 );
                             }
                         }
                         else
@@ -459,10 +494,9 @@ public abstract class PlaySeleniumTest
                             }
                             else
                             {
-                                cmd =
-                                    new WaitForEqualsStep( new StringSeleniumCommand( storedVars, commandProcessor,
-                                                                                      "get" + innerCmd, param1 ),
-                                                           param2 );
+                                StringSeleniumCommand innerCommand =
+                                    getInnerStringCommandByName( innerCmd, storedVars, commandProcessor, param1 );
+                                cmd = new WaitForEqualsStep( innerCommand, param2 );
                             }
                         }
                     }
@@ -636,6 +670,25 @@ public abstract class PlaySeleniumTest
         }
         return "*" + strLine + ": " + step.toString() + " [" + step.getExecutionTimeMillis() + "ms] " + message;
         // System.out.println( strLine + ": " + step.toString() );
+    }
+
+    private StringSeleniumCommand getInnerStringCommandByName( String innerCmd, StoredVars storedVars,
+                                                         CommandProcessor commandProcessor, String param1 )
+    {
+        StringSeleniumCommand result = null;
+        if ( "CacheEntry".equals( innerCmd ) )
+        {
+            result = new PlayGetCacheEntryCommand( storedVars, commandProcessor, seleniumUrl, param1 );
+        }
+        else if ( "LastReceivedEmailBy".equals( innerCmd ) )
+        {
+            result = new PlayGetLastReceivedEmailByCommand( storedVars, commandProcessor, seleniumUrl, param1 );
+        }
+        else
+        {
+            result = new StringSeleniumCommand( storedVars, commandProcessor, "get" + innerCmd, param1 );
+        }
+        return result;
     }
 
 }

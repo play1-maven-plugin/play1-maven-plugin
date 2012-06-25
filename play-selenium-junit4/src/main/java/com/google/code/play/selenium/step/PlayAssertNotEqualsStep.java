@@ -19,34 +19,44 @@
 
 package com.google.code.play.selenium.step;
 
+import org.junit.Assert;
+
 import com.google.code.play.selenium.StoredVars;
 
-public class PauseStep
+public class PlayAssertNotEqualsStep
     extends AbstractSeleniumStep
 {
 
     private StoredVars storedVars;
 
-    private String param;
-                    
-    public PauseStep( StoredVars storedVars, String param )
+    private String param1;
+
+    private String param2;
+
+    public PlayAssertNotEqualsStep( StoredVars storedVars, String param1, String param2 )
     {
         this.storedVars = storedVars;
-        this.param = param;
+        this.param1 = param1;
+        this.param2 = param2;
     }
 
     public void doExecute()
         throws Exception
     {
-        String millisStr = storedVars.fillValues( param );
-        long millis = Long.parseLong( millisStr );
-        Thread.sleep( millis );
+        String param1Filtered = storedVars.fillValues( param1 );
+        String param2Filtered = storedVars.fillValues( param2 );
+
+        if (param1Filtered.equals( param2Filtered ))
+        {
+            String assertMessage = String.format("%s == %s", param1Filtered, param2Filtered);
+            Assert.fail( assertMessage );
+        }
     }
 
     public String toString()
     {
         StringBuffer buf = new StringBuffer();
-        buf.append( "pause('" ).append( param ).append( "')" );
+        buf.append( "assertNotEquals('" ).append( param1 ).append( "', '" ).append( param2 ).append( "')" );
         return buf.toString();
     }
 

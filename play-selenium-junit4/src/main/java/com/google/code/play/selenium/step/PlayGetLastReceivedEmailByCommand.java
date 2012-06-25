@@ -20,34 +20,20 @@
 package com.google.code.play.selenium.step;
 
 import com.google.code.play.selenium.StoredVars;
+import com.thoughtworks.selenium.CommandProcessor;
 
-public class PauseStep
-    extends AbstractSeleniumStep
+public class PlayGetLastReceivedEmailByCommand
+    extends AbstractPlayHttpGetCommand
 {
 
-    private StoredVars storedVars;
-
-    private String param;
-                    
-    public PauseStep( StoredVars storedVars, String param )
+    public PlayGetLastReceivedEmailByCommand( StoredVars storedVars, CommandProcessor commandProcessor, String applicationRootUrl, String param1 )
     {
-        this.storedVars = storedVars;
-        this.param = param;
+        super( storedVars, commandProcessor, "getLastReceivedEmailBy", param1, applicationRootUrl );
     }
 
-    public void doExecute()
-        throws Exception
+    protected String getCommandRelativeUrl()
     {
-        String millisStr = storedVars.fillValues( param );
-        long millis = Long.parseLong( millisStr );
-        Thread.sleep( millis );
-    }
-
-    public String toString()
-    {
-        StringBuffer buf = new StringBuffer();
-        buf.append( "pause('" ).append( param ).append( "')" );
-        return buf.toString();
+        return String.format( "@tests/emails?by=%s", param1 );
     }
 
 }

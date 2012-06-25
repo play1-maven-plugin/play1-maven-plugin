@@ -1,0 +1,7 @@
+Get Rythm 1.0.0-20120624 sources from a Git repository:
+https://nodeload.github.com/greenlaw110/Rythm/zipball/3097cc7c9ce441120b93fa595a7187bb180e2a9d
+and place here.
+
+Extract archive content here.
+
+Rename "greenlaw110-Rythm-3097cc7" directory to "1.0.0-20120624".

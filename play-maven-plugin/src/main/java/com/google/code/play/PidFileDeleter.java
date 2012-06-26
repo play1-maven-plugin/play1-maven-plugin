@@ -16,7 +16,7 @@ public class PidFileDeleter
         super( "PidFileDeleter Shutdown Hook" );
     }
 
-    public static PidFileDeleter getInstance()
+    public static synchronized PidFileDeleter getInstance()
     {
         if ( INSTANCE == null )
         {

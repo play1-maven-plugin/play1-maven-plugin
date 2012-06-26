@@ -117,13 +117,13 @@ public class PlayPrecompileMojo
             javaTask.setDir( baseDir );
 
             boolean memoryInArgs = false;
-            String serverJvmArgs = getServerJvmArgs();
-            if ( serverJvmArgs != null )
+            String jvmArgs = getServerJvmArgs();
+            if ( jvmArgs != null )
             {
-                serverJvmArgs.trim();
-                if ( !serverJvmArgs.isEmpty() )
+                jvmArgs = jvmArgs.trim();
+                if ( !jvmArgs.isEmpty() )
                 {
-                    String[] args = serverJvmArgs.split( " " );
+                    String[] args = jvmArgs.split( " " );
                     for ( String arg : args )
                     {
                         javaTask.createJvmarg().setValue( arg );
@@ -160,23 +160,23 @@ public class PlayPrecompileMojo
         else
         {
             //find and add all system properties in "serverJvmArgs"
-            String serverJvmArgs = getServerJvmArgs();
-            if ( serverJvmArgs != null )
+            String jvmArgs = getServerJvmArgs();
+            if ( jvmArgs != null )
             {
-                serverJvmArgs.trim();
-                if ( !serverJvmArgs.isEmpty() )
+                jvmArgs = jvmArgs.trim();
+                if ( !jvmArgs.isEmpty() )
                 {
-                    String[] args = serverJvmArgs.split( " " );
+                    String[] args = jvmArgs.split( " " );
                     for ( String arg : args )
                     {
                         if ( arg.startsWith( "-D" ) )
                         {
                             arg = arg.substring( 2 );
                             int p = arg.indexOf( '=' );
-                            if (p >= 0)
+                            if ( p >= 0 )
                             {
                                 String key = arg.substring( 0, p );
-                                String value = arg.substring( p+1 );
+                                String value = arg.substring( p + 1 );
                                 getLog().debug( "  Adding system property '" + arg + "'" );
                                 addSystemProperty( javaTask, key, value );
                             }

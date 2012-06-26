@@ -51,7 +51,7 @@ public abstract class AbstractPlayRunMojo
      */
     private boolean runFork;
 
-    abstract protected String getPlayId();
+    protected abstract String getPlayId();
 
     @Override
     protected void internalExecute()

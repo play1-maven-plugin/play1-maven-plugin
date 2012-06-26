@@ -306,7 +306,7 @@ public abstract class PlaySeleniumTest
                             else
                             {
                                 StringSeleniumCommand innerCommand =
-                                    getInnerStringCommandByName( innerCmd, storedVars, commandProcessor, param1 );
+                                    getInnerStringCommandByName( innerCmd, storedVars, param1 );
                                 cmd = new VerifyNotEqualsStep( innerCommand, param2 );
                             }
                         }
@@ -346,7 +346,7 @@ public abstract class PlaySeleniumTest
                             else
                             {
                                 StringSeleniumCommand innerCommand =
-                                    getInnerStringCommandByName( innerCmd, storedVars, commandProcessor, param1 );
+                                    getInnerStringCommandByName( innerCmd, storedVars, param1 );
                                 cmd = new VerifyEqualsStep( innerCommand, param2 );
                             }
                         }
@@ -387,7 +387,7 @@ public abstract class PlaySeleniumTest
                             else
                             {
                                 StringSeleniumCommand innerCommand =
-                                    getInnerStringCommandByName( innerCmd, storedVars, commandProcessor, param1 );
+                                    getInnerStringCommandByName( innerCmd, storedVars, param1 );
                                 cmd = new AssertNotEqualsStep( innerCommand, param2 );
                             }
                         }
@@ -427,7 +427,7 @@ public abstract class PlaySeleniumTest
                             else
                             {
                                 StringSeleniumCommand innerCommand =
-                                    getInnerStringCommandByName( innerCmd, storedVars, commandProcessor, param1 );
+                                    getInnerStringCommandByName( innerCmd, storedVars, param1 );
                                 cmd = new AssertEqualsStep( innerCommand, param2 );
                             }
                         }
@@ -469,7 +469,7 @@ public abstract class PlaySeleniumTest
                             else
                             {
                                 StringSeleniumCommand innerCommand =
-                                    getInnerStringCommandByName( innerCmd, storedVars, commandProcessor, param1 );
+                                    getInnerStringCommandByName( innerCmd, storedVars, param1 );
                                 cmd = new WaitForNotEqualsStep( innerCommand, param2 );
                             }
                         }
@@ -490,7 +490,7 @@ public abstract class PlaySeleniumTest
                             else
                             {
                                 StringSeleniumCommand innerCommand =
-                                    getInnerStringCommandByName( innerCmd, storedVars, commandProcessor, param1 );
+                                    getInnerStringCommandByName( innerCmd, storedVars, param1 );
                                 cmd = new WaitForEqualsStep( innerCommand, param2 );
                             }
                         }
@@ -650,7 +650,7 @@ public abstract class PlaySeleniumTest
         String strLine = String.valueOf( line );
         while ( strLine.length() < indent )
         {
-            strLine = " " + strLine;// TODO improve
+            strLine = " " + strLine; // TODO improve
         }
         return " " + strLine + ": " + step.toString() + " [" + step.getExecutionTimeMillis() + "ms]";
         // System.out.println( strLine + ": " + step.toString() );
@@ -661,14 +661,13 @@ public abstract class PlaySeleniumTest
         String strLine = String.valueOf( line );
         while ( strLine.length() < indent )
         {
-            strLine = " " + strLine;// TODO improve
+            strLine = " " + strLine; // TODO improve
         }
         return "*" + strLine + ": " + step.toString() + " [" + step.getExecutionTimeMillis() + "ms] " + message;
         // System.out.println( strLine + ": " + step.toString() );
     }
 
-    private StringSeleniumCommand getInnerStringCommandByName( String innerCmd, StoredVars storedVars,
-                                                         CommandProcessor commandProcessor, String param1 )
+    private StringSeleniumCommand getInnerStringCommandByName( String innerCmd, StoredVars storedVars, String param1 )
     {
         StringSeleniumCommand result = null;
         if ( "CacheEntry".equals( innerCmd ) )

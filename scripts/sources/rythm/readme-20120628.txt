@@ -1,0 +1,2 @@
+Download https://github.com/downloads/greenlaw110/Rythm/rythm-1.0.0-20120628-dist.zip
+and extract to "1.0.0-20120628" subdirectory.

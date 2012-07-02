@@ -49,9 +49,6 @@ public abstract class AbstractPlayWarMojo
     extends AbstractArchivingMojo
 {
 
-    private static final String[] confClasspathResourcesIncludes =
-        new String[] { "application.conf", "messages", "messages.*", "routes" };
-
     /**
      * Play! id (profile) used for WAR packaging.
      * 
@@ -102,6 +99,22 @@ public abstract class AbstractPlayWarMojo
      */
     private String warDependencyExcludes;
 
+    /**
+     * Conf classpath resources include filter
+     * 
+     * @parameter expression="${play.warConfResourcesIncludes}" default-value="application.conf,messages,messages.*,routes"
+     * @since 1.0.0
+     */
+    private String warConfResourcesIncludes;
+
+    /**
+     * Conf classpath resources exclude filter.
+     * 
+     * @parameter expression="${play.warConfResourcesExcludes}" default-value=""
+     * @since 1.0.0
+     */
+    private String warConfResourcesExcludes;
+
     protected void checkIfPrecompiled() throws IOException, MojoExecutionException
     {
         File baseDir = project.getBasedir();
@@ -148,7 +161,19 @@ public abstract class AbstractPlayWarMojo
         }
         warArchiver.addDirectory( baseDir, "WEB-INF/application/", applicationIncludes, applicationExcludes );
 
-        warArchiver.addClasses( new File( baseDir, "conf" ), confClasspathResourcesIncludes, null );
+        getLog().debug( "War conf classpath resources includes: " + warConfResourcesIncludes );
+        getLog().debug( "War conf classpath resources excludes: " + warConfResourcesExcludes );
+        String[] confResourcesIncludes = null;
+        if ( warConfResourcesIncludes != null )
+        {
+            confResourcesIncludes = warConfResourcesIncludes.split( "," );
+        }
+        String[] confResourcesExcludes = null;
+        if ( warConfResourcesExcludes != null )
+        {
+            confResourcesExcludes = warConfResourcesExcludes.split( "," );
+        }
+        warArchiver.addClasses( new File( baseDir, "conf" ), confResourcesIncludes, confResourcesExcludes );
 
         File webXmlFile = new File( warWebappDirectory, "WEB-INF/web.xml" );
         if ( !webXmlFile.isFile() )

@@ -1,6 +1,7 @@
-call svn export -r 1066591 http://svn.apache.org/repos/asf/commons/sandbox/javaflow/trunk
+set ARTIFACT_ID=commons-javaflow
+set SRC_DIR=trunk-rel.%VERSION%
 
-set SRC_DIR=trunk-rel.1066591
-xcopy /I /E /Q trunk %SRC_DIR%
-copy ..\..\poms\play\commons-javaflow-1066591.pom %SRC_DIR%\pom.xml
-call mvn clean source:jar javadoc:jar --file %SRC_DIR%/pom.xml
+del /Q /S %SRC_DIR%
+call svn export -r %VERSION% http://svn.apache.org/repos/asf/commons/sandbox/javaflow/trunk %SRC_DIR%
+rename %SRC_DIR%\pom.xml pom.xml-orig 
+copy ..\..\poms\play\%ARTIFACT_ID%-%VERSION%.pom %SRC_DIR%\pom.xml

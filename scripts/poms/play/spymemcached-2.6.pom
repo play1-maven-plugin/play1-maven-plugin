@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+Based on http://files.couchbase.com/maven2/spy/spymemcached/2.6/spymemcached-2.6.pom
+-->
+
+<project
+    xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.google.code.maven-play-plugin.spy</groupId>
+    <artifactId>spymemcached</artifactId>
+    <version>2.6</version>
+
+    <name>Java client for Memcached</name>
+    <description>A simple, asynchronous, single-threaded Memcached client written in java.</description>
+    <url>http://code.google.com/p/spymemcached</url>
+
+    <licenses>
+        <license>
+            <name>The MIT License (MIT)</name>
+            <url>http://www.opensource.org/licenses/MIT http://www.gnu.org/licenses/lgpl.txt</url>
+        </license>
+    </licenses>
+
+    <scm>
+        <connection>scm:git:git://github.com/dustin/java-memcached-client.git</connection>
+        <url>https://github.com/dustin/java-memcached-client</url>
+    </scm>
+
+    <developers>
+        <developer>
+            <id>dsallings</id>
+            <name>Dustin Sallings</name>
+            <roles>
+                <role>owner</role>
+            </roles>
+        </developer>
+
+        <developer>
+            <id>ericlambert</id>
+            <name>Eric D. Lambert</name>
+            <roles>
+                <role>owner</role>
+            </roles>
+        </developer>
+
+        <developer>
+            <id>mingenthron</id>
+            <name>Matt Ingenthron</name>
+            <roles>
+                <role>owner</role>
+            </roles>
+        </developer>
+    </developers>
+
+</project>

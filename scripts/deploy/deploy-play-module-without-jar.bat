@@ -1,5 +1,6 @@
-call mvn clean install --file %PLAY_HOME%/parent/pom.xml
-call mvn clean install --file %PLAY_HOME%/modules/parent/pom.xml
+@rem deployed when deploying framework
+@rem call mvn clean install --file %PLAY_HOME%/parent/pom.xml
+@rem call mvn clean install --file %PLAY_HOME%/modules/parent/pom.xml
 
 set GROUP_ID_PREFIX=com.google.code.maven-play-plugin.
 set GROUP_ID=%GROUP_ID_PREFIX%org.playframework.modules.%MODULE_NAME%
@@ -11,5 +12,5 @@ set REPO_URL=https://maven-play-plugin.googlecode.com/svn/mavenrepo/releases
 @rem set REPO_ID=com.google.code.maven-play-plugin-snapshots
 @rem set REPO_URL=https://maven-play-plugin.googlecode.com/svn/mavenrepo/snapshots
 
-call mvn clean package --file %SRC_DIR%/pom-build-dist.xml
+call mvn clean package -Pdist --file %SRC_DIR%/pom-build-dist.xml
 call mvn deploy:deploy-file -Dfile=%SRC_DIR%/pom-dist.xml -DgroupId=%GROUP_ID% -DartifactId=%ARTIFACT_ID% -Dpackaging=pom -Dversion=%VERSION% -DgeneratePom=false -Dfiles=%SRC_DIR%/target/%ARTIFACT_ID%-%VERSION%-module.zip,%SRC_DIR%/target/%ARTIFACT_ID%-%VERSION%-module-min.zip -Dtypes=zip,zip -Dclassifiers=module,module-min -DrepositoryId=%REPO_ID% -Durl=dav:%REPO_URL% -e

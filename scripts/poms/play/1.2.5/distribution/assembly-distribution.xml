@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+-->
+
+<assembly>
+    <id>distribution</id>
+
+    <formats>
+        <format>zip</format>
+    </formats>
+
+    <includeSiteDirectory>false</includeSiteDirectory>
+
+    <dependencySets>
+        <dependencySet>
+            <includes>
+                <include>com.google.code.maven-play-plugin.org.playframework:play:zip:framework</include>
+            </includes>
+            <unpack>true</unpack>
+            <useProjectArtifact>false</useProjectArtifact>
+        </dependencySet>
+
+        <dependencySet>
+            <outputDirectory>framework</outputDirectory>
+            <includes>
+                <include>com.google.code.maven-play-plugin.org.playframework:play:jar</include>
+            </includes>
+            <useProjectArtifact>false</useProjectArtifact>
+        </dependencySet>
+
+        <dependencySet>
+            <outputDirectory>framework/lib</outputDirectory>
+            <includes>
+                <include>*:*:jar</include>
+            </includes>
+            <excludes>
+                <exclude>com.google.code.maven-play-plugin.org.playframework:play:jar</exclude>
+                <exclude>com.google.code.maven-play-plugin.org.playframework.modules.grizzly:play-grizzly:jar</exclude>
+                <exclude>com.google.code.maven-play-plugin.org.playframework.modules.testrunner:play-testrunner:jar</exclude>
+            </excludes>
+            <useProjectArtifact>false</useProjectArtifact>
+        </dependencySet>
+
+        <dependencySet>
+            <scope>test</scope>
+            <outputDirectory>framework/lib-test</outputDirectory>
+            <includes>
+                <include>org.easytesting:fest-assert:jar</include>
+                <include>org.apache.ant:ant:jar</include>
+            </includes>
+            <useProjectArtifact>false</useProjectArtifact>
+            <useTransitiveFiltering>true</useTransitiveFiltering>
+        </dependencySet>
+
+        <dependencySet>
+            <outputDirectory>modules/crud</outputDirectory>
+            <includes>
+                <include>com.google.code.maven-play-plugin.org.playframework.modules.crud:play-crud:zip:module</include>
+            </includes>
+            <unpack>true</unpack>
+            <useProjectArtifact>false</useProjectArtifact>
+        </dependencySet>
+
+        <dependencySet>
+            <outputDirectory>modules/docviewer</outputDirectory>
+            <includes>
+                <include>com.google.code.maven-play-plugin.org.playframework.modules.docviewer:play-docviewer:zip:module</include>
+            </includes>
+            <unpack>true</unpack>
+            <useProjectArtifact>false</useProjectArtifact>
+        </dependencySet>
+
+        <dependencySet>
+            <outputDirectory>modules/grizzly</outputDirectory>
+            <includes>
+                <include>com.google.code.maven-play-plugin.org.playframework.modules.grizzly:play-grizzly:zip:module</include>
+            </includes>
+            <unpack>true</unpack>
+            <useProjectArtifact>false</useProjectArtifact>
+        </dependencySet>
+
+        <dependencySet>
+            <outputDirectory>modules/grizzly/lib</outputDirectory>
+            <includes>
+                <include>com.google.code.maven-play-plugin.org.playframework.modules.grizzly:play-grizzly:jar</include>
+            </includes>
+            <useProjectArtifact>false</useProjectArtifact>
+            <useTransitiveFiltering>true</useTransitiveFiltering>
+        </dependencySet>
+
+        <dependencySet>
+            <outputDirectory>modules/secure</outputDirectory>
+            <includes>
+                <include>com.google.code.maven-play-plugin.org.playframework.modules.secure:play-secure:zip:module</include>
+            </includes>
+            <unpack>true</unpack>
+            <useProjectArtifact>false</useProjectArtifact>
+        </dependencySet>
+
+        <dependencySet>
+            <outputDirectory>modules/testrunner</outputDirectory>
+            <includes>
+                <include>com.google.code.maven-play-plugin.org.playframework.modules.testrunner:play-testrunner:zip:module</include>
+            </includes>
+            <unpack>true</unpack>
+            <useProjectArtifact>false</useProjectArtifact>
+        </dependencySet>
+
+        <dependencySet>
+            <outputDirectory>modules/testrunner/lib</outputDirectory>
+            <includes>
+                <include>com.google.code.maven-play-plugin.org.playframework.modules.testrunner:play-testrunner:jar</include>
+            </includes>
+            <useProjectArtifact>false</useProjectArtifact>
+            <useTransitiveFiltering>true</useTransitiveFiltering>
+        </dependencySet>
+    </dependencySets>
+</assembly>

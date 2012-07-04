@@ -1,5 +1,6 @@
-call mvn clean install --file %PLAY_HOME%/parent/pom.xml
-call mvn clean install --file %PLAY_HOME%/modules/parent/pom.xml
+@rem installed when installing framework
+@rem call mvn clean install --file %PLAY_HOME%/parent/pom.xml
+@rem call mvn clean install --file %PLAY_HOME%/modules/parent/pom.xml
 
 set GROUP_ID_PREFIX=com.google.code.maven-play-plugin.
 set GROUP_ID=%GROUP_ID_PREFIX%org.playframework.modules.%MODULE_NAME%

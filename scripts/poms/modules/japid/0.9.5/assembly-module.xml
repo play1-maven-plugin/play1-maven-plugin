@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+-->
+
+<assembly>
+    <id>module</id>
+
+    <formats>
+        <format>zip</format>
+    </formats>
+
+    <includeSiteDirectory>false</includeSiteDirectory>
+    <includeBaseDirectory>false</includeBaseDirectory>
+
+    <fileSets>
+        <fileSet>
+            <directory>${basedir}</directory>
+            <outputDirectory></outputDirectory>
+            <includes>
+                <include>bin/**</include>
+                <include>conf/**</include>
+                <include>documentation/**</include>
+                <include>eclipse-plugin/**</include>
+                <include>lib.plain/**</include>
+                <include>plainjapid/**</include>
+                <include>src.japid/**</include>
+                <include>src.japidplay/**</include>
+                <include>tests/**</include>
+                <include>build.standalone.sh</include>
+                <include>build.xml</include>
+                <include>commands.py</include>
+                <include>readme.txt</include>
+            </includes>
+        </fileSet>
+        <fileSet>
+            <directory>${basedir}/JapidContact</directory>
+            <outputDirectory>JapidContact</outputDirectory>
+            <includes>
+                <include>app/**</include>
+                <include>conf/**</include>
+                <include>public/**</include>
+                <include>test/**</include>
+                <include>readme.textile</include>
+            </includes>
+        </fileSet>
+        <fileSet>
+            <directory>${basedir}/JapidSample</directory>
+            <outputDirectory>JapidSample</outputDirectory>
+            <includes>
+                <include>app/**</include>
+                <include>conf/**</include>
+                <include>project/**</include>
+                <include>public/**</include>
+                <include>test/**</include>
+            </includes>
+            <excludes>
+                <exclude>project/project/**</exclude>
+                <exclude>project/target/**</exclude>
+            </excludes>
+        </fileSet>
+        <fileSet>
+            <directory>${project.build.directory}/apidocs</directory>
+            <outputDirectory>documentation/api</outputDirectory>
+        </fileSet>
+    </fileSets>
+
+    <files>
+        <file>
+            <source>${project.build.directory}/manifest</source>
+        </file>
+    </files>
+</assembly>

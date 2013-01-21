@@ -1,22 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!--
-Licensed to the Apache Software Foundation (ASF) under one
-or more contributor license agreements.  See the NOTICE file
-distributed with this work for additional information
-regarding copyright ownership.  The ASF licenses this file
-to you under the Apache License, Version 2.0 (the
-"License"); you may not use this file except in compliance
-with the License.  You may obtain a copy of the License at
+Copyright 2010-2013 Grzegorz Slowikowski
 
-  http://www.apache.org/licenses/LICENSE-2.0
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
 
-Unless required by applicable law or agreed to in writing,
-software distributed under the License is distributed on an
-"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-KIND, either express or implied.  See the License for the
-specific language governing permissions and limitations
-under the License.
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
 -->
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
@@ -24,7 +21,7 @@ under the License.
     <parent>
         <groupId>com.google.code.maven-play-plugin</groupId>
         <artifactId>maven-parent</artifactId>
-        <version>1.0.0-beta4-SNAPSHOT</version>
+        <version>1.0.0-beta4</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -34,26 +31,8 @@ under the License.
     <packaging>pom</packaging>
 
     <name>Maven Plugin for Play! Framework Parent</name>
+    <description>Maven Plugin for Play! Framework Parent</description>
     <url>http://maven-play-plugin.googlecode.com/svn/mavensite/${project.version}</url>
-
-    <repositories>
-        <repository>
-            <id>com.google.code.maven-play-plugin</id>
-            <name>Maven Play Plugin - releases</name>
-            <url>https://maven-play-plugin.googlecode.com/svn/mavenrepo/releases</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-        <repository>
-            <id>com.google.code.maven-play-plugin-snapshots</id>
-            <name>Maven Play Plugin - snapshots</name>
-            <url>https://maven-play-plugin.googlecode.com/svn/mavenrepo/snapshots</url>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-        </repository>
-    </repositories>
 
     <distributionManagement>
         <site>

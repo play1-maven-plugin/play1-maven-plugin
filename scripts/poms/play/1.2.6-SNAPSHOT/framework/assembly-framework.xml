@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+The contents of this file
+Copyright 2010-2013 Grzegorz Slowikowski
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+
+<assembly>
+    <id>framework</id>
+
+    <formats>
+        <format>zip</format>
+    </formats>
+
+    <includeSiteDirectory>false</includeSiteDirectory>
+    <includeBaseDirectory>false</includeBaseDirectory>
+
+    <fileSets>
+        <fileSet>
+            <directory>${basedir}</directory>
+            <outputDirectory>framework</outputDirectory>
+            <includes>
+                <include>lib/*.docurl</include>
+                <include>patches/**</include>
+                <include>templates/**</include>
+                <include>test-src/**</include>
+                <!--<include>assembly-framework.xml</include>-->
+                <!--<include>assembly-framework-min.xml</include>-->
+                <include>build.xml</include>
+                <include>dependencies.yml</include>
+                <!--<include>pom.xml</include>-->
+            </includes>
+        </fileSet>
+        <fileSet>
+            <directory>${basedir}/pym</directory>
+            <outputDirectory>framework/pym</outputDirectory>
+            <excludes>
+                <exclude>**/*.pyc</exclude>
+            </excludes>
+        </fileSet>
+        <fileSet>
+            <directory>${basedir}/src</directory>
+            <outputDirectory>framework/src</outputDirectory>
+            <excludes>
+                <exclude>play/version</exclude>
+            </excludes>
+        </fileSet>
+
+        <fileSet>
+            <directory>${project.build.outputDirectory}</directory>
+            <outputDirectory>framework/src</outputDirectory>
+            <includes>
+                <include>play/version</include>
+            </includes>
+        </fileSet>
+
+        <fileSet>
+            <directory>${basedir}/..</directory>
+            <includes>
+                <!--<include>assembly.xml</include>-->
+                <include>COPYING</include>
+                <!--<include>pom.xml</include>-->
+                <include>README.textile</include>
+                <include>documentation/**</include>
+                <!--<include>modules/pom.xml</include>-->
+                <include>nbproject/**</include>
+                <include>python/**</include>
+                <include>resources/**</include>
+                <include>samples-and-tests/**</include>
+                <include>support/**</include>
+            </includes>
+            <excludes>
+                <exclude>**/cobertura.ser</exclude>
+                <exclude>**/*.pyc</exclude>
+                <exclude>**/target/**</exclude>
+                <exclude>hs_err*</exclude>
+                <exclude>.*</exclude>
+                <exclude>.*/*</exclude>
+                <exclude></exclude>
+                <exclude>id</exclude>
+                <exclude>play</exclude>
+                <exclude>nbproject/**</exclude>
+                <exclude>**/.bzr/**</exclude>
+                <exclude>**/.git/**</exclude>
+                <exclude>*.bzrignore</exclude>
+                <exclude>support/textmate/**</exclude>
+                <exclude>samples-and-tests/**/test-result</exclude>
+                <exclude>samples-and-tests/**/i-am-working-here</exclude>
+                <exclude>samples-and-tests/**/data</exclude>
+                <exclude>samples-and-tests/**/logs</exclude>
+                <exclude>samples-and-tests/**/tmp</exclude>
+                <exclude>samples-and-tests/**/db</exclude>
+                <exclude>samples-and-tests/**/attachments</exclude>
+
+                <exclude>documentation/api/**</exclude>
+            </excludes>
+        </fileSet>
+
+        <fileSet>
+            <directory>${project.build.directory}/apidocs</directory>
+            <outputDirectory>documentation/api</outputDirectory>
+        </fileSet>
+    </fileSets>
+
+    <files>
+        <file>
+            <source>${basedir}/../play.bat</source>
+        </file>
+        <file>
+            <source>${basedir}/../play</source>
+            <fileMode>0777</fileMode>
+            <lineEnding>unix</lineEnding>
+        </file>
+    </files>
+</assembly>

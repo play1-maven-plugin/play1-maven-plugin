@@ -95,7 +95,7 @@ public abstract class AbstractPlayServerMojo
             if ( jvmArgs != null )
             {
                 jvmArgs = jvmArgs.trim();
-                if ( !jvmArgs.isEmpty() )
+                if ( jvmArgs.length() > 0 )
                 {
                     String[] args = jvmArgs.split( " " );
                     for ( String arg : args )
@@ -116,7 +116,7 @@ public abstract class AbstractPlayServerMojo
                 if ( jvmMemory != null )
                 {
                     jvmMemory = jvmMemory.trim();
-                    if ( !jvmMemory.isEmpty() )
+                    if ( jvmMemory.length() > 0 )
                     {
                         String[] args = jvmMemory.split( " " );
                         for ( String arg : args )
@@ -142,7 +142,7 @@ public abstract class AbstractPlayServerMojo
             javaTask.createJvmarg().setValue( "-XX:-UseSplitVerifier" );
 
             String javaPolicy = configParser.getProperty( "java.policy" );
-            if ( javaPolicy != null && !javaPolicy.isEmpty() )
+            if ( javaPolicy != null && javaPolicy.length() > 0 )
             {
                 File confDir = new File( baseDir, "conf" );
                 File policyFile = new File ( confDir, javaPolicy );
@@ -154,11 +154,11 @@ public abstract class AbstractPlayServerMojo
                 }
             }
 
-            if ( httpPort != null && !httpPort.isEmpty() )
+            if ( httpPort != null && httpPort.length() > 0 )
             {
                 javaTask.createArg().setValue( "--http.port=" + httpPort );
             }
-            if ( httpsPort != null && !httpsPort.isEmpty() )
+            if ( httpsPort != null && httpsPort.length() > 0 )
             {
                 javaTask.createArg().setValue( "--https.port=" + httpsPort );
             }
@@ -187,7 +187,7 @@ public abstract class AbstractPlayServerMojo
             if ( jvmArgs != null )
             {
                 jvmArgs = jvmArgs.trim();
-                if ( !jvmArgs.isEmpty() )
+                if ( jvmArgs.length() > 0 )
                 {
                     String[] args = jvmArgs.split( " " );
                     for ( String arg : args )

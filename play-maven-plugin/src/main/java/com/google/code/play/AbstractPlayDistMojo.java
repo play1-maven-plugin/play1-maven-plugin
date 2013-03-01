@@ -121,7 +121,7 @@ public abstract class AbstractPlayDistMojo
         }
 
         AndArtifactFilter dependencyFilter = new AndArtifactFilter();
-        if ( distDependencyIncludes != null && !distDependencyIncludes.isEmpty() )
+        if ( distDependencyIncludes != null && distDependencyIncludes.length() > 0 )
         {
             List<String> incl = Arrays.asList( distDependencyIncludes.split( "," ) );
             PatternIncludesArtifactFilter includeFilter =
@@ -129,7 +129,7 @@ public abstract class AbstractPlayDistMojo
 
             dependencyFilter.add( includeFilter );
         }
-        if ( distDependencyExcludes != null && !distDependencyExcludes.isEmpty() )
+        if ( distDependencyExcludes != null && distDependencyExcludes.length() > 0 )
         {
             List<String> excl = Arrays.asList( distDependencyExcludes.split( "," ) );
             PatternExcludesArtifactFilter excludeFilter =

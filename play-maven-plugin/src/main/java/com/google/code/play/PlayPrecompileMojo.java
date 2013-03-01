@@ -118,7 +118,7 @@ public class PlayPrecompileMojo
             if ( jvmArgs != null )
             {
                 jvmArgs = jvmArgs.trim();
-                if ( !jvmArgs.isEmpty() )
+                if ( jvmArgs.length() > 0 )
                 {
                     String[] args = jvmArgs.split( " " );
                     for ( String arg : args )
@@ -139,7 +139,7 @@ public class PlayPrecompileMojo
                 if ( jvmMemory != null )
                 {
                     jvmMemory = jvmMemory.trim();
-                    if ( !jvmMemory.isEmpty() )
+                    if ( jvmMemory.length() > 0 )
                     {
                         String[] args = jvmMemory.split( " " );
                         for ( String arg : args )
@@ -161,7 +161,7 @@ public class PlayPrecompileMojo
             if ( jvmArgs != null )
             {
                 jvmArgs = jvmArgs.trim();
-                if ( !jvmArgs.isEmpty() )
+                if ( jvmArgs.length() > 0 )
                 {
                     String[] args = jvmArgs.split( " " );
                     for ( String arg : args )

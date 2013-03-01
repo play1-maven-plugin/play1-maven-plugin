@@ -195,7 +195,7 @@ public abstract class AbstractPlayWarMojo
         }
 
         AndArtifactFilter dependencyFilter = new AndArtifactFilter();
-        if ( warDependencyIncludes != null && !warDependencyIncludes.isEmpty() )
+        if ( warDependencyIncludes != null && warDependencyIncludes.length() > 0 )
         {
             List<String> incl = Arrays.asList( warDependencyIncludes.split( "," ) ); 
             PatternIncludesArtifactFilter includeFilter =
@@ -203,7 +203,7 @@ public abstract class AbstractPlayWarMojo
 
             dependencyFilter.add( includeFilter );
         }
-        if ( warDependencyExcludes != null && !warDependencyExcludes.isEmpty() )
+        if ( warDependencyExcludes != null && warDependencyExcludes.length() > 0 )
         {
             List<String> excl = Arrays.asList( warDependencyExcludes.split( "," ) ); 
             PatternExcludesArtifactFilter excludeFilter =

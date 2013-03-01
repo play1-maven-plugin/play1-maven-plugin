@@ -146,7 +146,7 @@ public class PlayZipMojo
         }*/
 
         AndArtifactFilter dependencyFilter = new AndArtifactFilter();
-        if ( zipDependencyIncludes != null && !zipDependencyIncludes.isEmpty() )
+        if ( zipDependencyIncludes != null && zipDependencyIncludes.length() > 0 )
         {
             List<String> incl = Arrays.asList( zipDependencyIncludes.split( "," ) ); 
             PatternIncludesArtifactFilter includeFilter =
@@ -154,7 +154,7 @@ public class PlayZipMojo
 
             dependencyFilter.add( includeFilter );
         }
-        if ( zipDependencyExcludes != null && !zipDependencyExcludes.isEmpty() )
+        if ( zipDependencyExcludes != null && zipDependencyExcludes.length() > 0 )
         {
             List<String> excl = Arrays.asList( zipDependencyExcludes.split( "," ) ); 
             PatternExcludesArtifactFilter excludeFilter =

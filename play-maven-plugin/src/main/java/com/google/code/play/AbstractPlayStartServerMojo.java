@@ -86,7 +86,7 @@ public abstract class AbstractPlayStartServerMojo
     protected String getRootUrl( ConfigurationParser configParser )
     {
         int serverPort = 9000;
-        if ( getHttpPort() != null && !getHttpPort().isEmpty() )
+        if ( getHttpPort() != null && getHttpPort().length() > 0 )
         {
             serverPort = Integer.parseInt( getHttpPort() );
         }

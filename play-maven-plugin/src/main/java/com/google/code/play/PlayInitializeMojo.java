@@ -63,22 +63,6 @@ public class PlayInitializeMojo
     private String playId;
 
     /**
-     * Should application classes be compiled.
-     * 
-     * @parameter expression="${play.compileApp}" default-value="true"
-     * @since 1.0.0
-     */
-    private boolean compileApp;
-
-    /**
-     * Should test classes be compiled.
-     * 
-     * @parameter expression="${play.compileTest}" default-value="true"
-     * @since 1.0.0
-     */
-    private boolean compileTest;
-
-    /**
      * Should temporary Play! home directory be cleaned before it's reinitializing.
      * If true, homeOverwrite is meaningless.
      * 
@@ -172,37 +156,29 @@ public class PlayInitializeMojo
             }
         }
 
-        if ( compileApp )
+        File appPath = new File( baseDir, "app" );
+        project.addCompileSourceRoot( appPath.getAbsolutePath() );
+        getLog().debug( "Added source directory: " + appPath.getAbsolutePath() );
+
+        File confPath = new File( baseDir, "conf" );
+        Resource resource = new Resource();
+        resource.setDirectory( confPath.getAbsolutePath() );
+        project.addResource( resource );
+        getLog().debug( "Added resource: " + resource.getDirectory() );
+
+        for ( File modulePath : modules.values() )
         {
-            File appPath = new File( baseDir, "app" );
-            project.addCompileSourceRoot( appPath.getAbsolutePath() );
-            getLog().debug( "Added source directory: " + appPath.getAbsolutePath() );
-
-            File confPath = new File( baseDir, "conf" );
-            Resource resource = new Resource();
-            resource.setDirectory( confPath.getAbsolutePath() );
-            project.addResource( resource );
-            getLog().debug( "Added resource: " + resource.getDirectory() );
-
-            for ( File modulePath : modules.values() )
+            File moduleAppPath = new File( modulePath, "app" );
+            if ( moduleAppPath.isDirectory() )
             {
-                File moduleAppPath = new File( modulePath, "app" );
-                if ( moduleAppPath.isDirectory() )
-                {
-                    project.addCompileSourceRoot( moduleAppPath.getAbsolutePath() );
-                    getLog().debug( "Added source directory: " + moduleAppPath.getAbsolutePath() );
-                }
+                project.addCompileSourceRoot( moduleAppPath.getAbsolutePath() );
+                getLog().debug( "Added source directory: " + moduleAppPath.getAbsolutePath() );
             }
         }
 
-        if ( compileTest )
-        {
-            File testPath = new File( baseDir, "test" );
-            project.addTestCompileSourceRoot( testPath.getAbsolutePath() );
-            getLog().debug( "Added test source directory: " + testPath.getAbsolutePath() );
-
-            // add test sources from dependent modules?
-        }
+        File testPath = new File( baseDir, "test" );
+        project.addTestCompileSourceRoot( testPath.getAbsolutePath() );
+        getLog().debug( "Added test source directory: " + testPath.getAbsolutePath() );
     }
 
     protected File prepareAndGetPlayHome( String playDependencyVersion )

@@ -21,6 +21,7 @@ import java.io.IOException;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.tools.ant.taskdefs.Java;
 
 /**
@@ -35,17 +36,17 @@ public abstract class AbstractPlayRunMojo
     /**
      * Allows the server startup to be skipped.
      * 
-     * @parameter expression="${play.runSkip}" default-value="false"
      * @since 1.0.0
      */
+    @Parameter( property = "play.runSkip", defaultValue = "false" )
     private boolean runSkip;
 
     /**
-     * ...
+     * Run in forked Java process.
      * 
-     * @parameter expression="${play.runFork}" default-value="true"
      * @since 1.0.0
      */
+    @Parameter( property = "play.runFork", defaultValue = "true" )
     private boolean runFork;
 
     protected abstract String getPlayId();

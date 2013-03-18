@@ -21,6 +21,9 @@ import java.io.IOException;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.plugins.annotations.ResolutionScope;
 
 import org.apache.tools.ant.taskdefs.Java;
 
@@ -28,58 +31,58 @@ import org.apache.tools.ant.taskdefs.Java;
  * Start Play! Server ("play start" equivalent).
  * 
  * @author <a href="mailto:gslowikowski@gmail.com">Grzegorz Slowikowski</a>
- * @goal start
- * @requiresDependencyResolution test
+ * @since 1.0.0
  */
+@Mojo( name = "start", requiresDependencyResolution = ResolutionScope.TEST )
 public class PlayStartMojo
     extends AbstractPlayStartServerMojo
 {
     /**
      * Play! id (profile) used when starting server without tests.
      * 
-     * @parameter expression="${play.id}" default-value=""
      * @since 1.0.0
      */
+    @Parameter( property = "play.id", defaultValue = "" )
     private String playId;
 
     /**
      * Play! id (profile) used when starting server with tests.
      * 
-     * @parameter expression="${play.testId}" default-value="test"
      * @since 1.0.0
      */
+    @Parameter( property = "play.testId", defaultValue = "test" )
     private String playTestId;
 
     /**
      * Allows the server startup to be skipped.
      * 
-     * @parameter expression="${play.startSkip}" default-value="false"
      * @since 1.0.0
      */
+    @Parameter( property = "play.startSkip", defaultValue = "false" )
     private boolean startSkip;
 
     /**
      * Start server with test profile.
      * 
-     * @parameter expression="${play.startWithTests}" default-value="false"
      * @since 1.0.0
      */
+    @Parameter( property = "play.startWithTests", defaultValue = "false" )
     private boolean startWithTests;
 
     /**
      * Spawns started JVM process. See <a href="http://ant.apache.org/manual/Tasks/java.html">Ant Java task documentation</a> for details.
      * 
-     * @parameter expression="${play.startSpawn}" default-value="true"
      * @since 1.0.0
      */
+    @Parameter( property = "play.startSpawn", defaultValue = "true" )
     private boolean startSpawn;
 
     /**
      * After starting server wait for "http://localhost:${httpPort}/" URL to be available.
      * 
-     * @parameter expression="${play.startSynchro}" default-value="false"
      * @since 1.0.0
      */
+    @Parameter( property = "play.startSynchro", defaultValue = "false" )
     private boolean startSynchro;
 
     @Override

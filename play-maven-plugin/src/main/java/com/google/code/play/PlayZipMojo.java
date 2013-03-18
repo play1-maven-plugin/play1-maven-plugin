@@ -29,6 +29,10 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.resolver.filter.AndArtifactFilter;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.shared.artifact.filter.PatternExcludesArtifactFilter;
 import org.apache.maven.shared.artifact.filter.PatternIncludesArtifactFilter;
 import org.apache.maven.shared.dependency.tree.DependencyTreeBuilderException;
@@ -41,51 +45,50 @@ import org.codehaus.plexus.archiver.zip.ZipArchiver;
  * Package Play! application as a ZIP achive.
  * 
  * @author <a href="mailto:gslowikowski@gmail.com">Grzegorz Slowikowski</a>
- * @goal zip
- * @phase package
- * @requiresDependencyResolution runtime
+ * @since 1.0.0
  */
+@Mojo( name = "zip", defaultPhase = LifecyclePhase.PACKAGE, requiresDependencyResolution = ResolutionScope.RUNTIME )
 public class PlayZipMojo
     extends AbstractArchivingMojo
 {
     /**
      * Application resources include filter
      * 
-     * @parameter expression="${play.zipApplicationIncludes}" default-value="app/**,conf/**,public/**,tags/**"
      * @since 1.0.0
      */
+    @Parameter( property = "play.zipApplicationIncludes", defaultValue = "app/**,conf/**,public/**,tags/**" )
     private String zipApplicationIncludes;
 
     /**
      * Application resources exclude filter.
      * 
-     * @parameter expression="${play.zipApplicationExcludes}" default-value=""
      * @since 1.0.0
      */
+    @Parameter( property = "play.zipApplicationExcludes", defaultValue = "" )
     private String zipApplicationExcludes;
 
     /**
      * Should project dependencies ("lib" and "modules" directories) be packaged. No include/exclude filters.
      * 
-     * @parameter expression="${play.zipDependencies}" default-value="false"
      * @since 1.0.0
      */
+    @Parameter( property = "play.zipDependencies", defaultValue = "false" )
     private boolean zipDependencies;
 
     /**
      * Dependency include filter.
      * 
-     * @parameter expression="${play.zipDependencyIncludes}" default-value=""
      * @since 1.0.0
      */
+    @Parameter( property = "play.zipDependencyIncludes", defaultValue = "" )
     private String zipDependencyIncludes;
 
     /**
      * Dependency exclude filter.
      * 
-     * @parameter expression="${play.zipDependencyExcludes}" default-value=""
      * @since 1.0.0
      */
+    @Parameter( property = "play.zipDependencyExcludes", defaultValue = "" )
     private String zipDependencyExcludes;
 
     protected void internalExecute()

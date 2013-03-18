@@ -16,38 +16,42 @@
 
 package com.google.code.play;
 
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.plugins.annotations.ResolutionScope;
+
 /**
  * Run Play! Server ("play run" equivalent).
  * 
  * @author <a href="mailto:gslowikowski@gmail.com">Grzegorz Slowikowski</a>
- * @goal run
- * @requiresDependencyResolution test
+ * @since 1.0.0
  */
+@Mojo( name = "run", requiresDependencyResolution = ResolutionScope.TEST )
 public class PlayRunMojo
     extends AbstractPlayRunMojo
 {
     /**
      * Play! id (profile) used.
      * 
-     * @parameter expression="${play.id}" default-value=""
      * @since 1.0.0
      */
+    @Parameter( property = "play.id", defaultValue = "" )
     private String playId;
 
     /**
      * Play! id (profile) used when running server with tests.
      * 
-     * @parameter expression="${play.testId}" default-value="test"
      * @since 1.0.0
      */
+    @Parameter( property = "play.testId", defaultValue = "test" )
     private String playTestId;
 
     /**
      * Run server with test profile.
      * 
-     * @parameter expression="${play.runWithTests}" default-value="false"
      * @since 1.0.0
      */
+    @Parameter( property = "play.runWithTests", defaultValue = "false" )
     private boolean runWithTests;
 
     @Override

@@ -21,6 +21,10 @@ import java.io.IOException;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.shared.dependency.tree.DependencyTreeBuilderException;
 
 import org.codehaus.plexus.archiver.ArchiverException;
@@ -31,10 +35,9 @@ import org.codehaus.plexus.archiver.zip.ZipArchiver;
  * Create an exploded Play! framework and Play! application (standalone distribution).
  * 
  * @author <a href="mailto:gslowikowski@gmail.com">Grzegorz Slowikowski</a>
- * @goal dist-exploded
- * @phase package
- * @requiresDependencyResolution test
+ * @since 1.0.0
  */
+@Mojo( name = "dist-exploded", defaultPhase = LifecyclePhase.PACKAGE, requiresDependencyResolution = ResolutionScope.TEST )
 public class PlayDistExplodedMojo
     extends AbstractPlayDistMojo
 {
@@ -42,10 +45,9 @@ public class PlayDistExplodedMojo
     /**
      * Skip dist exploded generation.
      * 
-     * @parameter expression="${play.distExplodedSkip}" default-value="false"
-     * @required
      * @since 1.0.0
      */
+    @Parameter( property = "play.distExplodedSkip", defaultValue = "false" )
     private boolean distExplodedSkip;
 
     protected void internalExecute()

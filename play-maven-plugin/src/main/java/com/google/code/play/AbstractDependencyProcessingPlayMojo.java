@@ -29,6 +29,8 @@ import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactCollector;
+import org.apache.maven.plugins.annotations.Component;
+import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.shared.dependency.tree.DependencyNode;
 import org.apache.maven.shared.dependency.tree.DependencyTreeBuilder;
 import org.apache.maven.shared.dependency.tree.DependencyTreeBuilderException;
@@ -45,46 +47,36 @@ public abstract class AbstractDependencyProcessingPlayMojo
     /**
      * The artifact repository to use.
      *
-     * @parameter expression="${localRepository}"
-     * @required
-     * @readonly
      */
+    @Parameter( property = "localRepository", required = true, readonly = true )
     private ArtifactRepository localRepository;
 
     /**
      * The artifact factory to use.
      *
-     * @component
-     * @required
-     * @readonly
      */
+    @Component
     private ArtifactFactory artifactFactory;
 
     /**
      * The artifact metadata source to use.
      *
-     * @component
-     * @required
-     * @readonly
      */
+    @Component
     private ArtifactMetadataSource artifactMetadataSource;
 
     /**
      * The artifact collector to use.
      *
-     * @component
-     * @required
-     * @readonly
      */
+    @Component
     private ArtifactCollector artifactCollector;
 
     /**
      * The dependency tree builder to use.
      *
-     * @component
-     * @required
-     * @readonly
      */
+    @Component
     private DependencyTreeBuilder dependencyTreeBuilder;
 
     /**

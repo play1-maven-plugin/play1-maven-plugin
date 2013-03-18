@@ -21,6 +21,11 @@ import java.io.IOException;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Component;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.project.MavenProjectHelper;
 import org.apache.maven.shared.dependency.tree.DependencyTreeBuilderException;
 
@@ -32,10 +37,9 @@ import org.codehaus.plexus.archiver.zip.ZipArchiver;
  * Packages Play! framework and Play! application as one ZIP achive (standalone distribution).
  * 
  * @author <a href="mailto:gslowikowski@gmail.com">Grzegorz Slowikowski</a>
- * @goal dist
- * @phase package
- * @requiresDependencyResolution test
+ * @since 1.0.0
  */
+@Mojo( name = "dist", defaultPhase = LifecyclePhase.PACKAGE, requiresDependencyResolution = ResolutionScope.TEST )
 public class PlayDistMojo
     extends AbstractPlayDistMojo
 {
@@ -43,51 +47,48 @@ public class PlayDistMojo
     /**
      * Skip distribution file generation.
      * 
-     * @parameter expression="${play.distSkip}" default-value="false"
-     * @required
      * @since 1.0.0
      */
+    @Parameter( property = "play.distSkip", defaultValue = "false" )
     private boolean distSkip;
 
     /**
      * The directory for the generated distribution file.
      * 
-     * @parameter expression="${play.distOutputDirectory}" default-value="${project.build.directory}"
-     * @required
      * @since 1.0.0
      */
+    @Parameter( property = "play.distOutputDirectory", defaultValue = "${project.build.directory}", required = true )
     private String distOutputDirectory;
 
     /**
      * The name of the generated distribution file.
      * 
-     * @parameter expression="${play.distArchiveName}" default-value="${project.build.finalName}"
-     * @required
      * @since 1.0.0
      */
+    @Parameter( property = "play.distArchiveName", defaultValue = "${project.build.finalName}", required = true )
     private String distArchiveName;
 
     /**
      * Classifier to add to the generated distribution file.
      * 
-     * @parameter expression="${play.distClassifier}" default-value="dist"
      * @since 1.0.0
      */
+    @Parameter( property = "play.distClassifier", defaultValue = "dist" )
     private String distClassifier;
 
     /**
      * Attach generated distribution file to project artifacts.
      * 
-     * @parameter expression="${play.distAttach}" default-value="false"
      * @since 1.0.0
      */
+    @Parameter( property = "play.distAttach", defaultValue = "false" )
     private boolean distAttach;
 
     /**
      * Maven ProjectHelper.
      * 
-     * @component
      */
+    @Component
     private MavenProjectHelper projectHelper;
 
     protected void internalExecute()

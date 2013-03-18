@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.apache.maven.plugins.annotations.Component;
 import org.codehaus.plexus.archiver.ArchiveEntry;
 import org.codehaus.plexus.archiver.Archiver;
 import org.codehaus.plexus.archiver.ResourceIterator;
@@ -43,10 +44,8 @@ public abstract class AbstractArchivingMojo
     /**
      * To look up Archiver/UnArchiver implementations.
      * 
-     * @component role="org.codehaus.plexus.archiver.manager.ArchiverManager"
-     * @required
-     * @readonly
      */
+    @Component
     private ArchiverManager archiverManager;
 
     protected void expandArchive( Archiver archiver, File destDirectory )

@@ -28,6 +28,7 @@ import java.util.Set;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.Parameter;
 
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.taskdefs.Java;
@@ -42,33 +43,33 @@ public abstract class AbstractPlayServerMojo
     /**
      * Alternative server port.
      * 
-     * @parameter expression="${play.httpPort}" default-value=""
      * @since 1.0.0
      */
+    @Parameter( property = "play.httpPort", defaultValue = "" )
     private String httpPort;
 
     /**
      * Alternative server port for secure connection (https protocol).
      * 
-     * @parameter expression="${play.httpsPort}" default-value=""
      * @since 1.0.0
      */
+    @Parameter( property = "play.httpsPort", defaultValue = "" )
     private String httpsPort;
 
     /**
      * Disable the JPDA port checking and force the jpda.port value (Play!'s "-f" option equivalent).
      * 
-     * @parameter expression="${play.disableCheckJpda}" default-value="false"
      * @since 1.0.0
      */
+    @Parameter( property = "play.disableCheckJpda", defaultValue = "false" )
     private boolean disableCheckJpda;
 
     /**
      * Additional JVM arguments passed to Play! server's JVM
      * 
-     * @parameter expression="${play.serverJvmArgs}" default-value=""
      * @since 1.0.0
      */
+    @Parameter( property = "play.serverJvmArgs", defaultValue = "" )
     private String serverJvmArgs;
 
     protected Java prepareAntJavaTask( ConfigurationParser configParser, String playId, boolean fork )

@@ -21,6 +21,10 @@ import java.io.IOException;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.shared.dependency.tree.DependencyTreeBuilderException;
 
 import org.codehaus.plexus.archiver.ArchiverException;
@@ -31,10 +35,9 @@ import org.codehaus.plexus.archiver.war.WarArchiver;
  * Create an exploded Play! application webapp.
  * 
  * @author <a href="mailto:gslowikowski@gmail.com">Grzegorz Slowikowski</a>
- * @goal war-exploded
- * @phase package
- * @requiresDependencyResolution test
+ * @since 1.0.0
  */
+@Mojo( name = "war-exploded", defaultPhase = LifecyclePhase.PACKAGE, requiresDependencyResolution = ResolutionScope.TEST )
 public class PlayWarExplodedMojo
     extends AbstractPlayWarMojo
 {
@@ -42,18 +45,17 @@ public class PlayWarExplodedMojo
     /**
      * Skip War exploded generation.
      * 
-     * @parameter expression="${play.warExplodedSkip}" default-value="false"
-     * @required
      * @since 1.0.0
      */
+    @Parameter( property = "play.warExplodedSkip", defaultValue = "false" )
     private boolean warExplodedSkip;
 
     /**
      * WAR webapp directory include filter.
      * 
-     * @parameter expression="${play.warWebappIncludes}" default-value="**"
      * @since 1.0.0
      */
+    @Parameter( property = "play.warWebappIncludes", defaultValue = "**" )
     private String warWebappIncludes;
 
     /**
@@ -62,9 +64,9 @@ public class PlayWarExplodedMojo
      * in "warWebappDirectory" directory, because it is processed separately
      * from other "warWebappDirectory" directory content.
      * 
-     * @parameter expression="${play.warWebappExcludes}" default-value="WEB-INF/web.xml"
      * @since 1.0.0
      */
+    @Parameter( property = "play.warWebappExcludes", defaultValue = "WEB-INF/web.xml" )
     private String warWebappExcludes;
 
     protected void internalExecute()

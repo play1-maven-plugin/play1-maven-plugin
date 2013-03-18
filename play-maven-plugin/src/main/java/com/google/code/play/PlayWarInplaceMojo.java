@@ -20,6 +20,10 @@ import java.io.IOException;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.shared.dependency.tree.DependencyTreeBuilderException;
 
 import org.codehaus.plexus.archiver.ArchiverException;
@@ -27,13 +31,12 @@ import org.codehaus.plexus.archiver.manager.NoSuchArchiverException;
 import org.codehaus.plexus.archiver.war.WarArchiver;
 
 /**
- * Create an exploded Play! application webapp in the "war" source directory.
+ * Create an exploded Play! application webapp in ${warWebappDirectory} directory.
  * 
  * @author <a href="mailto:gslowikowski@gmail.com">Grzegorz Slowikowski</a>
- * @goal war-inplace
- * @phase package
- * @requiresDependencyResolution test
+ * @since 1.0.0
  */
+@Mojo( name = "war-inplace", defaultPhase = LifecyclePhase.PACKAGE, requiresDependencyResolution = ResolutionScope.TEST )
 public class PlayWarInplaceMojo
     extends AbstractPlayWarMojo
 {
@@ -41,10 +44,9 @@ public class PlayWarInplaceMojo
     /**
      * Skip War inplace generation.
      * 
-     * @parameter expression="${play.warInplaceSkip}" default-value="false"
-     * @required
      * @since 1.0.0
      */
+    @Parameter( property = "play.warInplaceSkip", defaultValue = "false" )
     private boolean warInplaceSkip;
 
     protected void internalExecute()

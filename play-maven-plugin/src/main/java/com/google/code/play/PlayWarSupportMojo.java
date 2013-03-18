@@ -21,33 +21,35 @@ import java.io.IOException;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 
 /**
  * Prepares project for WAR packaging.
  * For now only prepares "web.xml" file (replaces %APPLICATION_NAME% and %PLAY_ID% with actual values).
  * 
  * @author <a href="mailto:gslowikowski@gmail.com">Grzegorz Slowikowski</a>
- * @goal war-support
- * @phase prepare-package
+ * @since 1.0.0
  */
+@Mojo( name = "war-support", defaultPhase = LifecyclePhase.PREPARE_PACKAGE )
 public class PlayWarSupportMojo
     extends AbstractPlayMojo
 {
     /**
      * Play! id (profile) used for WAR packaging.
      * 
-     * @parameter expression="${play.warId}" default-value="war"
      * @since 1.0.0
      */
+    @Parameter( property = "play.warId", defaultValue = "war" )
     private String playWarId;
 
     /**
      * Single directory for extra files to include in the WAR.
      *
-     * @parameter expression="${play.warWebappDirectory}" default-value="${basedir}/war"
-     * @required
      * @since 1.0.0
      */
+    @Parameter( property = "play.warWebappDirectory", defaultValue = "${basedir}/war", required = true )
     private File warWebappDirectory;
 
     @Override

@@ -28,6 +28,7 @@ import java.util.Set;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.resolver.filter.AndArtifactFilter;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.shared.artifact.filter.PatternExcludesArtifactFilter;
 import org.apache.maven.shared.artifact.filter.PatternIncludesArtifactFilter;
 import org.apache.maven.shared.dependency.tree.DependencyTreeBuilderException;
@@ -47,41 +48,41 @@ public abstract class AbstractPlayDistMojo
     /**
      * Default Play! id (profile).
      * 
-     * @parameter expression="${play.id}" default-value=""
      * @since 1.0.0
      */
+    @Parameter( property = "play.id", defaultValue = "" )
     private String playId;
 
     /**
      * Distribution application resources include filter
      * 
-     * @parameter expression="${play.distApplicationIncludes}" default-value="app/**,conf/**,public/**,tags/**,test/**"
      * @since 1.0.0
      */
+    @Parameter( property = "play.distApplicationIncludes", defaultValue = "app/**,conf/**,public/**,tags/**,test/**" )
     private String distApplicationIncludes;
 
     /**
      * Distribution application resources exclude filter.
      * 
-     * @parameter expression="${play.distApplicationExcludes}" default-value=""
      * @since 1.0.0
      */
+    @Parameter( property = "play.distApplicationExcludes", defaultValue = "" )
     private String distApplicationExcludes;
 
     /**
      * Distribution dependency include filter.
      * 
-     * @parameter expression="${play.distDependencyIncludes}" default-value=""
      * @since 1.0.0
      */
+    @Parameter( property = "play.distDependencyIncludes", defaultValue = "" )
     private String distDependencyIncludes;
 
     /**
      * Distribution dependency exclude filter.
      * 
-     * @parameter expression="${play.distDependencyExcludes}" default-value=""
      * @since 1.0.0
      */
+    @Parameter( property = "play.distDependencyExcludes", defaultValue = "" )
     private String distDependencyExcludes;
 
     protected ZipArchiver prepareArchiver( ConfigurationParser configParser )

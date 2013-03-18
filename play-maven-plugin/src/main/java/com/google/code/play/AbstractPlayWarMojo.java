@@ -28,6 +28,7 @@ import java.util.Set;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.resolver.filter.AndArtifactFilter;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.Parameter;
 
 import org.apache.maven.shared.artifact.filter.PatternExcludesArtifactFilter;
 import org.apache.maven.shared.artifact.filter.PatternIncludesArtifactFilter;
@@ -49,67 +50,65 @@ public abstract class AbstractPlayWarMojo
     /**
      * Play! id (profile) used for WAR packaging.
      * 
-     * @parameter expression="${play.warId}" default-value="war"
      * @since 1.0.0
      */
+    @Parameter( property = "play.warId", defaultValue = "war" )
     private String playWarId;
 
     /**
      * Application resources include filter
      * 
-     * @parameter expression="${play.warApplicationIncludes}"
-     *            default-value="app/**,conf/**,precompiled/**,public/**,tags/**,test/**"
      * @since 1.0.0
      */
+    @Parameter( property = "play.warApplicationIncludes", defaultValue = "app/**,conf/**,precompiled/**,public/**,tags/**,test/**" )
     private String warApplicationIncludes;
 
     /**
      * Application resources exclude filter.
      * 
-     * @parameter expression="${play.warApplicationExcludes}" default-value="war/**"
      * @since 1.0.0
      */
+    @Parameter( property = "play.warApplicationExcludes", defaultValue = "war/**" )
     private String warApplicationExcludes;
 
     /**
      * Single directory for extra files to include in the WAR.
      *
-     * @parameter expression="${play.warWebappDirectory}" default-value="${basedir}/war"
-     * @required
      * @since 1.0.0
      */
+    @Parameter( property = "play.warWebappDirectory", defaultValue = "${basedir}/war", required = true )
     private File warWebappDirectory;
 
     /**
      * Dependency include filter.
      * 
-     * @parameter expression="${play.warDependencyIncludes}" default-value=""
      * @since 1.0.0
      */
+    @Parameter( property = "play.warDependencyIncludes", defaultValue = "" )
     private String warDependencyIncludes;
 
     /**
      * Dependency exclude filter.
      * 
-     * @parameter expression="${play.warDependencyExcludes}" default-value=""
      * @since 1.0.0
      */
+    @Parameter( property = "play.warDependencyExcludes", defaultValue = "" )
     private String warDependencyExcludes;
 
     /**
      * Conf classpath resources include filter
      * 
-     * @parameter expression="${play.warConfResourcesIncludes}" default-value="application.conf,messages,messages.*,routes"
      * @since 1.0.0
      */
+    @Parameter( property = "play.warConfResourcesIncludes", defaultValue = "application.conf,messages,messages.*,routes" )
     private String warConfResourcesIncludes;
 
     /**
      * Conf classpath resources exclude filter.
      * 
-     * @parameter expression="${play.warConfResourcesExcludes}" default-value=""
      * @since 1.0.0
      */
+    @Parameter( property = "play.warConfResourcesExcludes", defaultValue = "" )
     private String warConfResourcesExcludes;
 
     protected void checkIfPrecompiled() throws IOException, MojoExecutionException

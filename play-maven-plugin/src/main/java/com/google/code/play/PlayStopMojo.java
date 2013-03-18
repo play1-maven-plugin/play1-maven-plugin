@@ -20,13 +20,16 @@ import java.io.IOException;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 
 /**
  * Stop Play! Server ("play stop" equivalent).
  * 
  * @author <a href="mailto:gslowikowski@gmail.com">Grzegorz Slowikowski</a>
- * @goal stop
+ * @since 1.0.0
  */
+@Mojo( name = "stop" )
 public class PlayStopMojo
     extends AbstractPlayStopServerMojo
 {
@@ -34,9 +37,9 @@ public class PlayStopMojo
     /**
      * Skip goal execution
      * 
-     * @parameter expression="${play.stopSkip}" default-value="false"
      * @since 1.0.0
      */
+    @Parameter( property = "play.stopSkip", defaultValue = "false" )
     private boolean stopSkip;
 
     @Override

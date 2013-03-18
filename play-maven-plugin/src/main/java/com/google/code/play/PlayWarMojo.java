@@ -21,6 +21,11 @@ import java.io.IOException;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Component;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.project.MavenProjectHelper;
 import org.apache.maven.shared.dependency.tree.DependencyTreeBuilderException;
 
@@ -32,10 +37,9 @@ import org.codehaus.plexus.archiver.war.WarArchiver;
  * Package Play! application as a WAR achive.
  * 
  * @author <a href="mailto:gslowikowski@gmail.com">Grzegorz Slowikowski</a>
- * @goal war
- * @phase package
- * @requiresDependencyResolution test
+ * @since 1.0.0
  */
+@Mojo( name = "war", defaultPhase = LifecyclePhase.PACKAGE, requiresDependencyResolution = ResolutionScope.TEST )
 public class PlayWarMojo
     extends AbstractPlayWarMojo
 {
@@ -43,52 +47,49 @@ public class PlayWarMojo
     /**
      * Skip War generation.
      * 
-     * @parameter expression="${play.warSkip}" default-value="false"
-     * @required
      * @since 1.0.0
      */
+    @Parameter( property = "play.warSkip", defaultValue = "false" )
     private boolean warSkip;
 
     /**
      * The directory for the generated WAR file.
      * 
-     * @parameter expression="${play.warOutputDirectory}" default-value="${project.build.directory}"
-     * @required
      * @since 1.0.0
      */
+    @Parameter( property = "play.warOutputDirectory", defaultValue = "${project.build.directory}", required = true )
     private String warOutputDirectory;
 
     /**
      * The name of the generated WAR file.
      * 
-     * @parameter expression="${play.warArchiveName}" default-value="${project.build.finalName}"
-     * @required
      * @since 1.0.0
      */
+    @Parameter( property = "play.warArchiveName", defaultValue = "${project.build.finalName}", required = true )
     private String warArchiveName;
 
     /**
      * Classifier to add to the generated WAR file.
      * 
-     * @parameter expression="${play.warClassifier}" default-value=""
      * @since 1.0.0
      */
+    @Parameter( property = "play.warClassifier", defaultValue = "" )
     private String warClassifier;
 
     /**
      * Attach generated WAR file to project artifacts.
      * 
-     * @parameter expression="${play.warAttach}" default-value="false"
      * @since 1.0.0
      */
+    @Parameter( property = "play.warAttach", defaultValue = "false" )
     private boolean warAttach;
 
     /**
      * WAR webapp directory include filter.
      * 
-     * @parameter expression="${play.warWebappIncludes}" default-value="**"
      * @since 1.0.0
      */
+    @Parameter( property = "play.warWebappIncludes", defaultValue = "**" )
     private String warWebappIncludes;
 
     /**
@@ -97,16 +98,16 @@ public class PlayWarMojo
      * in "warWebappDirectory" directory, because it is processed separately
      * from other "warWebappDirectory" directory content.
      * 
-     * @parameter expression="${play.warWebappExcludes}" default-value="WEB-INF/web.xml"
      * @since 1.0.0
      */
+    @Parameter( property = "play.warWebappExcludes", defaultValue = "WEB-INF/web.xml" )
     private String warWebappExcludes;
 
     /**
      * Maven ProjectHelper.
      * 
-     * @component
      */
+    @Component
     private MavenProjectHelper projectHelper;
 
     protected void internalExecute()

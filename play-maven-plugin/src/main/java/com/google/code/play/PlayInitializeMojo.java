@@ -27,6 +27,11 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.model.Resource;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugins.annotations.Component;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.codehaus.plexus.archiver.ArchiverException;
 import org.codehaus.plexus.archiver.UnArchiver;
 import org.codehaus.plexus.archiver.manager.ArchiverManager;
@@ -44,10 +49,9 @@ import org.codehaus.plexus.util.FileUtils;
  * - Adds application and dependent modules test resources to Maven project as test resources.
  * 
  * @author <a href="mailto:gslowikowski@gmail.com">Grzegorz Slowikowski</a>
- * @goal initialize
- * @phase initialize
- * @requiresDependencyResolution compile
+ * @since 1.0.0
  */
+@Mojo( name = "initialize", defaultPhase = LifecyclePhase.INITIALIZE, requiresDependencyResolution = ResolutionScope.COMPILE )
 public class PlayInitializeMojo
     extends AbstractPlayMojo
 {
@@ -57,34 +61,33 @@ public class PlayInitializeMojo
     /**
      * Default Play! id (profile).
      * 
-     * @parameter expression="${play.id}" default-value=""
      * @since 1.0.0
      */
+    @Parameter( property = "play.id", defaultValue = "" )
     private String playId;
 
     /**
      * Should temporary Play! home directory be cleaned before it's reinitializing.
      * If true, homeOverwrite is meaningless.
      * 
-     * @parameter expression="${play.homeClean}" default-value="false"
      * @since 1.0.0
      */
+    @Parameter( property = "play.homeClean", defaultValue = "false" )
     private boolean homeClean;
 
     /**
      * Should existing temporary Play! home content be overwritten.
      * 
-     * @parameter expression="${play.homeOverwrite}" default-value="false"
      * @since 1.0.0
      */
+    @Parameter( property = "play.homeOverwrite", defaultValue = "false" )
     private boolean homeOverwrite;
 
     /**
      * To look up Archiver/UnArchiver implementations.
      * 
-     * @component role="org.codehaus.plexus.archiver.manager.ArchiverManager"
-     * @required
      */
+    @Component
     private ArchiverManager archiverManager;
 
     protected void internalExecute()

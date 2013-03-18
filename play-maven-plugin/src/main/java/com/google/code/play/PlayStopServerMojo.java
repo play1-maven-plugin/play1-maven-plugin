@@ -20,22 +20,25 @@ import java.io.IOException;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 
 /**
  * Stop Play! server after integration testing.
  * 
  * @author <a href="mailto:gslowikowski@gmail.com">Grzegorz Slowikowski</a>
- * @goal stop-server
+ * @since 1.0.0
  */
+@Mojo( name = "stop-server" )
 public class PlayStopServerMojo
     extends AbstractPlayStopServerMojo
 {
     /**
      * Skip goal execution
      * 
-     * @parameter expression="${play.seleniumSkip}" default-value="false"
      * @since 1.0.0
      */
+    @Parameter( property = "play.seleniumSkip", defaultValue = "false" )
     private boolean seleniumSkip;
 
     @Override

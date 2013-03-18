@@ -21,6 +21,9 @@ import java.io.IOException;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 import org.codehaus.plexus.util.FileUtils;
 
 /**
@@ -33,83 +36,82 @@ import org.codehaus.plexus.util.FileUtils;
  *  - "tmp"
  * 
  * @author <a href="mailto:gslowikowski@gmail.com">Grzegorz Slowikowski</a>
- * @goal clean
- * @phase clean
+ * @since 1.0.0
  */
+@Mojo( name = "clean", defaultPhase = LifecyclePhase.CLEAN )
 public class PlayCleanMojo
     extends AbstractPlayMojo
 {
     /**
      * Default Play! id (profile).
      * 
-     * @parameter expression="${play.id}" default-value=""
      * @since 1.0.0
      */
+    @Parameter( property = "play.id", defaultValue = "" )
     private String playId;
 
     /**
      * Should all "cleanable" directories be deleted. If "true", overrides all "cleanXXX" property values.
      * 
-     * @parameter expression="${play.cleanAll}" default-value="false"
      * @since 1.0.0
      */
+    @Parameter( property = "play.cleanAll", defaultValue = "false" )
     private boolean cleanAll;
 
     /**
      * Should "db" directory be deleted.
      * 
-     * @parameter expression="${play.cleanDb}" default-value="false"
      * @since 1.0.0
      */
+    @Parameter( property = "play.cleanDb", defaultValue = "false" )
     private boolean cleanDb;
 
     /**
      * Should "lib" and "modules" directories be deleted.
      * 
-     * @parameter expression="${play.cleanDependencies}" default-value="false"
      * @since 1.0.0
      */
+    @Parameter( property = "play.cleanDependencies", defaultValue = "false" )
     private boolean cleanDependencies;
 
     /**
      * Should "logs" directory be deleted.
      * 
-     * @parameter expression="${play.cleanLogs}" default-value="false"
      * @since 1.0.0
      */
+    @Parameter( property = "play.cleanLogs", defaultValue = "false" )
     private boolean cleanLogs;
 
     /**
      * Should "precompiled" directory be deleted.
      * 
-     * @parameter expression="${play.cleanPrecompiled}" default-value="false"
      * @since 1.0.0
      */
+    @Parameter( property = "play.cleanPrecompiled", defaultValue = "false" )
     private boolean cleanPrecompiled;
 
     /**
      * Should "test-result" directory be deleted.
      * 
-     * @parameter expression="${play.cleanTestResult}" default-value="false"
      * @since 1.0.0
      */
+    @Parameter( property = "play.cleanTestResult", defaultValue = "false" )
     private boolean cleanTestResult;
 
     /**
      * Should "tmp" directory be deleted.
      * 
-     * @parameter expression="${play.cleanTmp}" default-value="true"
      * @since 1.0.0
      */
+    @Parameter( property = "play.cleanTmp", defaultValue = "true" )
     private boolean cleanTmp;
 
     /**
      * Skip cleaning.
      * 
-     * @parameter expression="${play.cleanSkip}" default-value="false"
-     * @required
      * @since 1.0.0
      */
+    @Parameter( property = "play.cleanSkip", defaultValue = "false" )
     private boolean cleanSkip;
 
     protected void internalExecute()

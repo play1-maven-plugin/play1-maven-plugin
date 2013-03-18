@@ -25,6 +25,9 @@ import java.io.PrintWriter;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 
 /**
  * Generates JUnit test wrapper sources for Selenium tests. Maven Surefire plugin operates on Java test classes (JUnit
@@ -32,9 +35,9 @@ import org.apache.maven.plugin.MojoFailureException;
  * TestNG) wrapper for every Selenium test.
  * 
  * @author <a href="mailto:gslowikowski@gmail.com">Grzegorz Slowikowski</a>
- * @goal generate-selenium-junit4-sources
- * @phase generate-test-sources
+ * @since 1.0.0
  */
+@Mojo( name = "generate-selenium-junit4-sources", defaultPhase = LifecyclePhase.GENERATE_TEST_SOURCES )
 public class PlayGenerateSeleniumJunit4SourcesMojo
     extends AbstractPlayMojo
 {
@@ -42,9 +45,9 @@ public class PlayGenerateSeleniumJunit4SourcesMojo
     /**
      * Skip generating JUnit test wrapper sources.
      * 
-     * @parameter expression="${play.seleniumSkip}" default-value="false"
      * @since 1.0.0
      */
+    @Parameter( property = "play.seleniumSkip", defaultValue = "false" )
     private boolean seleniumSkip;
 
     protected void internalExecute()

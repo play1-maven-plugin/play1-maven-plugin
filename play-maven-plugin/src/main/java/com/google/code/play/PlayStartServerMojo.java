@@ -21,6 +21,9 @@ import java.io.IOException;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.plugins.annotations.ResolutionScope;
 
 import org.apache.tools.ant.taskdefs.Java;
 
@@ -28,26 +31,26 @@ import org.apache.tools.ant.taskdefs.Java;
  * Start Play! server before integration testing.
  * 
  * @author <a href="mailto:gslowikowski@gmail.com">Grzegorz Slowikowski</a>
- * @goal start-server
- * @requiresDependencyResolution test
+ * @since 1.0.0
  */
+@Mojo( name = "start-server", requiresDependencyResolution = ResolutionScope.TEST )
 public class PlayStartServerMojo
     extends AbstractPlayStartServerMojo
 {
     /**
      * Play! id (profile) used for testing.
      * 
-     * @parameter expression="${play.testId}" default-value="test"
      * @since 1.0.0
      */
+    @Parameter( property = "play.testId", defaultValue = "test" )
     private String playTestId;
 
     /**
      * Skip goal execution
      * 
-     * @parameter expression="${play.seleniumSkip}" default-value="false"
      * @since 1.0.0
      */
+    @Parameter( property = "play.seleniumSkip", defaultValue = "false" )
     private boolean seleniumSkip;
 
     @Override

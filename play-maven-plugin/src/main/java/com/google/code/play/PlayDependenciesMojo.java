@@ -26,6 +26,10 @@ import java.util.Set;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugins.annotations.Component;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.shared.dependency.tree.DependencyTreeBuilderException;
 
 import org.codehaus.plexus.archiver.ArchiverException;
@@ -41,9 +45,9 @@ import org.codehaus.plexus.util.FileUtils;
  * instead of "conf/dependencies.yml" file.
  * 
  * @author <a href="mailto:gslowikowski@gmail.com">Grzegorz Slowikowski</a>
- * @goal dependencies
- * @requiresDependencyResolution test
+ * @since 1.0.0
  */
+@Mojo( name = "dependencies", requiresDependencyResolution = ResolutionScope.TEST )
 public class PlayDependenciesMojo
     extends AbstractDependencyProcessingPlayMojo
 {
@@ -51,45 +55,42 @@ public class PlayDependenciesMojo
     /**
      * Skip dependencies extraction.
      * 
-     * @parameter expression="${play.dependenciesSkip}" default-value="false"
-     * @required
      * @since 1.0.0
      */
+    @Parameter( property = "play.dependenciesSkip", defaultValue = "false" )
     private boolean dependenciesSkip;
 
     /**
      * Should project's "lib" and "modules" subdirectories be cleaned before dependency resolution.
      * If true, dependenciesOverwrite is meaningless.
      * 
-     * @parameter expression="${play.dependenciesClean}" default-value="false"
      * @since 1.0.0
      */
+    @Parameter( property = "play.dependenciesClean", defaultValue = "false" )
     private boolean dependenciesClean;
 
     /**
      * Should existing dependencies be overwritten.
      * 
-     * @parameter expression="${play.dependenciesOverwrite}" default-value="false"
      * @since 1.0.0
      */
+    @Parameter( property = "play.dependenciesOverwrite", defaultValue = "false" )
     private boolean dependenciesOverwrite;
 
     /**
      * Should jar dependencies be processed. They are necessary for Play! Framework,
      * but not needed for Maven build (Maven uses dependency mechanism).
      * 
-     * @parameter expression="${play.dependenciesSkipJars}" default-value="false"
      * @since 1.0.0
      */
+    @Parameter( property = "play.dependenciesSkipJars", defaultValue = "false" )
     private boolean dependenciesSkipJars; // TODO-change default value to true
 
     /**
      * To look up Archiver/UnArchiver implementations.
      * 
-     * @component role="org.codehaus.plexus.archiver.manager.ArchiverManager"
-     * @required
-     * @readonly
      */
+    @Component
     private ArchiverManager archiverManager;
 
     protected void internalExecute()

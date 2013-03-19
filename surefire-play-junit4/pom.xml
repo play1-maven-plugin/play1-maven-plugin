@@ -31,6 +31,11 @@ limitations under the License.
     <name>SureFire Play!-JUnit4 Runner</name>
     <description>SureFire Play!-JUnit4 Runner</description>
 
+    <properties>
+        <play.version>1.1</play.version>
+        <surefire.version>2.14</surefire.version>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>com.google.code.maven-play-plugin</groupId>
@@ -49,28 +54,72 @@ limitations under the License.
         <dependency>
             <groupId>org.apache.maven.surefire</groupId>
             <artifactId>surefire-api</artifactId>
-            <version>2.11</version>
+            <version>${surefire.version}</version>
             <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>org.apache.maven.surefire</groupId>
             <artifactId>common-junit4</artifactId>
-            <version>2.11</version>
+            <version>${surefire.version}</version>
         </dependency>
 
         <dependency>
-            <groupId>org.codehaus.plexus</groupId>
-            <artifactId>plexus-utils</artifactId>
-            <version>3.0.8</version>
+            <groupId>org.apache.maven.surefire</groupId>
+            <artifactId>common-java5</artifactId>
+            <version>${surefire.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.maven.shared</groupId>
+            <artifactId>maven-shared-utils</artifactId>
+            <version>0.3</version>
         </dependency>
 
         <dependency>
             <groupId>com.google.code.maven-play-plugin.org.playframework</groupId>
             <artifactId>play</artifactId>
-            <version>1.1</version>
+            <version>${play.version}</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-javadoc-plugin</artifactId>
+                    <configuration>
+                        <links>
+                            <link>http://download.oracle.com/javase/5/docs/api/</link>
+                            <link>http://www.playframework.com/documentation/api/${play.version}/</link>
+                        </links>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+
+    <profiles>
+        <profile>
+            <id>fullsite</id>
+
+            <reporting>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <configuration>
+                            <links>
+                                <link>http://download.oracle.com/javase/5/docs/api/</link>
+                                <link>http://www.playframework.com/documentation/api/${play.version}/</link>
+                            </links>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </reporting>
+        </profile>
+    </profiles>
 
 </project>

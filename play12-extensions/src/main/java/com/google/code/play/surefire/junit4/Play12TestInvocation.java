@@ -18,9 +18,7 @@ package com.google.code.play.surefire.junit4;
 
 import java.lang.reflect.Method;
 
-import org.apache.maven.surefire.util.internal.StringUtils;
-
-import org.codehaus.plexus.util.SelectorUtils;
+import org.apache.maven.shared.utils.io.SelectorUtils;
 
 import org.junit.runner.Request;
 import org.junit.runner.Runner;
@@ -35,40 +33,38 @@ public class Play12TestInvocation
 
     private RunNotifier fNotifier;
 
-    private String testMethod;
+    private String[] testMethods;
 
-    public Play12TestInvocation( Class<?> testClass, RunNotifier fNotifier, String testMethod )
+    public Play12TestInvocation( Class<?> testClass, RunNotifier fNotifier, String[] testMethods )
     {
         this.testClass = testClass;
         this.fNotifier = fNotifier;
-        this.testMethod = testMethod;
+        this.testMethods = testMethods;
     }
 
     @Override
     public void execute()
-    // throws Exception
     {
-        if ( !StringUtils.isBlank( testMethod ) )
+        if ( null != testMethods )
         {
             Method[] methods = testClass.getMethods();
-            for ( int i = 0, size = methods.length; i < size; i++ )
+            for ( Method method : methods )
             {
-                if ( SelectorUtils.match( testMethod, methods[i].getName() ) )
+                for ( String testMethod : testMethods )
                 {
-                    Runner junitTestRunner = Request.method( testClass, methods[i].getName() ).getRunner();
-                    junitTestRunner.run( fNotifier );
+                    if ( SelectorUtils.match( testMethod, method.getName() ) )
+                    {
+                        Runner junitTestRunner = Request.method( testClass, method.getName() ).getRunner();
+                        junitTestRunner.run( fNotifier );
+                    }
                 }
             }
             return;
         }
 
         Runner junitTestRunner = Request.aClass( testClass ).getRunner();
-
+        
         junitTestRunner.run( fNotifier );
-        /*
-         * try { Runner junitTestRunner = Request.aClass( testClass ).getRunner(); junitTestRunner.run( fNotifier ); }
-         * catch ( Throwable e ) { throw new RuntimeException( e ); }
-         */
     }
 
     @Override

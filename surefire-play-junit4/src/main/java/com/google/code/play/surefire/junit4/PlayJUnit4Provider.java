@@ -31,12 +31,10 @@ import org.apache.maven.surefire.report.ReporterFactory;
 import org.apache.maven.surefire.report.RunListener;
 import org.apache.maven.surefire.report.SimpleReportEntry;
 import org.apache.maven.surefire.suite.RunResult;
-import org.apache.maven.surefire.testset.DirectoryScannerParameters;
 import org.apache.maven.surefire.testset.TestSetFailedException;
-//import org.apache.maven.surefire.util.DirectoryScanner;
-//import org.apache.maven.surefire.util.DefaultDirectoryScanner;
 import org.apache.maven.surefire.util.RunOrderCalculator;
 import org.apache.maven.surefire.util.TestsToRun;
+import org.apache.maven.surefire.util.internal.StringUtils;
 
 import org.junit.runner.Result;
 import org.junit.runner.notification.RunNotifier;
@@ -55,8 +53,6 @@ public class PlayJUnit4Provider
 {
     private final ClassLoader testClassLoader;
 
-    private final PlayDirectoryScanner directoryScanner;
-    
     private final List<org.junit.runner.notification.RunListener> customRunListeners;
 
     private final JUnit4TestChecker jUnit4TestChecker;
@@ -75,6 +71,8 @@ public class PlayJUnit4Provider
 
     private final RunOrderCalculator runOrderCalculator;
 
+    private final PlayScanResult scanResult;
+
     private final ConsoleLogger consoleLogger;
 
     public PlayJUnit4Provider( ProviderParameters booterParameters )
@@ -89,11 +87,7 @@ public class PlayJUnit4Provider
 
         this.testClassLoader = booterParameters.getTestClassLoader();
         this.consoleLogger = booterParameters.getConsoleLogger();
-        DirectoryScannerParameters directoryScannerParameters = booterParameters.getDirectoryScannerParameters();
-        this.directoryScanner = new PlayDirectoryScanner(new File(applicationPath, "test"),
-                                                         directoryScannerParameters.getIncludes(),
-                                                         directoryScannerParameters.getExcludes(),
-                                                         consoleLogger);
+        this.scanResult = PlayScanResult.from( booterParameters.getProviderProperties(), consoleLogger );
         this.runOrderCalculator = booterParameters.getRunOrderCalculator();
         customRunListeners =
             JUnit4RunListenerFactory.createCustomListeners( booterParameters.getProviderProperties().getProperty( "listener" ) );
@@ -169,7 +163,18 @@ public class PlayJUnit4Provider
         {
             if ( testsToRun == null )
             {
-                testsToRun = forkTestSet == null ? scanClassPath() : TestsToRun.fromClass( (Class<?>) forkTestSet );
+                if ( forkTestSet instanceof TestsToRun )
+                {
+                    testsToRun = (TestsToRun) forkTestSet;
+                }
+                else if ( forkTestSet instanceof Class )
+                {
+                    testsToRun = TestsToRun.fromClass( (Class) forkTestSet );
+                }
+                else
+                {
+                    testsToRun = scanClassPath();
+                }
             }
 
             upgradeCheck();
@@ -177,7 +182,6 @@ public class PlayJUnit4Provider
             final ReporterFactory reporterFactory = providerParameters.getReporterFactory();
 
             final RunListener reporter = reporterFactory.createReporter();
-
 
             ConsoleOutputCapture.startCapture( (ConsoleOutputReceiver) reporter );
 
@@ -188,12 +192,19 @@ public class PlayJUnit4Provider
 
             runNotifer.fireTestRunStarted( null );
 
-            for ( Class<?> clazz : testsToRun.getLocatedClasses() )
+//            for ( Class<?> clazz : testsToRun.getLocatedClasses() )
+//            {
+//                executeTestSet( clazz, reporter, runNotifer );
+//            }
+            //for ( @SuppressWarnings( "unchecked" ) Iterator<Class<?>> iter = testsToRun.iterator(); iter.hasNext(); )
+            for ( Iterator<Class<?>> iter = testsToRun.iterator(); iter.hasNext(); )
             {
-                executeTestSet( clazz, reporter, runNotifer );
+                executeTestSet( iter.next(), reporter, runNotifer );
             }
 
             runNotifer.fireTestRunFinished( result );
+
+            JUnit4RunListener.rethrowAnyTestMechanismFailures( result );
 
             closeRunNotifer( jUnit4TestSetReporter, customRunListeners );
 
@@ -230,7 +241,17 @@ public class PlayJUnit4Provider
 
         try
         {
-            execute( clazz, listeners, this.requestedTestMethod );
+//            execute( clazz, listeners, this.requestedTestMethod );
+            if ( !StringUtils.isBlank( this.requestedTestMethod ) )
+            {
+                String actualTestMethod = getMethod( clazz, this.requestedTestMethod ); //add by rainLee
+                String[] testMethods = StringUtils.split( actualTestMethod, "+" );
+                execute( clazz, listeners, testMethods );
+            }
+            else
+            { //the original way
+                execute( clazz, listeners, null );
+            }
         }
         catch ( TestSetFailedException e )
         {
@@ -238,9 +259,12 @@ public class PlayJUnit4Provider
         }
         catch ( Throwable e )
         {
-            reporter.testError( new SimpleReportEntry( report.getSourceName(), report.getName(),
-                                                       new PojoStackTraceWriter( report.getSourceName(),
-                                                                                 report.getName(), e ) ) );
+//            reporter.testError( new SimpleReportEntry( report.getSourceName(), report.getName(),
+//                                                       new PojoStackTraceWriter( report.getSourceName(),
+//                                                                                 report.getName(), e ) ) );
+            reporter.testError( SimpleReportEntry.withException( report.getSourceName(), report.getName(),
+                                                                 new PojoStackTraceWriter( report.getSourceName(),
+                                                                                           report.getName(), e ) ) );
         }
         finally
         {
@@ -248,11 +272,12 @@ public class PlayJUnit4Provider
         }
     }
 
-    private RunNotifier getRunNotifer( org.junit.runner.notification.RunListener main, Result result, List<org.junit.runner.notification.RunListener> others )
+    private RunNotifier getRunNotifer( org.junit.runner.notification.RunListener main, Result result,
+                                       List<org.junit.runner.notification.RunListener> others )
     {
         RunNotifier fNotifier = new RunNotifier();
         fNotifier.addListener( main );
-        fNotifier.addListener(  result.createListener() );
+        fNotifier.addListener( result.createListener() );
         for ( org.junit.runner.notification.RunListener listener : others )
         {
             fNotifier.addListener( listener );
@@ -281,27 +306,47 @@ public class PlayJUnit4Provider
 
     private TestsToRun scanClassPath()
     {
-        final TestsToRun scannedClasses = directoryScanner.locateTestClasses( Play.classloader, jUnit4TestChecker );
-        return runOrderCalculator.orderTestClasses(  scannedClasses );
+//        final TestsToRun scannedClasses = directoryScanner.locateTestClasses( Play.classloader, jUnit4TestChecker );
+        final TestsToRun scannedClasses = scanResult.applyFilter( jUnit4TestChecker, Play.classloader/*testClassLoader*/ );
+        return runOrderCalculator.orderTestClasses( scannedClasses );
     }
 
+    //GS?@SuppressWarnings("unchecked")
     private void upgradeCheck()
         throws TestSetFailedException
     {
-        if ( isJunit4UpgradeCheck()
-            && directoryScanner.getClassesSkippedByValidation().size() > 0 )
+//        if ( isJunit4UpgradeCheck()
+//            && directoryScanner.getClassesSkippedByValidation().size() > 0 )
+//        {
+//            StringBuilder reason = new StringBuilder();
+//            reason.append( "Updated check failed\n" );
+//            reason.append( "There are tests that would be run with junit4 / surefire 2.6 but not with [2.7,):\n" );
+//            // noinspection unchecked
+//            for ( Class<?> testClass : (List<Class<?>>) directoryScanner.getClassesSkippedByValidation() )
+//            {
+//                reason.append( "   " );
+//                reason.append( testClass.getCanonicalName() );
+//                reason.append( "\n" );
+//            }
+//            throw new TestSetFailedException( reason.toString() );
+//        }
+        if ( isJunit4UpgradeCheck() )
         {
-            StringBuilder reason = new StringBuilder();
-            reason.append( "Updated check failed\n" );
-            reason.append( "There are tests that would be run with junit4 / surefire 2.6 but not with [2.7,):\n" );
-            // noinspection unchecked
-            for ( Class<?> testClass : (List<Class<?>>) directoryScanner.getClassesSkippedByValidation() )
+            List<Class<?>> classesSkippedByValidation =
+                scanResult.getClassesSkippedByValidation( jUnit4TestChecker, testClassLoader );
+            if ( !classesSkippedByValidation.isEmpty() )
             {
-                reason.append( "   " );
-                reason.append( testClass.getCanonicalName() );
-                reason.append( "\n" );
+                StringBuilder reason = new StringBuilder();
+                reason.append( "Updated check failed\n" );
+                reason.append( "There are tests that would be run with junit4 / surefire 2.6 but not with [2.7,):\n" );
+                for ( Class testClass : classesSkippedByValidation )
+                {
+                    reason.append( "   " );
+                    reason.append( testClass.getName() );
+                    reason.append( "\n" );
+                }
+                throw new TestSetFailedException( reason.toString() );
             }
-            throw new TestSetFailedException( reason.toString() );
         }
     }
 
@@ -311,7 +356,27 @@ public class PlayJUnit4Provider
         return property != null;
     }
 
-    public static void execute( Class<?> testClass, RunNotifier fNotifier, String testMethod )
+//    public static void execute( Class<?> testClass, RunNotifier fNotifier, String testMethod )
+//        throws TestSetFailedException
+//    {
+//        try
+//        {
+//            String invocationClassName = "com.google.code.play.surefire.junit4.TestInvocation";
+//            if ( "1.2".compareTo( Play.version ) <= 0 )
+//            {
+//                invocationClassName = "com.google.code.play.surefire.junit4.Play12TestInvocation";
+//            }
+//            Invoker.DirectInvocation invocation = getInvocation( invocationClassName, testClass, fNotifier, testMethod );
+//            Invoker.invokeInThread( invocation );
+//        }
+//        catch ( Throwable e )
+//        {
+//            throw new TestSetFailedException( e );
+//            // ????? throw ExceptionUtils.getRootCause(e);
+//        }
+//    }
+
+    public static void execute( Class<?> testClass, RunNotifier fNotifier, String[] testMethods )
         throws TestSetFailedException
     {
         try
@@ -321,7 +386,8 @@ public class PlayJUnit4Provider
             {
                 invocationClassName = "com.google.code.play.surefire.junit4.Play12TestInvocation";
             }
-            Invoker.DirectInvocation invocation = getInvocation( invocationClassName, testClass, fNotifier, testMethod );
+            Invoker.DirectInvocation invocation =
+                getInvocation( invocationClassName, testClass, fNotifier, testMethods );
             Invoker.invokeInThread( invocation );
         }
         catch ( Throwable e )
@@ -331,14 +397,46 @@ public class PlayJUnit4Provider
         }
     }
 
+
+    /**
+     * this method retrive  testMethods from String like "com.xx.ImmutablePairTest#testBasic,com.xx.StopWatchTest#testLang315+testStopWatchSimpleGet"
+     * <br>
+     * and we need to think about cases that 2 or more method in 1 class. we should choose the correct method
+     *
+     * @param testClass     the testclass
+     * @param testMethodStr the test method string
+     * @return a string ;)
+     */
+    private static String getMethod( Class<?> testClass, String testMethodStr )
+    {
+        String className = testClass.getName();
+
+        if ( !testMethodStr.contains( "#" ) && !testMethodStr.contains( "," ) )
+        { //the original way
+            return testMethodStr;
+        }
+        testMethodStr += ","; //for the bellow  split code
+        int beginIndex = testMethodStr.indexOf( className );
+        int endIndex = testMethodStr.indexOf( ",", beginIndex );
+        String classMethodStr =
+            testMethodStr.substring( beginIndex, endIndex ); //String like "StopWatchTest#testLang315"
+
+        int index = classMethodStr.indexOf( '#' );
+        if ( index >= 0 )
+        {
+            return classMethodStr.substring( index + 1, classMethodStr.length() );
+        }
+        return null;
+    }
+
     public static Invoker.DirectInvocation getInvocation( String invocationClassName, Class<?> testClass,
-                                                          RunNotifier fNotifier, String testMethod )
+                                                          RunNotifier fNotifier, String[] testMethods )
         throws Throwable
     {
         Invoker.DirectInvocation invocation = null;
         Class<?> cl = Class.forName( invocationClassName );
-        Constructor<?> c = cl.getConstructor( Class.class, RunNotifier.class, String.class );
-        invocation = (Invoker.DirectInvocation) c.newInstance( testClass, fNotifier, testMethod );
+        Constructor<?> c = cl.getConstructor( Class.class, RunNotifier.class, String[].class );
+        invocation = (Invoker.DirectInvocation) c.newInstance( testClass, fNotifier, testMethods );
         return invocation;
     }
 

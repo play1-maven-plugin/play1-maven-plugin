@@ -23,7 +23,7 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 
 /**
- * Stop Play! Server. Base class for "stop" and "stop-server" mojos.
+ * Stop Play&#33; Server. Base class for "stop" and "stop-server" mojos.
  * 
  * @author <a href="mailto:gslowikowski@gmail.com">Grzegorz Slowikowski</a>
  */

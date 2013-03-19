@@ -28,7 +28,7 @@ import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.tools.ant.taskdefs.Java;
 
 /**
- * Start Play! Server ("play start" equivalent).
+ * Start Play&#33; server ("play start" equivalent).
  * 
  * @author <a href="mailto:gslowikowski@gmail.com">Grzegorz Slowikowski</a>
  * @since 1.0.0

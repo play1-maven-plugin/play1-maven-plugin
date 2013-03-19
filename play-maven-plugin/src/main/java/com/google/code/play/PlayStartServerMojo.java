@@ -28,7 +28,7 @@ import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.tools.ant.taskdefs.Java;
 
 /**
- * Start Play! server before integration testing.
+ * Start Play&#33; server before integration testing.
  * 
  * @author <a href="mailto:gslowikowski@gmail.com">Grzegorz Slowikowski</a>
  * @since 1.0.0

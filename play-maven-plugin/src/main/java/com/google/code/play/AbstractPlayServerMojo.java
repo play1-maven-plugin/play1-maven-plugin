@@ -35,7 +35,7 @@ import org.apache.tools.ant.taskdefs.Java;
 import org.apache.tools.ant.types.Path;
 
 /**
- * Base class for Play! Server starting mojos.
+ * Base class for Play&#33; Server starting mojos.
  */
 public abstract class AbstractPlayServerMojo
     extends AbstractAntJavaBasedPlayMojo

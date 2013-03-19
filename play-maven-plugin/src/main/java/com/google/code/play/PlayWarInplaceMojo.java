@@ -31,7 +31,7 @@ import org.codehaus.plexus.archiver.manager.NoSuchArchiverException;
 import org.codehaus.plexus.archiver.war.WarArchiver;
 
 /**
- * Create an exploded Play! application webapp in ${warWebappDirectory} directory.
+ * Create an exploded Play&#33; application webapp in ${warWebappDirectory} directory.
  * 
  * @author <a href="mailto:gslowikowski@gmail.com">Grzegorz Slowikowski</a>
  * @since 1.0.0

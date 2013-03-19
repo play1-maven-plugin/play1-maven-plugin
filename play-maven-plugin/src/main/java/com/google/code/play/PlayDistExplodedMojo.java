@@ -32,7 +32,7 @@ import org.codehaus.plexus.archiver.manager.NoSuchArchiverException;
 import org.codehaus.plexus.archiver.zip.ZipArchiver;
 
 /**
- * Create an exploded Play! framework and Play! application (standalone distribution).
+ * Create an exploded Play&#33; framework and Play&#33; application (standalone distribution).
  * 
  * @author <a href="mailto:gslowikowski@gmail.com">Grzegorz Slowikowski</a>
  * @since 1.0.0

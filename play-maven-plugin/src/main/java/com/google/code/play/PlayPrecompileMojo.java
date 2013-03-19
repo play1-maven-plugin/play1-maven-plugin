@@ -33,7 +33,7 @@ import org.apache.tools.ant.types.Path;
 import org.codehaus.plexus.util.FileUtils;
 
 /**
- * Invoke Play! precompilation.
+ * Invoke Play&#33; precompilation.
  * 
  * @author <a href="mailto:gslowikowski@gmail.com">Grzegorz Slowikowski</a>
  * @since 1.0.0

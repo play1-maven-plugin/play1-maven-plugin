@@ -26,7 +26,7 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.apache.tools.ant.taskdefs.Java;
 
 /**
- * Start Play! Server. Base class for "start" and "start-server" mojos.
+ * Start Play&#33; Server. Base class for "start" and "start-server" mojos.
  * 
  * @author <a href="mailto:gslowikowski@gmail.com">Grzegorz Slowikowski</a>
  */

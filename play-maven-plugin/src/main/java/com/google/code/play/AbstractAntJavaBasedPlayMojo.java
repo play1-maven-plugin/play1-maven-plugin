@@ -21,7 +21,7 @@ import java.util.List;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugins.annotations.Component;
+import org.apache.maven.plugins.annotations.Parameter;
 
 import org.apache.tools.ant.BuildLogger;
 import org.apache.tools.ant.NoBannerLogger;
@@ -38,10 +38,10 @@ public abstract class AbstractAntJavaBasedPlayMojo
 {
 
     /**
-     * List of artifacts this plugin depends on. Used for resolving the Findbugs coreplugin.
+     * List of artifacts this plugin depends on.
      * 
      */
-    @Component
+    @Parameter( property = "plugin.artifacts", required = true, readonly = true )
     private List<Artifact> pluginArtifacts;
 
     protected static class JavaRunnable

@@ -24,7 +24,7 @@ public class MultiLineHelper
     }
 
     /**
-     * Converts <br />
+     * Converts &lt;br /&gt;
      * tags to "\n" characters
      * 
      * @param parameter input text

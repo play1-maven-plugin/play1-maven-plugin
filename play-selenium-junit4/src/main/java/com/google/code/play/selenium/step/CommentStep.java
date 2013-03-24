@@ -36,7 +36,7 @@ public class CommentStep
 
     public long getExecutionTimeMillis()
     {
-        return 0L;
+        return -1L;
     }
 
     public String toString()

@@ -532,10 +532,6 @@ public abstract class PlaySeleniumTest
     {
         StringBuffer testTraceBuf = new StringBuffer();
         StringBuffer verificationFailuresBuf = new StringBuffer();
-        // dumpTest(steps);
-        // int stepsCnt = steps.size();
-        // int indent = String.valueOf(stepsCnt).length();
-        int indent = 4;
         int line = 0;
         for ( Step step : steps )
         {
@@ -543,7 +539,7 @@ public abstract class PlaySeleniumTest
             try
             {
                 step.execute();
-                String logLine = dumpTestStep( line, indent, step );
+                String logLine = dumpTestStep( line, step );
                 if ( traceTest )
                 {
                     System.out.println( logLine );
@@ -556,7 +552,7 @@ public abstract class PlaySeleniumTest
             catch ( VerificationError e )
             {
                 String msg = "verification failure: " + e.getMessage();
-                String logLine = dumpTestStep( line, indent, step, msg );
+                String logLine = dumpTestStepWhenError( line, step, msg );
                 if ( traceTest )
                 {
                     System.out.println( logLine );
@@ -570,7 +566,7 @@ public abstract class PlaySeleniumTest
             catch ( AssertionError e )
             {
                 String msg = "assertion failure: " + e.getMessage();
-                String logLine = dumpTestStep( line, indent, step, msg );
+                String logLine = dumpTestStepWhenError( line, step, msg );
                 if ( traceTest )
                 {
                     System.out.println( logLine );
@@ -586,7 +582,7 @@ public abstract class PlaySeleniumTest
             catch ( Error e )//TODO-should I handle errors?
             {
                 String msg = "error: " + e.getMessage();
-                String logLine = dumpTestStep( line, indent, step, msg );
+                String logLine = dumpTestStepWhenError( line, step, msg );
                 if ( traceTest )
                 {
                     System.out.println( logLine );
@@ -602,7 +598,7 @@ public abstract class PlaySeleniumTest
             catch ( RuntimeException e )
             {
                 String msg = "runtime exception: " + e.getMessage();
-                String logLine = dumpTestStep( line, indent, step, msg );
+                String logLine = dumpTestStepWhenError( line, step, msg );
                 if ( traceTest )
                 {
                     System.out.println( logLine );
@@ -627,41 +623,44 @@ public abstract class PlaySeleniumTest
         }
     }
 
-/*
-    private void dumpTest( List<Step> steps )
+    private String dumpTestStep( int line, Step step )
     {
-        int stepsCnt = steps.size();
-        int indent = String.valueOf( stepsCnt ).length();
-        System.out.println( "Test" );// TODO - where is test name?
-        int line = 1;
-        for ( Step step : steps )
-        {
-            dumpTestStep( line, indent, step );
-            line++;
-        }
-    }
-*/
+        long executionTimeMillis = step.getExecutionTimeMillis();
 
-    private String dumpTestStep( int line, int indent, Step step )
-    {
-        String strLine = String.valueOf( line );
-        while ( strLine.length() < indent )
+        StringBuilder sb = new StringBuilder();
+        sb.append( " " );
+        sb.append(String.format( "%4s", line ) );
+        sb.append( ": " );
+        sb.append( step.toString() );
+        if ( executionTimeMillis >= 0 )
         {
-            strLine = " " + strLine; // TODO improve
+            sb.append( " [" );
+            sb.append( executionTimeMillis );
+            sb.append( "ms]" );
         }
-        return " " + strLine + ": " + step.toString() + " [" + step.getExecutionTimeMillis() + "ms]";
-        // System.out.println( strLine + ": " + step.toString() );
+
+        return sb.toString();
     }
 
-    private String dumpTestStep( int line, int indent, Step step, String message )
+    private String dumpTestStepWhenError( int line, Step step, String errorMessage )
     {
-        String strLine = String.valueOf( line );
-        while ( strLine.length() < indent )
+        long executionTimeMillis = step.getExecutionTimeMillis();
+
+        StringBuilder sb = new StringBuilder();
+        sb.append( "*" );
+        sb.append(String.format( "%4s", line ) );
+        sb.append( ": " );
+        sb.append( step.toString() );
+        if ( executionTimeMillis >= 0 )
         {
-            strLine = " " + strLine; // TODO improve
+            sb.append( " [" );
+            sb.append( executionTimeMillis );
+            sb.append( "ms]" );
         }
-        return "*" + strLine + ": " + step.toString() + " [" + step.getExecutionTimeMillis() + "ms] " + message;
-        // System.out.println( strLine + ": " + step.toString() );
+        sb.append( " " );
+        sb.append( errorMessage );
+
+        return sb.toString();
     }
 
     private StringSeleniumCommand getInnerStringCommandByName( String innerCmd, StoredVars storedVars, String param1 )

@@ -67,6 +67,7 @@ limitations under the License.
                     <configuration>
                         <links>
                             <link>http://download.oracle.com/javase/5/docs/api/</link>
+                            <link>http://junit.sourceforge.net/javadoc_40/</link>
                             <link>http://www.playframework.com/documentation/api/${play.version}/</link>
                         </links>
                     </configuration>
@@ -87,6 +88,7 @@ limitations under the License.
                         <configuration>
                             <links>
                                 <link>http://download.oracle.com/javase/5/docs/api/</link>
+                                <link>http://junit.sourceforge.net/javadoc_40/</link>
                                 <link>http://www.playframework.com/documentation/api/${play.version}/</link>
                             </links>
                         </configuration>

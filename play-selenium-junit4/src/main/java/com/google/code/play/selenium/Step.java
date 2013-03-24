@@ -23,5 +23,4 @@ public interface Step
 
     long getExecutionTimeMillis();
 
-    // String toString();
 }

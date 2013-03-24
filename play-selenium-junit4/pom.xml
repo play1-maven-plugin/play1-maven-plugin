@@ -52,4 +52,44 @@ limitations under the License.
         </dependency>
     </dependencies>
 
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-javadoc-plugin</artifactId>
+                    <configuration>
+                        <links>
+                            <link>http://download.oracle.com/javase/5/docs/api/</link>
+                            <link>http://jsoup.org/apidocs/</link>
+                            <link>http://www.cloudtesting.com/selenium-docs/1.0.1/selenium-java-client-driver/</link>
+                        </links>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+
+    <profiles>
+        <profile>
+            <id>fullsite</id>
+
+            <reporting>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <configuration>
+                            <links>
+                                <link>http://download.oracle.com/javase/5/docs/api/</link>
+                                <link>http://jsoup.org/apidocs/</link>
+                            <link>http://www.cloudtesting.com/selenium-docs/1.0.1/selenium-java-client-driver/</link>
+                            </links>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </reporting>
+        </profile>
+    </profiles>
+
 </project>

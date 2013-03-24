@@ -101,7 +101,7 @@ public class PlayScanResult
             {
                 if ( testClass.getClassLoader() != testClassLoader )
                 {
-                    consoleLogger.info( String.format( "WARNING: Test class %s not loaded by Play.classloader. This may cause unexpected problems.\n",
+                    consoleLogger.info( String.format( "WARNING: Test class %s not loaded by Play.classloader. This may cause unexpected problems.%n",
                                                        testClass.getName() ) );
                 }
                 result.add( testClass );

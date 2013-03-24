@@ -1,8 +1,1 @@
-I. Implement commands:
-
-1. clearSession -  (check ebean-yabe project)
-
-2. assertEquals,assertNotEquals,... - two parameters, but no one is remote Selenium call
- for example comparing two variables (check ebean-zencontact project)
-
-II. Read Play! server's protocol and port from "application.conf" configuration file
+I. Read Play! server's protocol and port from "application.conf" configuration file

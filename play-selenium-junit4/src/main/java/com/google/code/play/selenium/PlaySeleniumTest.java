@@ -629,7 +629,7 @@ public abstract class PlaySeleniumTest
 
         StringBuilder sb = new StringBuilder();
         sb.append( " " );
-        sb.append(String.format( "%4s", line ) );
+        sb.append( String.format( "%4s", line ) );
         sb.append( ": " );
         sb.append( step.toString() );
         if ( executionTimeMillis >= 0 )
@@ -648,7 +648,7 @@ public abstract class PlaySeleniumTest
 
         StringBuilder sb = new StringBuilder();
         sb.append( "*" );
-        sb.append(String.format( "%4s", line ) );
+        sb.append( String.format( "%4s", line ) );
         sb.append( ": " );
         sb.append( step.toString() );
         if ( executionTimeMillis >= 0 )

@@ -36,7 +36,7 @@ import org.apache.maven.shared.dependency.tree.DependencyTreeBuilder;
 import org.apache.maven.shared.dependency.tree.DependencyTreeBuilderException;
 
 /**
- * Abstract base class for Play&#33; dependency processing mojos.
+ * Base class for Play&#33; dependency processing mojos.
  * 
  * @author <a href="mailto:gslowikowski@gmail.com">Grzegorz Slowikowski</a>
  */

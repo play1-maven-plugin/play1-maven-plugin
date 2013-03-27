@@ -30,9 +30,11 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 
 /**
- * Generates JUnit test wrapper sources for Selenium tests. Maven Surefire plugin operates on Java test classes (JUnit
- * or TestNG). Play! application Selenium tests are defined in "*.test.html" files so there is a need for a JUnit (or
- * TestNG) wrapper for every Selenium test.
+ * Generate JUnit test wrapper source files for Selenium tests.
+ * 
+ * Maven Surefire plugin operates on Java test classes (JUnit or TestNG).
+ * Play&#33; application Selenium tests are defined in "*.test.html" files
+ * so there is a need for a JUnit (or TestNG) wrapper for every Selenium test.
  * 
  * @author <a href="mailto:gslowikowski@gmail.com">Grzegorz Slowikowski</a>
  * @since 1.0.0

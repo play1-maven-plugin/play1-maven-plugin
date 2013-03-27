@@ -25,7 +25,7 @@ import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.tools.ant.taskdefs.Java;
 
 /**
- * Run Play&#33; Server synchronously. Base class for "run" and "test" mojos.
+ * Base class for Play&#33; server synchronously starting ("run" and "test") mojos.
  * 
  * @author <a href="mailto:gslowikowski@gmail.com">Grzegorz Slowikowski</a>
  */

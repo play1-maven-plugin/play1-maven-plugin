@@ -41,7 +41,7 @@ import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.util.FileUtils;
 
 /**
- * Abstract base class for Play&#33; mojos.
+ * Base class for all Play&#33; mojos.
  * 
  * @author <a href="mailto:gslowikowski@gmail.com">Grzegorz Slowikowski</a>
  */

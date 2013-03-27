@@ -25,6 +25,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
+/**
+ * Play&#33; configuration file ("conf/application.conf") reader.
+ * 
+ * @author <a href="mailto:gslowikowski@gmail.com">Grzegorz Slowikowski</a>
+ */
 public class ConfigurationParser
 {
 

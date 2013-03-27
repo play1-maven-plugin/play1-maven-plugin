@@ -27,7 +27,9 @@ import org.apache.maven.plugins.annotations.Parameter;
 import org.codehaus.plexus.util.FileUtils;
 
 /**
- * Clean Play&#33; temporary directories:
+ * Clean Play&#33; temporary directories.
+ *
+ * Directories being cleaned (fully configurable):
  *  - "db"
  *  - "lib" and "modules"
  *  - "logs"

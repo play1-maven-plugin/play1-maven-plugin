@@ -31,7 +31,9 @@ import org.apache.tools.ant.taskdefs.Java;
 import org.apache.tools.ant.types.Environment;
 
 /**
- * Base class for mojos using Ant Java task.
+ * Base class for Ant Java task using mojos.
+ *
+ * @author <a href="mailto:gslowikowski@gmail.com">Grzegorz Slowikowski</a>
  */
 public abstract class AbstractAntJavaBasedPlayMojo
     extends AbstractDependencyProcessingPlayMojo
@@ -44,6 +46,9 @@ public abstract class AbstractAntJavaBasedPlayMojo
     @Parameter( property = "plugin.artifacts", required = true, readonly = true )
     private List<Artifact> pluginArtifacts;
 
+    /**
+     * Internal runnable wrapper for Ant Java task.
+     */
     protected static class JavaRunnable
         implements Runnable
     {

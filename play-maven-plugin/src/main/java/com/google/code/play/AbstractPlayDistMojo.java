@@ -37,7 +37,7 @@ import org.codehaus.plexus.archiver.manager.NoSuchArchiverException;
 import org.codehaus.plexus.archiver.zip.ZipArchiver;
 
 /**
- * Base class for Play&#33; dist packaging mojos.
+ * Base class for Play&#33; distribution packaging mojos.
  * 
  * @author <a href="mailto:gslowikowski@gmail.com">Grzegorz Slowikowski</a>
  */

@@ -20,6 +20,15 @@ import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * Shutdown hook responsible for deleting "server.pid" file.
+ * 
+ * Responsible for deleting "server.pid" (or any other) file,
+ * if it should be deleted before Maven process ends,
+ * but for some reason it wasn't (play:stop-server was not executed for example). 
+ * 
+ * @author <a href="mailto:gslowikowski@gmail.com">Grzegorz Slowikowski</a>
+ */
 public class PidFileDeleter
     extends Thread
 {

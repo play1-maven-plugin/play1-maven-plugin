@@ -39,7 +39,8 @@ import org.codehaus.plexus.archiver.manager.NoSuchArchiverException;
 import org.codehaus.plexus.util.FileUtils;
 
 /**
- * Initializes Play&#33; Maven project:
+ * Initialize Play&#33; Maven project.
+ * 
  * - Checks Play! home directory and creates temporary Play! home in "target" directory
  * if no Play! home directory defined and there is Play! framework zip dependency
  * in the project.

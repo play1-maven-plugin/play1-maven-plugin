@@ -34,7 +34,7 @@ import org.codehaus.plexus.archiver.manager.NoSuchArchiverException;
 import org.codehaus.plexus.archiver.zip.ZipArchiver;
 
 /**
- * Packages Play&#33; framework and Play&#33; application as one ZIP achive (standalone distribution).
+ * Package Play&#33; framework and Play&#33; application as one zip achive (standalone distribution).
  * 
  * @author <a href="mailto:gslowikowski@gmail.com">Grzegorz Slowikowski</a>
  * @since 1.0.0

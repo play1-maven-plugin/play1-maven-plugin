@@ -40,7 +40,8 @@ import org.codehaus.plexus.archiver.manager.NoSuchArchiverException;
 import org.codehaus.plexus.util.FileUtils;
 
 /**
- * Extracts project dependencies to "lib" and "modules" directories.
+ * Extract project dependencies to "lib" and "modules" directories.
+ * 
  * It's like Play! framework's "dependencies" command, but uses Maven dependencies,
  * instead of "conf/dependencies.yml" file.
  * 

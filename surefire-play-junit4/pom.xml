@@ -93,6 +93,7 @@ limitations under the License.
                     <configuration>
                         <links>
                             <link>http://download.oracle.com/javase/5/docs/api/</link>
+                            <link>http://maven-play-plugin.googlecode.com/svn/apidocs/org/apache/maven/surefire/surefire-api/${surefire.version}/</link>
                             <link>http://junit.sourceforge.net/javadoc_40/</link>
                             <link>http://www.playframework.com/documentation/api/${play.version}/</link>
                         </links>
@@ -114,6 +115,7 @@ limitations under the License.
                         <configuration>
                             <links>
                                 <link>http://download.oracle.com/javase/5/docs/api/</link>
+                                <link>http://maven-play-plugin.googlecode.com/svn/apidocs/org/apache/maven/surefire/surefire-api/${surefire.version}/</link>
                                 <link>http://junit.sourceforge.net/javadoc_40/</link>
                                 <link>http://www.playframework.com/documentation/api/${play.version}/</link>
                             </links>

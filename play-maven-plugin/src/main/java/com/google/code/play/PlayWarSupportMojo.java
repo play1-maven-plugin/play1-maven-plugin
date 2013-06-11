@@ -24,6 +24,7 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
+import org.codehaus.plexus.util.FileUtils;
 
 /**
  * Prepare project for war packaging.
@@ -52,22 +53,39 @@ public class PlayWarSupportMojo
     @Parameter( property = "play.warWebappDirectory", defaultValue = "${basedir}/war", required = true )
     private File warWebappDirectory;
 
+    /**
+     * Replace %APPLICATION_NAME% and %PLAY_ID% in "WEB-INF/web.xml" file
+     * with application name ("application.name" property in "conf/application.conf" file)
+     * and Play! war profile name ("playWarId" plugin configuration property value).
+     * 
+     * @since 1.0.0
+     */
+    @Parameter( property = "play.warFilterWebXml", defaultValue = "true" )
+    private boolean warFilterWebXml;
+
     @Override
     protected void internalExecute()
         throws MojoExecutionException, MojoFailureException, IOException
     {
-        File playHome = getPlayHome();
+        ConfigurationParser configParser = getConfiguration( playWarId );
 
-        ConfigurationParser configParser =  getConfiguration( playWarId );
+        File buildDirectory = new File( project.getBuild().getDirectory() );
+        File tmpDirectory = new File( buildDirectory, "play/tmp" );
 
         File webXmlFile = new File( warWebappDirectory, "WEB-INF/web.xml" );
         if ( !webXmlFile.isFile() )
         {
-            File buildDirectory = new File( project.getBuild().getDirectory() );
-            File tmpDirectory = new File( buildDirectory, "play/tmp" );
-            filterWebXml( new File( playHome, "resources/war/web.xml" ), tmpDirectory,
-                          configParser.getApplicationName(), playWarId );
-//            webXmlFile = new File( tmpDirectory, "filtered-web.xml" );
+            File playHome = getPlayHome();
+            webXmlFile = new File( playHome, "resources/war/web.xml" );
+        }
+        if ( warFilterWebXml )
+        {
+            filterWebXml( webXmlFile, tmpDirectory, configParser.getApplicationName(), playWarId );
+        }
+        else
+        {
+            File filteredWebXmlFile = new File( tmpDirectory, "filtered-web.xml" );
+            FileUtils.copyFile( webXmlFile, filteredWebXmlFile );
         }
     }
 

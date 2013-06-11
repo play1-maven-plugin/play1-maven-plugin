@@ -111,6 +111,16 @@ public abstract class AbstractPlayWarMojo
     @Parameter( property = "play.warConfResourcesExcludes", defaultValue = "" )
     private String warConfResourcesExcludes;
 
+    /**
+     * Replace %APPLICATION_NAME% and %PLAY_ID% in "WEB-INF/web.xml" file
+     * with application name ("application.name" property in "conf/application.conf" file)
+     * and Play! war profile name ("playWarId" plugin configuration property value).
+     * 
+     * @since 1.0.0
+     */
+    @Parameter( property = "play.warFilterWebXml", defaultValue = "true" )
+    private boolean warFilterWebXml;
+
     protected void checkIfPrecompiled() throws IOException, MojoExecutionException
     {
         File baseDir = project.getBasedir();
@@ -174,10 +184,12 @@ public abstract class AbstractPlayWarMojo
         File webXmlFile = new File( warWebappDirectory, "WEB-INF/web.xml" );
         if ( !webXmlFile.isFile() )
         {
+            webXmlFile = new File( playHome, "resources/war/web.xml" );
+        }
+        if ( warFilterWebXml )
+        {
             File tmpDirectory = new File( buildDirectory, "play/tmp" );
-            filterWebXml( new File( playHome, "resources/war/web.xml" ), tmpDirectory,
-                          configParser.getApplicationName(), playWarId );
-            webXmlFile = new File( tmpDirectory, "filtered-web.xml" );
+            webXmlFile = filterWebXml( webXmlFile, tmpDirectory, configParser.getApplicationName(), playWarId );
         }
         warArchiver.setWebxml( webXmlFile );
 

@@ -3,4 +3,4 @@ call ..\set-play-home-%VERSION%.bat
 
 set MODULE_NAME=docviewer
 
-call install-play-module-without-jar.bat
+call install-play-module-with-jar.bat

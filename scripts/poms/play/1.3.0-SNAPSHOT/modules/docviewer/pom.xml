@@ -29,7 +29,7 @@ limitations under the License.
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.google.code.maven-play-plugin.org.playframework.modules.docviewer</groupId>
     <artifactId>play-docviewer</artifactId>
-    <packaging>pom</packaging>
+    <packaging>jar</packaging>
 
     <name>Play! DocViewer Module</name>
     <description>Play! DocViewer Module</description>
@@ -62,7 +62,42 @@ limitations under the License.
             <version>${project.version}</version>
             <scope>provided</scope>
         </dependency>
+
+        <dependency>
+            <groupId>org.apache.ant</groupId>
+            <artifactId>ant</artifactId>
+            <version>1.8.2</version>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>enforce-java6</id>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <configuration>
+                    <links>
+                        <link>http://download.oracle.com/javase/6/docs/api/</link>
+                        <link>http://www.playframework.org/documentation/api/${project.version}/</link>
+                    </links>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 
     <profiles>
         <profile>
@@ -85,16 +120,12 @@ limitations under the License.
 
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-compiler-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>compile-app</id>
-                                <phase>compile</phase>
-                                <goals>
-                                    <goal>compile</goal>
-                                </goals>
-                            </execution>
-                        </executions>
+                        <artifactId>maven-jar-plugin</artifactId>
+                        <configuration>
+                            <includes>
+                                <include>play/modules/docviewer/**</include>
+                            </includes>
+                        </configuration>
                     </plugin>
                 </plugins>
             </build>
@@ -115,6 +146,23 @@ limitations under the License.
                                 <goals>
                                     <goal>single</goal>
                                 </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>javadoc-for-assembly</id>
+                                <goals>
+                                    <goal>javadoc</goal>
+                                </goals>
+                                <phase>prepare-package</phase>
+                                <configuration>
+                                    <reportOutputDirectory>${project.build.directory}/apidocs</reportOutputDirectory>
+                                </configuration>
                             </execution>
                         </executions>
                     </plugin>

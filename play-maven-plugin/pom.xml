@@ -38,11 +38,11 @@ limitations under the License.
     </prerequisites>
 
     <properties>
-        <ant.version>1.9.0</ant.version>
+        <ant.version>1.9.1</ant.version>
         <maven.version>2.2.1</maven.version>
-        <maven-dependency-tree.version>1.2</maven-dependency-tree.version>
+        <maven-dependency-tree.version>2.1</maven-dependency-tree.version>
         <maven-plugin-plugin.version>3.2</maven-plugin-plugin.version>
-        <plexus-archiver.version>2.3</plexus-archiver.version>
+        <plexus-archiver.version>2.4.1</plexus-archiver.version>
     </properties>
 
     <dependencies>

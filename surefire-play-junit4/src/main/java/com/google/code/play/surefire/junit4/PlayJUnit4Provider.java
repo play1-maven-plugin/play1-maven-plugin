@@ -169,7 +169,7 @@ public class PlayJUnit4Provider
                 }
                 else if ( forkTestSet instanceof Class )
                 {
-                    testsToRun = TestsToRun.fromClass( (Class) forkTestSet );
+                    testsToRun = TestsToRun.fromClass( (Class<?>) forkTestSet );
                 }
                 else
                 {
@@ -192,14 +192,9 @@ public class PlayJUnit4Provider
 
             runNotifer.fireTestRunStarted( null );
 
-//            for ( Class<?> clazz : testsToRun.getLocatedClasses() )
-//            {
-//                executeTestSet( clazz, reporter, runNotifer );
-//            }
-            //for ( @SuppressWarnings( "unchecked" ) Iterator<Class<?>> iter = testsToRun.iterator(); iter.hasNext(); )
-            for ( Iterator<Class<?>> iter = testsToRun.iterator(); iter.hasNext(); )
+            for ( Class<?> aTestsToRun : testsToRun )
             {
-                executeTestSet( iter.next(), reporter, runNotifer );
+                executeTestSet( aTestsToRun, reporter, runNotifer );
             }
 
             runNotifer.fireTestRunFinished( result );
@@ -243,7 +238,6 @@ public class PlayJUnit4Provider
 
         try
         {
-//            execute( clazz, listeners, this.requestedTestMethod );
             if ( !StringUtils.isBlank( this.requestedTestMethod ) )
             {
                 String actualTestMethod = getMethod( clazz, this.requestedTestMethod ); //add by rainLee
@@ -261,9 +255,6 @@ public class PlayJUnit4Provider
         }
         catch ( Throwable e )
         {
-//            reporter.testError( new SimpleReportEntry( report.getSourceName(), report.getName(),
-//                                                       new PojoStackTraceWriter( report.getSourceName(),
-//                                                                                 report.getName(), e ) ) );
             reporter.testError( SimpleReportEntry.withException( report.getSourceName(), report.getName(),
                                                                  new PojoStackTraceWriter( report.getSourceName(),
                                                                                            report.getName(), e ) ) );
@@ -308,30 +299,13 @@ public class PlayJUnit4Provider
 
     private TestsToRun scanClassPath()
     {
-//        final TestsToRun scannedClasses = directoryScanner.locateTestClasses( Play.classloader, jUnit4TestChecker );
         final TestsToRun scannedClasses = scanResult.applyFilter( jUnit4TestChecker, Play.classloader/*testClassLoader*/ );
         return runOrderCalculator.orderTestClasses( scannedClasses );
     }
 
-    //GS?@SuppressWarnings("unchecked")
     private void upgradeCheck()
         throws TestSetFailedException
     {
-//        if ( isJunit4UpgradeCheck()
-//            && directoryScanner.getClassesSkippedByValidation().size() > 0 )
-//        {
-//            StringBuilder reason = new StringBuilder();
-//            reason.append( "Updated check failed\n" );
-//            reason.append( "There are tests that would be run with junit4 / surefire 2.6 but not with [2.7,):\n" );
-//            // noinspection unchecked
-//            for ( Class<?> testClass : (List<Class<?>>) directoryScanner.getClassesSkippedByValidation() )
-//            {
-//                reason.append( "   " );
-//                reason.append( testClass.getCanonicalName() );
-//                reason.append( "\n" );
-//            }
-//            throw new TestSetFailedException( reason.toString() );
-//        }
         if ( isJunit4UpgradeCheck() )
         {
             List<Class<?>> classesSkippedByValidation =
@@ -341,7 +315,7 @@ public class PlayJUnit4Provider
                 StringBuilder reason = new StringBuilder();
                 reason.append( "Updated check failed\n" );
                 reason.append( "There are tests that would be run with junit4 / surefire 2.6 but not with [2.7,):\n" );
-                for ( Class testClass : classesSkippedByValidation )
+                for ( Class<?> testClass : classesSkippedByValidation )
                 {
                     reason.append( "   " );
                     reason.append( testClass.getName() );
@@ -357,26 +331,6 @@ public class PlayJUnit4Provider
         final String property = System.getProperty( "surefire.junit4.upgradecheck" );
         return property != null;
     }
-
-//    public static void execute( Class<?> testClass, RunNotifier fNotifier, String testMethod )
-//        throws TestSetFailedException
-//    {
-//        try
-//        {
-//            String invocationClassName = "com.google.code.play.surefire.junit4.TestInvocation";
-//            if ( "1.2".compareTo( Play.version ) <= 0 )
-//            {
-//                invocationClassName = "com.google.code.play.surefire.junit4.Play12TestInvocation";
-//            }
-//            Invoker.DirectInvocation invocation = getInvocation( invocationClassName, testClass, fNotifier, testMethod );
-//            Invoker.invokeInThread( invocation );
-//        }
-//        catch ( Throwable e )
-//        {
-//            throw new TestSetFailedException( e );
-//            // ????? throw ExceptionUtils.getRootCause(e);
-//        }
-//    }
 
     public static void execute( Class<?> testClass, RunNotifier fNotifier, String[] testMethods )
         throws TestSetFailedException

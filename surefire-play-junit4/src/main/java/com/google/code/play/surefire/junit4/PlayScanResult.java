@@ -38,7 +38,7 @@ public class PlayScanResult
 
     public PlayScanResult( List<String> files, ConsoleLogger consoleLogger )
     {
-        this.files = files;
+        this.files = Collections.unmodifiableList( files );
         this.consoleLogger = consoleLogger;
     }
 
@@ -83,12 +83,12 @@ public class PlayScanResult
 
     public List<String> getFiles()
     {
-        return Collections.unmodifiableList( files );
+        return files;
     }
 
     public TestsToRun applyFilter( ScannerFilter scannerFilter, ClassLoader testClassLoader )
     {
-        List<Class<?>> result = new ArrayList<Class<?>>();
+        List<Class> result = new ArrayList<Class>();
 
         int size = size();
         for ( int i = 0; i < size; i++ )
@@ -143,6 +143,19 @@ public class PlayScanResult
             throw new NestedRuntimeException( "Unable to create test class '" + className + "'", e );
         }
         return testClass;
+    }
+
+    public PlayScanResult append(PlayScanResult other){
+        if ( other != null )
+        {
+            List<String> src = new ArrayList<String>( files );
+            src.addAll( other.files );
+            return new PlayScanResult( src, consoleLogger );
+        }
+        else
+        {
+            return this;
+        }
     }
 
 

@@ -33,7 +33,7 @@ limitations under the License.
 
     <properties>
         <play.version>1.1</play.version>
-        <surefire.version>2.14</surefire.version>
+        <surefire.version>2.15</surefire.version>
     </properties>
 
     <dependencies>

@@ -198,21 +198,24 @@ public abstract class AbstractDependencyProcessingPlayMojo
     private DependencyNode findArtifactNode( Artifact artifact, DependencyNode findRootNode )
     {
         DependencyNode result = null;
-        if ( findRootNode.getArtifact().equals( artifact ) )
+        if ( findRootNode.getState() == DependencyNode.INCLUDED )
         {
-            result = findRootNode;
-        }
-        else
-        {
-            List<?> childDependencyNodes = findRootNode.getChildren();
-            for ( Iterator<?> iter = childDependencyNodes.iterator(); iter.hasNext(); )
+            if ( findRootNode.getArtifact().equals( artifact ) )
             {
-                DependencyNode childNode = (DependencyNode) iter.next();
-                DependencyNode tmp = findArtifactNode( artifact, childNode );
-                if ( tmp != null )
+                result = findRootNode;
+            }
+            else
+            {
+                List<?> childDependencyNodes = findRootNode.getChildren();
+                for ( Iterator<?> iter = childDependencyNodes.iterator(); iter.hasNext(); )
                 {
-                    result = tmp;
-                    break;
+                    DependencyNode childNode = (DependencyNode) iter.next();
+                    DependencyNode tmp = findArtifactNode( artifact, childNode );
+                    if ( tmp != null )
+                    {
+                        result = tmp;
+                        break;
+                    }
                 }
             }
         }

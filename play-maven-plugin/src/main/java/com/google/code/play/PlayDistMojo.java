@@ -96,7 +96,7 @@ public class PlayDistMojo
     {
         if ( distSkip )
         {
-            getLog().info( "UberZip generation skipped" );
+            getLog().info( "Dist generation skipped" );
             return;
         }
 

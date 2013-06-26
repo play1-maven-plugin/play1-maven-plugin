@@ -95,8 +95,8 @@ public abstract class AbstractPlayDistMojo
         Set<String> providedModuleNames = getProvidedModuleNames( configParser, playId, false );
 
         // APPLICATION
-        getLog().debug( "UberZip includes: " + distApplicationIncludes );
-        getLog().debug( "UberZip excludes: " + distApplicationExcludes );
+        getLog().debug( "Dist includes: " + distApplicationIncludes );
+        getLog().debug( "Dist excludes: " + distApplicationExcludes );
         String[] applicationIncludes = null;
         if ( distApplicationIncludes != null )
         {

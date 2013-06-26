@@ -156,7 +156,7 @@ public abstract class AbstractPlayMojo
         }
     }
 
-    // used by "initialize", "uberzip" and "war" mojos
+    // used by "initialize", "dist" and "war" mojos
     protected Artifact findFrameworkArtifact( boolean minVersionWins )
     {
         Artifact result = null;

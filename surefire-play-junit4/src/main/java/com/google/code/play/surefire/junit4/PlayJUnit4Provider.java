@@ -61,12 +61,6 @@ public class PlayJUnit4Provider
 
     private TestsToRun testsToRun;
     
-    private final String playId;
-
-    private final File applicationPath;
-
-    private final File playHome;
-    
     private final ProviderParameters providerParameters;
 
     private final RunOrderCalculator runOrderCalculator;
@@ -78,13 +72,6 @@ public class PlayJUnit4Provider
     public PlayJUnit4Provider( ProviderParameters booterParameters )
     {
         this.providerParameters = booterParameters;
-
-        Properties providerProperties = providerParameters.getProviderProperties();
-        this.playId =
-            ( providerProperties.containsKey( "play.testId" ) ? providerProperties.getProperty( "play.testId" ) : "test" );
-        this.applicationPath = checkPath( System.getProperty( "user.dir" ) );
-        this.playHome = getPlayHome();
-
         this.testClassLoader = booterParameters.getTestClassLoader();
         this.consoleLogger = booterParameters.getConsoleLogger();
         this.scanResult = PlayScanResult.from( booterParameters.getProviderProperties(), consoleLogger );
@@ -95,24 +82,33 @@ public class PlayJUnit4Provider
         requestedTestMethod = booterParameters.getTestRequest().getRequestedTestMethod();
     }
 
-    // copy of AbstractPlayMojo.getPlayHome() method (with getCanonicalPath() changed to getAbsolutePath() )
-    // TODO-what exception classes should I throw?
-    // TODO - I would like to change getAbsolutePath() to getCanonicalPath(), but I cannot throw IOException here
-    private File getPlayHome()
+    private String getProviderProperty(String key, String defaultValue)
     {
-        File targetDir = new File( this.applicationPath, "target" );
+        Properties providerProperties = providerParameters.getProviderProperties();
+        return providerProperties.getProperty( key, defaultValue );
+    }
+
+    private File getApplicationPath()
+        throws TestSetFailedException
+    {
+        return checkPath( System.getProperty( "user.dir" ) );
+    }
+
+    // Copy of AbstractPlayMojo.getPlayHome() method (with getCanonicalPath() changed to getAbsolutePath() )
+    private File getPlayHome(File applicationPath)
+        throws TestSetFailedException
+    {
+        File targetDir = new File( applicationPath, "target" );
         File playTmpDir = new File( targetDir, "play" );
         File playTmpHomeDir = new File( playTmpDir, "home" );
         if ( !playTmpHomeDir.exists() )
         {
-            // what exception class should I throw?
-            throw new RuntimeException( String.format( "Play! home directory \"%s\" does not exist",
+            throw new TestSetFailedException( String.format( "Play! home directory \"%s\" does not exist",
                                                        playTmpHomeDir.getAbsolutePath() ) );
         }
         if ( !playTmpHomeDir.isDirectory() )
         {
-            // what exception class should I throw?
-            throw new RuntimeException( String.format( "Play! home directory \"%s\" is not a directory",
+            throw new TestSetFailedException( String.format( "Play! home directory \"%s\" is not a directory",
                                                        playTmpHomeDir.getAbsolutePath() ) );
         }
         // Additional check whether the temporary Play! home directory is created by this plugin
@@ -121,35 +117,32 @@ public class PlayJUnit4Provider
         {
             if ( !warningFile.isFile() )
             {
-                // what exception class should I throw?
-                throw new RuntimeException( String.format( "Play! home directory warning file \"%s\" is not a file",
+                throw new TestSetFailedException( String.format( "Play! home directory warning file \"%s\" is not a file",
                                                            warningFile.getAbsolutePath() ) );
             }
         }
         else
         {
-            // what exception class should I throw?
-            throw new RuntimeException( String.format( "Play! home directory warning file \"%s\" does not exist",
+            throw new TestSetFailedException( String.format( "Play! home directory warning file \"%s\" does not exist",
                                                        warningFile.getAbsolutePath() ) );
         }
         return playTmpHomeDir;
     }
 
-    // TODO-what exception classes should I throw?
-    private File checkPath( String path )
+    private File checkPath( String path ) throws TestSetFailedException
     {
         if ( path == null )
         {
-            throw new RuntimeException( "Path is null" );
+            throw new TestSetFailedException( "Path is null" );
         }
         File file = new File( path );
         if ( !file.exists() )
         {
-            throw new RuntimeException( "Path \"" + path + "\" does not exist" );
+            throw new TestSetFailedException( "Path \"" + path + "\" does not exist" );
         }
         if ( !file.isDirectory() )
         {
-            throw new RuntimeException( "Path \"" + path + "\" is not a directory" );
+            throw new TestSetFailedException( "Path \"" + path + "\" is not a directory" );
         }
         return file;
     }
@@ -158,6 +151,7 @@ public class PlayJUnit4Provider
         throws TestSetFailedException, ReporterException
     {
         consoleLogger.info( "Play! initialization\n" );
+
         initializePlayEngine();
         try
         {
@@ -213,7 +207,11 @@ public class PlayJUnit4Provider
     }
 
     private void initializePlayEngine()
+        throws TestSetFailedException
     {
+        File applicationPath = getApplicationPath();
+        File playHome = getPlayHome(applicationPath);
+        String playId = getProviderProperty( "play.testId", "test" );
         System.setProperty( "application.path", applicationPath.getAbsolutePath() );
         System.setProperty( "play.id", ( playId != null ? playId : "" ) );
         Play.frameworkPath = playHome;

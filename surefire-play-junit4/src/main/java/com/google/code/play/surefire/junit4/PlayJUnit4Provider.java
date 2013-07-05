@@ -210,21 +210,61 @@ public class PlayJUnit4Provider
         throws TestSetFailedException
     {
         File applicationPath = getApplicationPath();
-        File playHome = getPlayHome(applicationPath);
+        File playHome = getPlayHome( applicationPath );
         String playId = getProviderProperty( "play.testId", "test" );
-        System.setProperty( "application.path", applicationPath.getAbsolutePath() );
-        System.setProperty( "play.id", ( playId != null ? playId : "" ) );
-        Play.frameworkPath = playHome;
-        Play.init( applicationPath, playId );
-        if ( !Play.started ) // in PROD mode or ... Play! is started automatically
-        {
-            Play.start();
-        }
+        consoleLogger.info( "playId = '" + playId + "'" );
+        int playStartTimeout = Integer.parseInt( getProviderProperty( "play.startTimeout", "0" ) );
+        runRunnerable( new PlayStartRunnable( playHome, applicationPath, playId ), "Play! initialization",
+                       playStartTimeout );
     }
 
     private void finalizePlayEngine()
+        throws TestSetFailedException
     {
-        Play.stop();
+        int playStopTimeout = Integer.parseInt( getProviderProperty( "play.stopTimeout", "0" ) );
+        runRunnerable( new PlayStopRunnable(), "Play! finalization", playStopTimeout );
+    }
+
+    private void runRunnerable( AbstractRunnable runnable, String threadName, int timeout )
+        throws TestSetFailedException
+    {
+        if ( timeout <= 0 )
+        {
+            try
+            {
+                runnable.methodToRun();
+            }
+            catch ( Exception e )
+            {
+                throw new TestSetFailedException( threadName + " error", e );
+            }
+        }
+        else
+        {
+            Thread t = new Thread( runnable, threadName );
+            t.setDaemon( true );
+            t.start();
+            try
+            {
+                t.join( timeout );
+            }
+            catch ( InterruptedException e )
+            {
+                t.interrupt();
+                throw new TestSetFailedException( threadName + " interrupted", e );
+            }
+            Exception runnerException = runnable.getException();
+            if ( runnerException != null )
+            {
+                // If there is an exception, the thread is not alive anymore t.interrupt();
+                throw new TestSetFailedException( threadName + " error", runnerException );
+            }
+            if ( !runnable.isExecuted() ) // Thread still alive
+            {
+                t.interrupt();
+                throw new TestSetFailedException( threadName + " timed out" );
+            }
+        }
     }
 
     private void executeTestSet( Class<?> clazz, RunListener reporter, RunNotifier listeners )

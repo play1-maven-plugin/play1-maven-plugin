@@ -100,7 +100,7 @@ public abstract class AbstractPlayWarMojo
      * 
      * @since 1.0.0
      */
-    @Parameter( property = "play.warConfResourcesIncludes", defaultValue = "application.conf,messages,messages.*,routes" )
+    @Parameter( property = "play.warConfResourcesIncludes", defaultValue = "" )
     private String warConfResourcesIncludes;
 
     /**
@@ -170,12 +170,12 @@ public abstract class AbstractPlayWarMojo
         getLog().debug( "War conf classpath resources includes: " + warConfResourcesIncludes );
         getLog().debug( "War conf classpath resources excludes: " + warConfResourcesExcludes );
         String[] confResourcesIncludes = null;
-        if ( warConfResourcesIncludes != null )
+        if ( warConfResourcesIncludes != null && warConfResourcesIncludes.length() > 0 )
         {
             confResourcesIncludes = warConfResourcesIncludes.split( "," );
         }
         String[] confResourcesExcludes = null;
-        if ( warConfResourcesExcludes != null )
+        if ( warConfResourcesExcludes != null && warConfResourcesExcludes.length() > 0 )
         {
             confResourcesExcludes = warConfResourcesExcludes.split( "," );
         }

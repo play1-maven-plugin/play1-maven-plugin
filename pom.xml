@@ -34,14 +34,6 @@ limitations under the License.
     <description>Maven Plugin for Play! Framework Parent</description>
     <url>http://maven-play-plugin.googlecode.com/svn/mavensite/${project.version}</url>
 
-    <distributionManagement>
-        <site>
-            <id>com.google.code.maven-play-plugin-sites</id>
-            <name>Maven Play Plugin - sites</name>
-            <url>dav:https://maven-play-plugin.googlecode.com/svn/mavensite/${project.version}</url>
-        </site>
-    </distributionManagement>
-
     <scm>
         <connection>scm:svn:http://maven-play-plugin.googlecode.com/svn/trunk/plugin/</connection>
         <developerConnection>scm:svn:https://maven-play-plugin.googlecode.com/svn/trunk/plugin/</developerConnection>

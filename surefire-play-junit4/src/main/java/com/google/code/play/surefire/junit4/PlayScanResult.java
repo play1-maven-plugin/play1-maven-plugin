@@ -145,7 +145,8 @@ public class PlayScanResult
         return testClass;
     }
 
-    public PlayScanResult append(PlayScanResult other){
+    public PlayScanResult append( PlayScanResult other )
+    {
         if ( other != null )
         {
             List<String> src = new ArrayList<String>( files );

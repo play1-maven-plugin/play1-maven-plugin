@@ -82,7 +82,7 @@ public class PlayJUnit4Provider
         requestedTestMethod = booterParameters.getTestRequest().getRequestedTestMethod();
     }
 
-    private String getProviderProperty(String key, String defaultValue)
+    private String getProviderProperty( String key, String defaultValue )
     {
         Properties providerProperties = providerParameters.getProviderProperties();
         return providerProperties.getProperty( key, defaultValue );
@@ -95,7 +95,7 @@ public class PlayJUnit4Provider
     }
 
     // Copy of AbstractPlayMojo.getPlayHome() method (with getCanonicalPath() changed to getAbsolutePath() )
-    private File getPlayHome(File applicationPath)
+    private File getPlayHome( File applicationPath )
         throws TestSetFailedException
     {
         File targetDir = new File( applicationPath, "target" );

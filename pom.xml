@@ -27,7 +27,7 @@ limitations under the License.
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.google.code.maven-play-plugin</groupId>
     <artifactId>plugin</artifactId>
-    <version>1.0.0-beta6</version>
+    <version>1.0.0-beta7-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>Maven Plugin for Play! Framework Parent</name>
@@ -35,9 +35,9 @@ limitations under the License.
     <url>http://maven-play-plugin.googlecode.com/svn/mavensite/${project.version}</url>
 
     <scm>
-        <connection>scm:svn:http://maven-play-plugin.googlecode.com/svn/tags/plugin-1.0.0-beta6</connection>
-        <developerConnection>scm:svn:https://maven-play-plugin.googlecode.com/svn/tags/plugin-1.0.0-beta6</developerConnection>
-        <url>http://maven-play-plugin.googlecode.com/svn/tags/plugin-1.0.0-beta6</url>
+        <connection>scm:svn:http://maven-play-plugin.googlecode.com/svn/trunk/plugin/</connection>
+        <developerConnection>scm:svn:https://maven-play-plugin.googlecode.com/svn/trunk/plugin/</developerConnection>
+        <url>http://maven-play-plugin.googlecode.com/svn/trunk/plugin/</url>
     </scm>
 
     <modules>

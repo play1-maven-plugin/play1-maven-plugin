@@ -212,7 +212,6 @@ public class PlayJUnit4Provider
         File applicationPath = getApplicationPath();
         File playHome = getPlayHome( applicationPath );
         String playId = getProviderProperty( "play.testId", "test" );
-        consoleLogger.info( "playId = '" + playId + "'" );
         int playStartTimeout = Integer.parseInt( getProviderProperty( "play.startTimeout", "0" ) );
         runRunnerable( new PlayStartRunnable( playHome, applicationPath, playId ), "Play! initialization",
                        playStartTimeout );

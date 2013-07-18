@@ -269,7 +269,7 @@ public abstract class AbstractPlayServerMojo
         for ( Iterator<?> iter = classPathArtifacts.iterator(); iter.hasNext(); )
         {
             Artifact artifact = (Artifact) iter.next();
-            if ( !excludedArtifacts.contains( artifact ) )
+            if ( artifact.getArtifactHandler().isAddedToClasspath() && !excludedArtifacts.contains( artifact ) )
             {
                 getLog().debug( String.format( "CP: %s:%s:%s (%s)", artifact.getGroupId(),
                                                artifact.getArtifactId(), artifact.getType(), artifact.getScope() ) );

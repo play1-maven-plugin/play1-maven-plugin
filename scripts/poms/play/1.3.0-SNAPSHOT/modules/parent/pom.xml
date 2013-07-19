@@ -1,17 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!--
-Copyright 2010
-
-    Guillaume Bort (http://guillaume.bort.fr)
-    zenexity (http://www.zenexity.fr)
-    Play framework contributors (https://github.com/playframework/play/contributors)
+The contents of this file
+Copyright 2010-2013 Grzegorz Slowikowski
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
-    http://www.apache.org/licenses/LICENSE-2.0
+http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
@@ -37,6 +34,26 @@ limitations under the License.
     <name>Play! Modules Parent</name>
     <description>Play! Modules Parent</description>
     <url>http://www.playframework.org</url>
+
+    <developers>
+        <developer>
+            <id>guillaumebort</id>
+            <name>Guillaume Bort</name>
+        </developer>
+    </developers>
+
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <scm>
+        <connection>scm:git:git://github.com/playframework/play.git</connection>
+        <url>https://github.com/playframework/play</url>
+    </scm>
 
     <build>
         <pluginManagement>
@@ -71,7 +88,7 @@ limitations under the License.
                         <plugin>
                             <groupId>org.codehaus.mojo</groupId>
                             <artifactId>build-helper-maven-plugin</artifactId>
-                            <version>1.7</version>
+                            <version>1.8</version>
                             <configuration>
                                 <sources>
                                     <source>${basedir}/app</source>

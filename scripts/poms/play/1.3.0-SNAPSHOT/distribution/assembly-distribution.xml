@@ -50,6 +50,7 @@ limitations under the License.
             </includes>
             <excludes>
                 <exclude>com.google.code.maven-play-plugin.org.playframework:play:jar</exclude>
+                <exclude>com.google.code.maven-play-plugin.org.playframework.modules.docviewer:play-docviewer:jar</exclude>
                 <exclude>com.google.code.maven-play-plugin.org.playframework.modules.grizzly:play-grizzly:jar</exclude>
                 <exclude>com.google.code.maven-play-plugin.org.playframework.modules.testrunner:play-testrunner:jar</exclude>
             </excludes>
@@ -83,6 +84,15 @@ limitations under the License.
             </includes>
             <unpack>true</unpack>
             <useProjectArtifact>false</useProjectArtifact>
+        </dependencySet>
+
+        <dependencySet>
+            <outputDirectory>modules/docviewer/lib</outputDirectory>
+            <includes>
+                <include>com.google.code.maven-play-plugin.org.playframework.modules.docviewer:play-docviewer:jar</include>
+            </includes>
+            <useProjectArtifact>false</useProjectArtifact>
+            <useTransitiveFiltering>true</useTransitiveFiltering>
         </dependencySet>
 
         <dependencySet>

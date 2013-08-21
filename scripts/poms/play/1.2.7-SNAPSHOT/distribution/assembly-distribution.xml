@@ -62,6 +62,7 @@ limitations under the License.
             <includes>
                 <include>org.easytesting:fest-assert:jar</include>
                 <include>org.apache.ant:ant:jar</include>
+                <include>org.mockito:mockito-all:jar</include>
             </includes>
             <useProjectArtifact>false</useProjectArtifact>
             <useTransitiveFiltering>true</useTransitiveFiltering>

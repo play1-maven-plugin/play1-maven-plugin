@@ -42,7 +42,7 @@ limitations under the License.
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.google.code.maven-play-plugin.org.playframework.modules.secure</groupId>
     <artifactId>play-secure</artifactId>
-    <version>1.2.6-SNAPSHOT</version>
+    <version>1.2.7-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>Play! Secure Module</name>

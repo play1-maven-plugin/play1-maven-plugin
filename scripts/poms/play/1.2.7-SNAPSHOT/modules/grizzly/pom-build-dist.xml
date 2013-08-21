@@ -22,7 +22,7 @@ limitations under the License.
     <parent>
         <groupId>com.google.code.maven-play-plugin.org.playframework.modules</groupId>
         <artifactId>play-modules-parent</artifactId>
-        <version>1.2.6-SNAPSHOT</version>
+        <version>1.2.7-SNAPSHOT</version>
         <relativePath>../parent/pom.xml</relativePath>
     </parent>
 

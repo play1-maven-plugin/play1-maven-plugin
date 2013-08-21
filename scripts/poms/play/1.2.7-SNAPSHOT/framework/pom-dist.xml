@@ -42,7 +42,7 @@ limitations under the License.
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.google.code.maven-play-plugin.org.playframework</groupId>
     <artifactId>play</artifactId>
-    <version>1.2.6-SNAPSHOT</version>
+    <version>1.2.7-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>Play! Framework</name>
@@ -70,6 +70,12 @@ limitations under the License.
     </scm>
 
     <dependencies>
+        <dependency>
+            <groupId>antlr</groupId>
+            <artifactId>antlr</artifactId>
+            <version>2.7.7</version>
+        </dependency>
+
         <dependency>
             <groupId>asm</groupId>
             <artifactId>asm-all</artifactId>
@@ -473,6 +479,10 @@ limitations under the License.
             <artifactId>hibernate-core</artifactId>
             <version>3.6.10.Final-patched-play-1.2.5</version>
             <exclusions>
+                <exclusion>
+                    <groupId>antlr</groupId>
+                    <artifactId>antlr</artifactId>
+                </exclusion>
                 <exclusion>
                     <groupId>javax.transaction</groupId>
                     <artifactId>jta</artifactId>

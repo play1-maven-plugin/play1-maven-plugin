@@ -22,7 +22,7 @@ limitations under the License.
     <parent>
         <groupId>com.google.code.maven-play-plugin.org.playframework</groupId>
         <artifactId>play-parent</artifactId>
-        <version>1.2.6-SNAPSHOT</version>
+        <version>1.2.7-SNAPSHOT</version>
         <relativePath>../parent/pom.xml</relativePath>
     </parent>
 
@@ -67,6 +67,13 @@ limitations under the License.
                     <artifactId>ant-launcher</artifactId>
                 </exclusion>
             </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-all</artifactId>
+            <version>1.8.5</version>
+            <scope>test</scope>
         </dependency>
 
         <dependency>

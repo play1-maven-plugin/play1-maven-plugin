@@ -100,7 +100,6 @@ limitations under the License.
         <file>
             <source>${basedir}/../play</source>
             <fileMode>0777</fileMode>
-            <lineEnding>unix</lineEnding>
         </file>
     </files>
 </assembly>

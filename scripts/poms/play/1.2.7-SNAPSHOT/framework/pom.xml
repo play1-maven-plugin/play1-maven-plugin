@@ -22,7 +22,7 @@ limitations under the License.
     <parent>
         <groupId>com.google.code.maven-play-plugin.org.playframework</groupId>
         <artifactId>play-parent</artifactId>
-        <version>1.2.6-SNAPSHOT</version>
+        <version>1.2.7-SNAPSHOT</version>
         <relativePath>../parent/pom.xml</relativePath>
     </parent>
 
@@ -55,6 +55,12 @@ limitations under the License.
     </scm>
 
     <dependencies>
+        <dependency>
+            <groupId>antlr</groupId>
+            <artifactId>antlr</artifactId>
+            <version>2.7.7</version>
+        </dependency>
+
         <dependency>
             <groupId>asm</groupId>
             <artifactId>asm-all</artifactId>
@@ -459,6 +465,10 @@ limitations under the License.
             <version>3.6.10.Final-patched-play-1.2.5</version>
             <exclusions>
                 <exclusion>
+                    <groupId>antlr</groupId>
+                    <artifactId>antlr</artifactId>
+                </exclusion>
+                <exclusion>
                     <groupId>javax.transaction</groupId>
                     <artifactId>jta</artifactId>
                 </exclusion>
@@ -528,9 +538,6 @@ limitations under the License.
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
-                    <includes>
-                        <include>**/*Test.java</include>
-                    </includes>
                     <excludes> <!-- does not work for me -->
                         <exclude>play/LoggerTest.java</exclude>
                     </excludes>

@@ -3,7 +3,6 @@
 set VERSION=1.3.0-SNAPSHOT
 call ..\set-play-home-%VERSION%.bat
 
-call install-130snapshot-deps
 call install-130snapshot-play
 call install-130snapshot-play-crud
 call install-130snapshot-play-docviewer

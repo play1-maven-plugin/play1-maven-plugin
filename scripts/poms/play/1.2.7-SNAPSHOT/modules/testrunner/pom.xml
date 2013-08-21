@@ -76,13 +76,6 @@ limitations under the License.
         </dependency>
 
         <dependency>
-            <groupId>commons-collections</groupId>
-            <artifactId>commons-collections</artifactId>
-            <version>3.2.1</version>
-            <optional>true</optional>
-        </dependency>
-
-        <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
             <version>1.4</version>
@@ -187,6 +180,10 @@ limitations under the License.
                                 </goals>
                                 <phase>prepare-package</phase>
                                 <configuration>
+                                    <links>
+                                        <link>http://download.oracle.com/javase/6/docs/api/</link>
+                                        <link>http://www.playframework.org/documentation/api/1.1/</link>
+                                    </links>
                                     <reportOutputDirectory>${project.build.directory}/apidocs</reportOutputDirectory>
                                 </configuration>
                             </execution>

@@ -55,11 +55,6 @@ limitations under the License.
         <url>https://github.com/playframework/play</url>
     </scm>
 
-    <properties>
-        <maven.test.skip>true</maven.test.skip>
-        <manifest.specification.title>Test runner module</manifest.specification.title>
-    </properties>
-
     <dependencies>
         <dependency>
             <groupId>com.google.code.maven-play-plugin.org.playframework</groupId>
@@ -186,6 +181,10 @@ limitations under the License.
                                 </goals>
                                 <phase>prepare-package</phase>
                                 <configuration>
+                                    <links>
+                                        <link>http://download.oracle.com/javase/6/docs/api/</link>
+                                        <link>http://www.playframework.org/documentation/api/1.1/</link>
+                                    </links>
                                     <reportOutputDirectory>${project.build.directory}/apidocs</reportOutputDirectory>
                                 </configuration>
                             </execution>

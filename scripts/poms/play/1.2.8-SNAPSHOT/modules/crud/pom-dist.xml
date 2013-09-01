@@ -42,7 +42,7 @@ limitations under the License.
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.google.code.maven-play-plugin.org.playframework.modules.crud</groupId>
     <artifactId>play-crud</artifactId>
-    <version>1.2.7-SNAPSHOT</version>
+    <version>1.2.8-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>Play! CRUD Module</name>

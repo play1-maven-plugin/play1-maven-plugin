@@ -51,6 +51,7 @@ limitations under the License.
             <excludes>
                 <exclude>com.google.code.maven-play-plugin.org.playframework:play:jar</exclude>
                 <exclude>com.google.code.maven-play-plugin.org.playframework.modules.grizzly:play-grizzly:jar</exclude>
+                <exclude>com.sun.grizzly:grizzly-http-webserver:jar</exclude>
                 <exclude>com.google.code.maven-play-plugin.org.playframework.modules.testrunner:play-testrunner:jar</exclude>
             </excludes>
             <useProjectArtifact>false</useProjectArtifact>

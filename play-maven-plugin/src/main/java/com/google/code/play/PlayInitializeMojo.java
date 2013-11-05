@@ -115,7 +115,7 @@ public class PlayInitializeMojo
 
         File baseDir = project.getBasedir();
 
-        ConfigurationParser configParser =  getConfiguration( playId );
+        ConfigurationParser configParser = getConfiguration( playId );
         // Get modules
         Map<String, File> modules = new HashMap<String, File>();
 
@@ -152,6 +152,10 @@ public class PlayInitializeMojo
                             String realModulePath = readFileFirstLine( file );
                             // String realModulePath = play.libs.IO.readContentAsString( file );
                             file = new File( realModulePath );
+                            if ( !file.isAbsolute() )
+                            {
+                                file = new File( baseDir, realModulePath );
+                            }
                             getLog().debug( "Added module '" + moduleName + "': " + file.getAbsolutePath() );
                             modules.put( moduleName, file );
                         }

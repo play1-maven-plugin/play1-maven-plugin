@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -30,6 +31,7 @@ import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
+import org.apache.maven.project.MavenProject;
 import org.apache.maven.shared.dependency.tree.DependencyTreeBuilderException;
 
 import org.codehaus.plexus.archiver.ArchiverException;
@@ -38,6 +40,7 @@ import org.codehaus.plexus.archiver.manager.ArchiverManager;
 import org.codehaus.plexus.archiver.manager.NoSuchArchiverException;
 
 import org.codehaus.plexus.util.FileUtils;
+import org.codehaus.plexus.util.PathTool;
 
 /**
  * Extract project dependencies to "lib" and "modules" directories.
@@ -94,6 +97,12 @@ public class PlayDependenciesMojo
     @Component
     private ArchiverManager archiverManager;
 
+    /**
+     * All projects in the reactor.
+     */
+    @Parameter( defaultValue = "${reactorProjects}", required = true, readonly = true )
+    protected List<MavenProject> reactorProjects;
+
     protected void internalExecute()
         throws MojoExecutionException, MojoFailureException, IOException
     {
@@ -148,7 +157,54 @@ public class PlayDependenciesMojo
 
                 if ( !Artifact.SCOPE_PROVIDED.equals( moduleZipArtifact.getScope() ) )
                 {
-                    checkPotentialReactorProblem( moduleZipArtifact );
+                    boolean foundInReactor = false;
+                    if ( "play".equals( moduleZipArtifact.getType() ))
+                    {
+                        getLog().info( "play dependency found" );
+                    }
+                    for ( MavenProject reactorProject : reactorProjects )
+                    {
+                        if ( reactorProject != project )
+                        {
+                            Artifact reactorProjectArtifact = reactorProject.getArtifact();
+                            //File reactorProjectArtifactFile = reactorProject.getArtifact().getFile();
+                            if ( reactorProjectArtifact.equals( moduleZipArtifact ) )
+                            {
+                                File reactorProjectBasedir = reactorProject.getBasedir();
+                                String relativePath =
+                                    PathTool.getRelativeFilePath( baseDir.getAbsolutePath(),
+                                                                  reactorProjectBasedir.getAbsolutePath() );
+                                getLog().info( "relative path: '" + relativePath + "'" );
+                                File moduleLinkFile =
+                                    new File( baseDir, String.format( "modules/%s-%s",
+                                                                      reactorProject.getArtifact().getArtifactId(),
+                                                                      reactorProject.getArtifact().getVersion() ) );
+                                if ( moduleLinkFile.isDirectory() )
+                                {
+                                    getLog().info( String.format( "Deleting \"%s\" directory", moduleLinkFile ) ); // TODO-more descriptive message
+                                    FileUtils.deleteDirectory( moduleLinkFile );
+                                }
+                                else if ( !moduleLinkFile.exists() )
+                                {
+                                    if ( !moduleLinkFile.getParentFile().mkdirs() )
+                                    {
+                                        throw new IOException( String.format( "Cannot create \"%s\" directory",
+                                                                              moduleLinkFile.getParentFile().getCanonicalPath() ) );
+                                    }
+                                }
+
+                                writeToFile( moduleLinkFile, relativePath );
+                                foundInReactor = true;
+                                break;
+                            }
+                        }
+                    }
+                    
+                    if ( foundInReactor )
+                    {
+                        break;//TODO-change it
+                    }
+                    //already not needed checkPotentialReactorProblem( moduleZipArtifact );
 
                     File moduleZipFile = moduleZipArtifact.getFile();
                     String moduleSubDir =
@@ -268,7 +324,7 @@ public class PlayDependenciesMojo
         }
     }
 
-    private void checkPotentialReactorProblem( Artifact artifact )
+    /*private void checkPotentialReactorProblem( Artifact artifact )
     {
         File artifactFile = artifact.getFile();
         if ( artifactFile.isDirectory() )
@@ -278,7 +334,7 @@ public class PlayDependenciesMojo
                                                         artifact.getGroupId(), artifact.getArtifactId(),
                                                         artifact.getType(), artifact.getBaseVersion() ) );
         }
-    }
+    }*/
 
     private void scalaHack( File scalaModuleDirectory, Set<Artifact> filteredArtifacts ) throws IOException
     {

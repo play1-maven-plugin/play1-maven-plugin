@@ -42,7 +42,7 @@ limitations under the License.
         <maven.version>2.2.1</maven.version>
         <maven-dependency-tree.version>2.1</maven-dependency-tree.version>
         <maven-plugin-plugin.version>3.2</maven-plugin-plugin.version>
-        <plexus-archiver.version>2.4.1</plexus-archiver.version>
+        <plexus-archiver.version>2.4.4</plexus-archiver.version>
     </properties>
 
     <dependencies>
@@ -112,13 +112,13 @@ limitations under the License.
         <dependency>
             <groupId>org.codehaus.plexus</groupId>
             <artifactId>plexus-io</artifactId>
-            <version>2.0.6</version>
+            <version>2.0.10</version>
         </dependency>
 
         <dependency>
             <groupId>org.codehaus.plexus</groupId>
             <artifactId>plexus-utils</artifactId>
-            <version>3.0.10</version>
+            <version>3.0.15</version>
         </dependency>
     </dependencies>
 
@@ -209,7 +209,7 @@ limitations under the License.
                                 <link>http://maven.apache.org/ref/${maven.version}/maven-plugin-api/apidocs/</link>
                                 <link>http://maven.apache.org/ref/${maven.version}/maven-project/apidocs/</link>
                                 <link>http://maven-play-plugin.googlecode.com/svn/apidocs/org/apache/ant/ant/${ant.version}/</link>
-                                <link>http://maven-play-plugin.googlecode.com/svn/apidocs/org/apache/maven/shared/maven-dependency-tree/${maven-dependency-tree.version}/</link>
+                                <link>https://svn.apache.org/repos/infra/websites/production/maven/content/shared-archives/maven-dependency-tree-${maven-dependency-tree.version}/</link>
                                 <link>http://maven-play-plugin.googlecode.com/svn/apidocs/org/codehaus/plexus/plexus-archiver/${plexus-archiver.version}/</link>
                             </links>
                             <tagletArtifacts>

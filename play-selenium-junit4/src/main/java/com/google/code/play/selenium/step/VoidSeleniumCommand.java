@@ -61,7 +61,7 @@ public class VoidSeleniumCommand
         }
         else
         {
-            commandProcessor.doCommand( command, new String[] {} ); // czy ro moze sie zdarzyc?
+            commandProcessor.doCommand( command, new String[] {} ); // could it ever happen?
         }
     }
 

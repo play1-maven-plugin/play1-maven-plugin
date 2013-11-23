@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -45,9 +46,8 @@ import org.codehaus.plexus.util.FileUtils;
  * if no Play! home directory defined and there is Play! framework zip dependency
  * in the project.
  * - Adds application and dependent modules sources to Maven project as compile source roots.
- * - Adds application and dependent modules resources to Maven project as resources.
- * - Adds application and dependent modules test sources to Maven project as test compile source roots.
- * - Adds application and dependent modules test resources to Maven project as test resources.
+ * - Adds application resources to Maven project as resources.
+ * - Adds application test sources to Maven project as test compile source roots.
  * 
  * @author <a href="mailto:gslowikowski@gmail.com">Grzegorz Slowikowski</a>
  * @since 1.0.0
@@ -169,10 +169,22 @@ public class PlayInitializeMojo
         getLog().debug( "Added source directory: " + appPath.getAbsolutePath() );
 
         File confPath = new File( baseDir, "conf" );
-        Resource resource = new Resource();
-        resource.setDirectory( confPath.getAbsolutePath() );
-        project.addResource( resource );
-        getLog().debug( "Added resource: " + resource.getDirectory() );
+        boolean confResourceAlreadyAdded = false;
+        List<Resource> projectResources = project.getResources();
+        for ( Resource resource: projectResources )
+        {
+			if (resource.getDirectory().equals(confPath.getAbsolutePath())) {
+				confResourceAlreadyAdded = true;
+				break;
+			}
+        }
+        if ( !confResourceAlreadyAdded )
+        {
+            Resource resource = new Resource();
+            resource.setDirectory( confPath.getAbsolutePath() );
+            project.addResource( resource );
+            getLog().debug( "Added resource: " + resource.getDirectory() );
+        }
 
         for ( File modulePath : modules.values() )
         {

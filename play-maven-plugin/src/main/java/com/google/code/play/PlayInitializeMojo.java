@@ -165,18 +165,21 @@ public class PlayInitializeMojo
         }
 
         File appPath = new File( baseDir, "app" );
-        project.addCompileSourceRoot( appPath.getAbsolutePath() );
-        getLog().debug( "Added source directory: " + appPath.getAbsolutePath() );
+        if ( !project.getCompileSourceRoots().contains( appPath.getAbsolutePath() ) )
+        {
+            project.addCompileSourceRoot( appPath.getAbsolutePath() );
+            getLog().debug( "Added source directory: " + appPath.getAbsolutePath() );
+        }
 
         File confPath = new File( baseDir, "conf" );
         boolean confResourceAlreadyAdded = false;
         List<Resource> projectResources = project.getResources();
         for ( Resource resource: projectResources )
         {
-			if (resource.getDirectory().equals(confPath.getAbsolutePath())) {
-				confResourceAlreadyAdded = true;
-				break;
-			}
+            if (resource.getDirectory().equals(confPath.getAbsolutePath())) {
+                confResourceAlreadyAdded = true;
+                break;
+            }
         }
         if ( !confResourceAlreadyAdded )
         {
@@ -191,14 +194,20 @@ public class PlayInitializeMojo
             File moduleAppPath = new File( modulePath, "app" );
             if ( moduleAppPath.isDirectory() )
             {
-                project.addCompileSourceRoot( moduleAppPath.getAbsolutePath() );
-                getLog().debug( "Added source directory: " + moduleAppPath.getAbsolutePath() );
+                if ( !project.getCompileSourceRoots().contains( moduleAppPath.getAbsolutePath() ) )
+                {
+                    project.addCompileSourceRoot( moduleAppPath.getAbsolutePath() );
+                    getLog().debug( "Added source directory: " + moduleAppPath.getAbsolutePath() );
+                }
             }
         }
 
         File testPath = new File( baseDir, "test" );
-        project.addTestCompileSourceRoot( testPath.getAbsolutePath() );
-        getLog().debug( "Added test source directory: " + testPath.getAbsolutePath() );
+        if ( !project.getTestCompileSourceRoots().contains( testPath.getAbsolutePath() ) )
+        {
+            project.addTestCompileSourceRoot( testPath.getAbsolutePath() );
+            getLog().debug( "Added test source directory: " + testPath.getAbsolutePath() );
+        }
     }
 
     protected File prepareAndGetPlayHome( String playDependencyVersion )

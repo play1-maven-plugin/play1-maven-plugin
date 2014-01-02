@@ -51,8 +51,8 @@ limitations under the License.
     </licenses>
 
     <scm>
-        <connection>scm:git:git://github.com/playframework/play.git</connection>
-        <url>https://github.com/playframework/play</url>
+        <connection>scm:git:git://github.com/playframework/play1.git</connection>
+        <url>https://github.com/playframework/play1</url>
     </scm>
 
     <dependencies>

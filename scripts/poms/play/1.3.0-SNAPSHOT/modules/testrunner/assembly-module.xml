@@ -54,7 +54,6 @@ limitations under the License.
                 <include>net.sourceforge.htmlunit:htmlunit</include>
                 <include>commons-io:commons-io</include>
                 <include>org.apache.commons:commons-lang3</include>
-                <include>org.apache.james:apache-mime4j</include> <!-- not needed, should be removed -->
             </includes>
             <useTransitiveFiltering>true</useTransitiveFiltering>
         </dependencySet>

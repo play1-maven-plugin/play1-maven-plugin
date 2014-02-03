@@ -61,16 +61,37 @@ public abstract class AbstractPlayRunMojo
             return;
         }
         
-        String playId = getPlayId();
-        
         File baseDir = project.getBasedir();
 
+        File confDir = new File( baseDir, "conf" );
+
+        File applicationConfFile = new File( confDir, "application.conf" );
+        if ( applicationConfFile.length() == 0 )
+        {
+            getLog().info( "Empty \"conf/application.conf\" file, skipping execution" );
+            return;
+        }
+
+        File routesFile = new File( confDir, "routes" );
+        if ( !routesFile.isFile() )
+        {
+            getLog().info( "No \"conf/routes\" file, skipping execution" );
+            return;
+        }
+        else if ( routesFile.length() == 0 )
+        {
+            getLog().info( "Empty \"conf/routes\" file, skipping execution" );
+            return;
+        }
+        
         File pidFile = new File( baseDir, "server.pid" );
         if ( pidFile.exists() )
         {
             throw new MojoExecutionException( String.format( "Play! Server already started (\"%s\" file found)",
                                                              pidFile.getName() ) );
         }
+
+        String playId = getPlayId();
 
         ConfigurationParser configParser =  getConfiguration( playId );
 

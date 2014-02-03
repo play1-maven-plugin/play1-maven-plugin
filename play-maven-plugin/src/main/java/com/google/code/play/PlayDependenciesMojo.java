@@ -158,23 +158,18 @@ public class PlayDependenciesMojo
                 if ( !Artifact.SCOPE_PROVIDED.equals( moduleZipArtifact.getScope() ) )
                 {
                     boolean foundInReactor = false;
-                    if ( "play".equals( moduleZipArtifact.getType() ))
-                    {
-                        getLog().info( "play dependency found" );
-                    }
                     for ( MavenProject reactorProject : reactorProjects )
                     {
                         if ( reactorProject != project )
                         {
                             Artifact reactorProjectArtifact = reactorProject.getArtifact();
-                            //File reactorProjectArtifactFile = reactorProject.getArtifact().getFile();
+
                             if ( reactorProjectArtifact.equals( moduleZipArtifact ) )
                             {
                                 File reactorProjectBasedir = reactorProject.getBasedir();
                                 String relativePath =
                                     PathTool.getRelativeFilePath( baseDir.getAbsolutePath(),
                                                                   reactorProjectBasedir.getAbsolutePath() );
-                                getLog().info( "relative path: '" + relativePath + "'" );
                                 File moduleLinkFile =
                                     new File( baseDir, String.format( "modules/%s-%s",
                                                                       reactorProject.getArtifact().getArtifactId(),
@@ -195,6 +190,7 @@ public class PlayDependenciesMojo
 
                                 writeToFile( moduleLinkFile, relativePath );
                                 foundInReactor = true;
+                                getLog().info( String.format( "Play! module dependency found in reactor, relative path is \"%s\"", relativePath ) );
                                 break;
                             }
                         }

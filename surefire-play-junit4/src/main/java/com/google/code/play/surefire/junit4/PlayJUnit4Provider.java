@@ -213,7 +213,7 @@ public class PlayJUnit4Provider
         File playHome = getPlayHome( applicationPath );
         String playId = getProviderProperty( "play.testId", "test" );
         int playStartTimeout = Integer.parseInt( getProviderProperty( "play.startTimeout", "0" ) );
-        runRunnerable( new PlayStartRunnable( playHome, applicationPath, playId ), "Play! initialization",
+        runRunnable( new PlayStartRunnable( playHome, applicationPath, playId ), "Play! initialization",
                        playStartTimeout );
     }
 
@@ -221,10 +221,10 @@ public class PlayJUnit4Provider
         throws TestSetFailedException
     {
         int playStopTimeout = Integer.parseInt( getProviderProperty( "play.stopTimeout", "0" ) );
-        runRunnerable( new PlayStopRunnable(), "Play! finalization", playStopTimeout );
+        runRunnable( new PlayStopRunnable(), "Play! finalization", playStopTimeout );
     }
 
-    private void runRunnerable( AbstractRunnable runnable, String threadName, int timeout )
+    private void runRunnable( AbstractRunnable runnable, String threadName, int timeout )
         throws TestSetFailedException
     {
         if ( timeout <= 0 )

@@ -32,6 +32,8 @@ import org.apache.tools.ant.types.Path;
 
 import org.codehaus.plexus.util.FileUtils;
 
+import com.google.code.play.PlayServerBooter;
+
 /**
  * Invoke Play&#33; precompilation.
  * 
@@ -108,7 +110,7 @@ public class PlayPrecompileMojo
         Java javaTask = new Java();
         javaTask.setTaskName( "play" );
         javaTask.setProject( antProject );
-        javaTask.setClassname( "com.google.code.play.PlayServerBooter" );
+        javaTask.setClassname( PlayServerBooter.class.getName() );
         javaTask.setClasspath( classPath );
         javaTask.setFailonerror( true );
         javaTask.setFork( precompileFork );

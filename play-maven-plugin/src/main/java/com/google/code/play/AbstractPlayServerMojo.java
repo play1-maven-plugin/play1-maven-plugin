@@ -34,6 +34,8 @@ import org.apache.tools.ant.Project;
 import org.apache.tools.ant.taskdefs.Java;
 import org.apache.tools.ant.types.Path;
 
+import com.google.code.play.PlayServerBooter;
+
 /**
  * Base class for Play&#33; server mojos.
  */
@@ -84,7 +86,7 @@ public abstract class AbstractPlayServerMojo
         Java javaTask = new Java();
         javaTask.setTaskName( "play" );
         javaTask.setProject( antProject );
-        javaTask.setClassname( "com.google.code.play.PlayServerBooter" );
+        javaTask.setClassname( PlayServerBooter.class.getName() );
         javaTask.setClasspath( classPath );
         javaTask.setFork( fork );
         if ( fork )
@@ -279,7 +281,7 @@ public abstract class AbstractPlayServerMojo
         classPath.createPathElement().setLocation( getPluginArtifact( "com.google.code.maven-play-plugin",
                                                                       "play-server-booter", "jar" ).getFile() );
         return classPath;
-    }    
+    }
 
     protected Artifact getFrameworkJarArtifact()
     {

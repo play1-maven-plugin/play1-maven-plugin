@@ -24,6 +24,7 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
+
 import org.codehaus.plexus.util.FileUtils;
 
 /**
@@ -67,6 +68,13 @@ public class PlayWarSupportMojo
     protected void internalExecute()
         throws MojoExecutionException, MojoFailureException, IOException
     {
+        String checkMessage = playModuleNotApplicationCheck();
+        if ( checkMessage != null )
+        {
+            getLog().info( checkMessage );
+            return;
+        }
+
         ConfigurationParser configParser = getConfiguration( playWarId );
 
         File buildDirectory = new File( project.getBuild().getDirectory() );

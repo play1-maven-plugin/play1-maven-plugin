@@ -59,6 +59,13 @@ public class PlayDistExplodedMojo
             return;
         }
 
+        String checkMessage = playModuleNotApplicationCheck();
+        if ( checkMessage != null )
+        {
+            getLog().info( checkMessage );
+            return;
+        }
+
         try
         {
             ConfigurationParser configParser = getConfiguration();

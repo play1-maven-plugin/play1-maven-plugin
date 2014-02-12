@@ -78,6 +78,13 @@ public class PlayWarExplodedMojo
             return;
         }
 
+        String checkMessage = playModuleNotApplicationCheck();
+        if ( checkMessage != null )
+        {
+            getLog().info( checkMessage );
+            return;
+        }
+
         checkIfPrecompiled();
 
         try

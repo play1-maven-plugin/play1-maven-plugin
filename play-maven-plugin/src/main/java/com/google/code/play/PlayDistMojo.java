@@ -100,6 +100,13 @@ public class PlayDistMojo
             return;
         }
 
+        String checkMessage = playModuleNotApplicationCheck();
+        if ( checkMessage != null )
+        {
+            getLog().info( checkMessage );
+            return;
+        }
+
         try
         {
             File destFile = new File( distOutputDirectory, getDestinationFileName() );

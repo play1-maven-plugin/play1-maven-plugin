@@ -63,6 +63,13 @@ public class PlayStartServerMojo
             return;
         }
 
+        String checkMessage = playModuleNotApplicationCheck();
+        if ( checkMessage != null )
+        {
+            getLog().info( checkMessage );
+            return;
+        }
+        
         String startPlayId = playTestId;
 
         File buildDirectory = new File( project.getBuild().getDirectory() );

@@ -55,19 +55,31 @@ public class PlayGenerateSeleniumJunit4SourcesMojo
     protected void internalExecute()
         throws MojoExecutionException, MojoFailureException, IOException
     {
-        if ( !seleniumSkip )
+        if ( seleniumSkip )
         {
-            File baseDir = project.getBasedir();
-            File playTests = new File( baseDir, "test" );
-            File destDir = new File( project.getBuild().getDirectory(), "selenium/generated" ); // TODO - maybe parametrize
-
-            int classesGenerated = processTestsInDirectory( playTests, destDir, null );
-            if ( classesGenerated == 0 )
-            {
-                getLog().info( "Nothing to generate - all Selenium JUnit4 test sources are up to date" );
-            }
-            project.addTestCompileSourceRoot( destDir.getAbsolutePath() );
+            getLog().info( "Skipping execution" );
+            return;
         }
+
+        String checkMessage = playModuleNotApplicationCheck();
+        if ( checkMessage != null )
+        {
+            getLog().info( checkMessage );
+            return;
+        }
+
+        File baseDir = project.getBasedir();
+        
+        File playTests = new File( baseDir, "test" );
+
+        File destDir = new File( project.getBuild().getDirectory(), "selenium/generated" ); // TODO - maybe parametrize
+
+        int classesGenerated = processTestsInDirectory( playTests, destDir, null );
+        if ( classesGenerated == 0 )
+        {
+            getLog().info( "Nothing to generate - all Selenium JUnit4 test sources are up to date" );
+        }
+        project.addTestCompileSourceRoot( destDir.getAbsolutePath() );
     }
 
     protected int processTestsInDirectory( File srcDir, File destDir, String javaPackageName )

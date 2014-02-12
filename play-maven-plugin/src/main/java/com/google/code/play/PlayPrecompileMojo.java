@@ -94,8 +94,15 @@ public class PlayPrecompileMojo
             return;
         }
 
+        String checkMessage = playModuleNotApplicationCheck();
+        if ( checkMessage != null )
+        {
+            getLog().info( checkMessage );
+            return;
+        }
+
         String precompilePlayId = ( precompileTests ? playTestId : playId );
-        
+
         File playHome = getPlayHome();
         File baseDir = project.getBasedir();
 

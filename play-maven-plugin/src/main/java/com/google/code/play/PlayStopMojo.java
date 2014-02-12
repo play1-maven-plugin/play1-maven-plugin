@@ -52,6 +52,13 @@ public class PlayStopMojo
             return;
         }
         
+        String checkMessage = playModuleNotApplicationCheck();
+        if ( checkMessage != null )
+        {
+            getLog().info( checkMessage );
+            return;
+        }
+        
         getLog().info( "Stopping Play! Server" );
 
         stopServer();

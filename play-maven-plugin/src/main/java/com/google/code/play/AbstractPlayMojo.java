@@ -363,5 +363,41 @@ public abstract class AbstractPlayMojo
                 || "secure".equals( moduleName ) || "testrunner".equals( moduleName );
         return result;
     }
+
+    // Temporary solution to distinguish real Play! application
+    // from Play! modules used by application inside a reactor
+    // (multi-module) build.
+    // If there is one (ONLY ONE allowed for now) real Play! application
+    // and some Play! modules (having "play" packaging as well) inside a reactor,
+    // only for this one application mojos: play:generate-selenium-junit4-sources,
+    // play:precompile, play:start, play:start-server, play:stop, play:run
+    // and play:test will be executed.
+    protected String playModuleNotApplicationCheck()
+    {
+        String resultMessage = null;
+
+        File baseDir = project.getBasedir();
+        File confDir = new File( baseDir, "conf" );
+
+        File applicationConfFile = new File( confDir, "application.conf" );
+        if ( applicationConfFile.length() == 0 )
+        {
+            resultMessage = "Empty \"conf/application.conf\" file, skipping execution";
+        }
+        else
+        {
+            File routesFile = new File( confDir, "routes" );
+            if ( !routesFile.isFile() )
+            {
+                resultMessage = "No \"conf/routes\" file, skipping execution";
+            }
+            else if ( routesFile.length() == 0 )
+            {
+                resultMessage = "Empty \"conf/routes\" file, skipping execution";
+            }
+        }
+
+        return resultMessage;
+    }
     
 }

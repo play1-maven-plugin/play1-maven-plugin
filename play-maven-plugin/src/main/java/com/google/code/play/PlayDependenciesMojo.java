@@ -275,6 +275,16 @@ public class PlayDependenciesMojo
                 {
                     Artifact classPathArtifact = (Artifact) iter.next();
                     File jarFile = classPathArtifact.getFile();
+                    // In a reactor (multi-module) build if "play" module depends on "jar" module,
+                    // "jar" module artifact's file can be a directory instead of a file.
+                    // This happens when "compile" lifecycle phase or any phase between "compile"
+                    // and "package" has ben executed before "play:dependencies" mojo
+                    // (for example "mvn compile play:dependencies").
+                    // How to solve this problem?
+                    // Dependency "jar" artifact has to be installed first ("mvn install" for "jar"
+                    // module only) or at least "package" phase has to be executed for the whole reactor
+                    // before "play:dependencies" ("mvn package play:dependencies").
+                    checkPotentialReactorProblem( classPathArtifact );
                     if ( dependenciesOverwrite )
                     {
                         FileUtils.copyFileToDirectory( jarFile, libDir );
@@ -322,7 +332,7 @@ public class PlayDependenciesMojo
         }
     }
 
-    /*private void checkPotentialReactorProblem( Artifact artifact )
+    private void checkPotentialReactorProblem( Artifact artifact )
     {
         File artifactFile = artifact.getFile();
         if ( artifactFile.isDirectory() )
@@ -332,7 +342,7 @@ public class PlayDependenciesMojo
                                                         artifact.getGroupId(), artifact.getArtifactId(),
                                                         artifact.getType(), artifact.getBaseVersion() ) );
         }
-    }*/
+    }
 
     private void scalaHack( File scalaModuleDirectory, Set<Artifact> filteredArtifacts ) throws IOException
     {

@@ -34,8 +34,6 @@ import org.apache.tools.ant.Project;
 import org.apache.tools.ant.taskdefs.Java;
 import org.apache.tools.ant.types.Path;
 
-import com.google.code.play.PlayServerBooter;
-
 /**
  * Base class for Play&#33; server mojos.
  */

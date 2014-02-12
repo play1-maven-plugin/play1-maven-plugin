@@ -32,8 +32,6 @@ import org.apache.tools.ant.types.Path;
 
 import org.codehaus.plexus.util.FileUtils;
 
-import com.google.code.play.PlayServerBooter;
-
 /**
  * Invoke Play&#33; precompilation.
  * 

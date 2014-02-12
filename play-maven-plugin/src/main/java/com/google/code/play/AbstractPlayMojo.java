@@ -70,11 +70,31 @@ public abstract class AbstractPlayMojo
         try
         {
             internalExecute();
+
+            if ( project.getArtifact().getFile() == null )
+            {
+                setBasedirAsArtifactFile();
+            }
         }
         catch ( IOException e )
         {
             throw new MojoExecutionException( "?", e );
         }
+    }
+
+    // Trick.
+    // Any lifecycle phase or any play:xxx mojo requiring dependency resolution
+    // (for example: "play:dependencies" or "play:run") can be executed for Maven reactor
+    // (multi-module build) with at least two "play" modules, where one "play" module
+    // depends on another, without the need to execute "compiler:compile" (or "compile" phase)
+    // before it.
+    // Setting project artifact's file to project's base directoy should have no side effects
+    // because "play" packaging module artifact's file is not being added to classpaths
+    // of other reactor modules depending on it (see "<addedToClasspath>false</addedToClasspath>"
+    // in "src/main/resources/META-INF/plexus/components.xml" file).
+    protected void setBasedirAsArtifactFile()
+    {
+        project.getArtifact().setFile( project.getBasedir() );
     }
 
     protected File getPlayHome()

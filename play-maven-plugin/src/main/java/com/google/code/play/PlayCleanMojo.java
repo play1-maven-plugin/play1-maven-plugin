@@ -191,6 +191,11 @@ public class PlayCleanMojo
         }
     }
 
+    protected void setBasedirAsArtifactFile()
+    {
+        // Do nothing, this mojo is an exception.
+    }
+
     private void deleteDirectory( File directory )
         throws IOException
     {

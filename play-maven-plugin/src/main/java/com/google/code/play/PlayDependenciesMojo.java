@@ -164,7 +164,9 @@ public class PlayDependenciesMojo
                         {
                             Artifact reactorProjectArtifact = reactorProject.getArtifact();
 
-                            if ( reactorProjectArtifact.equals( moduleZipArtifact ) )
+                            if ( reactorProjectArtifact.getGroupId().equals( moduleZipArtifact.getGroupId() )
+                                && reactorProjectArtifact.getArtifactId().equals( moduleZipArtifact.getArtifactId() )
+                                && reactorProjectArtifact.getVersion().equals( moduleZipArtifact.getVersion() ) )
                             {
                                 File reactorProjectBasedir = reactorProject.getBasedir();
                                 String relativePath =

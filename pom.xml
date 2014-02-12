@@ -22,6 +22,7 @@ limitations under the License.
         <groupId>com.google.code.maven-play-plugin</groupId>
         <artifactId>maven-parent</artifactId>
         <version>1.0.0-beta7-SNAPSHOT</version>
+        <relativePath>../maven-parent</relativePath>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>

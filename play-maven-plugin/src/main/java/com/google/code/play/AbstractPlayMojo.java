@@ -369,9 +369,10 @@ public abstract class AbstractPlayMojo
     // (multi-module) build.
     // If there is one (ONLY ONE allowed for now) real Play! application
     // and some Play! modules (having "play" packaging as well) inside a reactor,
-    // only for this one application mojos: play:generate-selenium-junit4-sources,
-    // play:precompile, play:start, play:start-server, play:stop, play:run
-    // and play:test will be executed.
+    // only for this one application following mojos:
+    // "play:generate-selenium-junit4-sources", "play:precompile", 
+    // "play:start", "play:stop", "play:run", "play:test",
+    // "play:start-server" and "play:stop-server" will be executed.
     protected String playModuleNotApplicationCheck()
     {
         String resultMessage = null;

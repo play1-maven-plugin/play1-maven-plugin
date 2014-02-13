@@ -176,7 +176,8 @@ public class PlayInitializeMojo
         List<Resource> projectResources = project.getResources();
         for ( Resource resource: projectResources )
         {
-            if (resource.getDirectory().equals(confPath.getAbsolutePath())) {
+            if ( resource.getDirectory().equals( confPath.getAbsolutePath() ) )
+            {
                 confResourceAlreadyAdded = true;
                 break;
             }

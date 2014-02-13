@@ -91,11 +91,11 @@ public class ConfigurationParser
         this.properties = readOneConfigurationFile( configurationFileName, confs );
     }
 
-    private Properties readOneConfigurationFile( String configurationFileName, Set<File> confs )
+    private Properties readOneConfigurationFile( String fileName, Set<File> confs )
         throws IOException
     {
         File confDir = new File( applicationDirectory, "conf" );
-        File configurationFile = new File( confDir, configurationFileName );
+        File configurationFile = new File( confDir, fileName );
         if ( !configurationFile.exists() )
         {
             throw new IOException( String.format( "Configuration reader - \"%s\" file does not exist.",

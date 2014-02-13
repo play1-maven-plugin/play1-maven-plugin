@@ -17,8 +17,8 @@
 package com.google.code.play;
 
 import java.io.File;
-import java.io.FileWriter;
 import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.lang.management.ManagementFactory;
 
 import play.Play;
@@ -51,7 +51,7 @@ public class PlayServerBooter
                 pidStr = name.substring( 0, p );
             }
             File pidFile = new File( pidFileName );
-            FileWriter fw = new FileWriter( pidFile );
+            PrintWriter fw = new PrintWriter( pidFile, "UTF-8" );
             try
             {
                 fw.write( pidStr );

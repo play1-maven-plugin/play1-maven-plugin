@@ -181,7 +181,7 @@ public class PlayDependenciesMojo
                                     getLog().info( String.format( "Deleting \"%s\" directory", moduleLinkFile ) ); // TODO-more descriptive message
                                     FileUtils.deleteDirectory( moduleLinkFile );
                                 }
-                                else if ( !moduleLinkFile.exists() )
+                                else if ( !moduleLinkFile.getParentFile().exists() )
                                 {
                                     if ( !moduleLinkFile.getParentFile().mkdirs() )
                                     {

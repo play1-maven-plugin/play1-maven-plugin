@@ -42,6 +42,8 @@ import org.codehaus.plexus.archiver.manager.NoSuchArchiverException;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.PathTool;
 
+import org.sonatype.plexus.build.incremental.BuildContext;
+
 /**
  * Extract project dependencies to "lib" and "modules" directories.
  * 
@@ -103,6 +105,12 @@ public class PlayDependenciesMojo
     @Parameter( defaultValue = "${reactorProjects}", required = true, readonly = true )
     protected List<MavenProject> reactorProjects;
 
+    /**
+     * For M2E integration.
+     */
+    @Component
+    private BuildContext buildContext;
+
     protected void internalExecute()
         throws MojoExecutionException, MojoFailureException, IOException
     {
@@ -149,6 +157,8 @@ public class PlayDependenciesMojo
             }
 
             // modules/*/lib
+            File modulesDir = new File( baseDir, "modules" );
+
             Map<String, Artifact> moduleArtifacts = findAllModuleArtifacts( true );
             for ( Map.Entry<String, Artifact> moduleArtifactEntry : moduleArtifacts.entrySet() )
             {
@@ -173,7 +183,7 @@ public class PlayDependenciesMojo
                                     PathTool.getRelativeFilePath( baseDir.getAbsolutePath(),
                                                                   reactorProjectBasedir.getAbsolutePath() );
                                 File moduleLinkFile =
-                                    new File( baseDir, String.format( "modules/%s-%s",
+                                    new File( modulesDir, String.format( "%s-%s",
                                                                       reactorProject.getArtifact().getArtifactId(),
                                                                       reactorProject.getArtifact().getVersion() ) );
                                 if ( moduleLinkFile.isDirectory() )
@@ -191,6 +201,7 @@ public class PlayDependenciesMojo
                                 }
 
                                 writeToFile( moduleLinkFile, relativePath );
+                                buildContext.refresh( moduleLinkFile );
                                 foundInReactor = true;
                                 getLog().info( String.format( "Play! module dependency found in reactor, relative path is \"%s\"", relativePath ) );
                                 break;
@@ -206,8 +217,8 @@ public class PlayDependenciesMojo
 
                     File moduleZipFile = moduleZipArtifact.getFile();
                     String moduleSubDir =
-                                    String.format( "modules/%s-%s/", moduleName, moduleZipArtifact.getBaseVersion() );
-                    File moduleDirectory = new File( baseDir, moduleSubDir );
+                                    String.format( "%s-%s", moduleName, moduleZipArtifact.getBaseVersion() );
+                    File moduleDirectory = new File( modulesDir, moduleSubDir );
                     createModuleDirectory( moduleDirectory, dependenciesOverwrite
                                            || moduleDirectory.lastModified() < moduleZipFile.lastModified() );
                     if ( moduleDirectory.list().length == 0 )
@@ -218,6 +229,7 @@ public class PlayDependenciesMojo
                         zipUnArchiver.setOverwrite( false/* ??true */ );
                         zipUnArchiver.extract();
                         moduleDirectory.setLastModified( System.currentTimeMillis() );
+                        buildContext.refresh( moduleDirectory );
                         // Scala module hack
                         if ( "scala".equals( moduleName ) )
                         {
@@ -288,10 +300,14 @@ public class PlayDependenciesMojo
                     if ( dependenciesOverwrite )
                     {
                         FileUtils.copyFileToDirectory( jarFile, libDir );
+                        buildContext.refresh( new File(libDir, jarFile.getName()) );
                     }
                     else
                     {
-                        FileUtils.copyFileToDirectoryIfModified( jarFile, libDir );
+                        if ( FileUtils.copyFileIfModified( jarFile, new File( libDir, jarFile.getName() ) ) )
+                        {
+                            buildContext.refresh( new File(libDir, jarFile.getName()) );
+                        }
                     }
                 }
             }

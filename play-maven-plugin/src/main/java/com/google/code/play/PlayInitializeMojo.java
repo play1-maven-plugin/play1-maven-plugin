@@ -33,11 +33,15 @@ import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
+
 import org.codehaus.plexus.archiver.ArchiverException;
 import org.codehaus.plexus.archiver.UnArchiver;
 import org.codehaus.plexus.archiver.manager.ArchiverManager;
 import org.codehaus.plexus.archiver.manager.NoSuchArchiverException;
+
 import org.codehaus.plexus.util.FileUtils;
+
+import org.sonatype.plexus.build.incremental.BuildContext;
 
 /**
  * Initialize Play&#33; Maven project.
@@ -90,6 +94,12 @@ public class PlayInitializeMojo
      */
     @Component
     private ArchiverManager archiverManager;
+
+    /**
+     * For M2E integration.
+     */
+    @Component
+    private BuildContext buildContext;
 
     protected void internalExecute()
         throws MojoExecutionException, MojoFailureException, IOException
@@ -301,6 +311,7 @@ public class PlayInitializeMojo
             createDir( playFrameworkVersionFile.getParentFile() );
             writeToFile( playFrameworkVersionFile, playDependencyVersion );
             frameworkDir.setLastModified( System.currentTimeMillis() );
+            buildContext.refresh( frameworkDir );
         }
 
         // decompress provided-scoped modules
@@ -330,6 +341,7 @@ public class PlayInitializeMojo
                     zipUnArchiver.setOverwrite( false/* ??true */ );
                     zipUnArchiver.extract();
                     moduleDirectory.setLastModified( System.currentTimeMillis() );
+                    buildContext.refresh( moduleDirectory );
                     // Scala module hack
                     if ( "scala".equals( moduleName ) )
                     {

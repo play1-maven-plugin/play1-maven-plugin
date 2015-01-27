@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+Based on http://repo1.maven.org/maven2/com/mchange/c3p0/0.9.5/c3p0-0.9.5.pom
+-->
+
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                             http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+ <modelVersion>4.0.0</modelVersion>
+
+ <groupId>com.google.code.maven-play-plugin.com.mchange</groupId>
+ <artifactId>c3p0-oracle-thin-extras</artifactId> 
+ <packaging>jar</packaging> 
+ <version>0.9.5</version>
+
+ <name>c3p0-oracle-thin-extras</name>
+ <description>a JDBC Connection pooling / Statement caching library</description>
+ <url>https://github.com/swaldman/c3p0</url>
+ <licenses>
+   <license>
+     <name>GNU Lesser General Public License, Version 2.1</name>
+     <url>http://www.gnu.org/licenses/lgpl-2.1.html</url>
+     <distribution>repo</distribution>
+   </license>
+   <license>                                      
+     <name>Eclipse Public License, Version 1.0</name>
+     <url>http://www.eclipse.org/org/documents/epl-v10.php</url> 
+     <distribution>repo</distribution>
+   </license>
+ </licenses>
+ <scm>
+   <url>scm:git:git@github.com:swaldman/c3p0.git</url>              
+   <connection>scm:git:git@github.com:swaldman/c3p0.git</connection>
+ </scm>
+ <developers>
+   <developer>
+     <id>swaldman</id>                  
+     <name>Steve Waldman</name>         
+     <email>swaldman@mchange.com</email>
+   </developer>
+ </developers>
+ <dependencies>
+   <dependency>
+     <groupId>com.mchange</groupId>
+     <artifactId>c3p0</artifactId> 
+     <version>0.9.5</version>
+   </dependency>
+<!--
+   Oracle JDBC driver dependency required (containing classes: oracle.sql.BLOB, oracle.sql.CLOB and oracle.jdbc.driver.OracleConnection).
+   Not present here because Oracle licensing policy does not allow publishing their artifacts in central Maven repository
+-->
+ </dependencies>
+</project>
+

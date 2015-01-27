@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  Copyright (c) 2012, 2014 Eclipse Foundation and others.
+  All rights reserved. This program and the accompanying materials
+  are made available under the terms of the Eclipse Distribution License v1.0
+  which accompanies this distribution, and is available at
+  http://www.eclipse.org/org/documents/edl-v10.php
+ 
+  Contributors:
+     Igor Fedorenko - initial implementation
+-->
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.google.code.maven-play-plugin.org.eclipse.jdt</groupId>
+    <artifactId>org.eclipse.jdt.core</artifactId>
+    <version>3.10.0.v20140604-1726</version>
+    <packaging>jar</packaging>
+
+    <name>Eclipse JDT Core</name>
+    <description>Eclipse JDT project contributes a set of plug-ins that add the capabilities of a full-featured Java IDE to the Eclipse platform. The JDT plugins provide APIs so that they can themselves be further extended by other tool builders. JDT Core defines the non-UI infrastructure.</description>
+    <url>http://www.eclipse.org/jdt/core/</url>
+
+    <licenses>
+        <license>
+            <name>Eclipse Public License - v 1.0</name>
+            <url>http://www.eclipse.org/legal/epl-v10.html</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <scm>
+        <connection>scm:git:git://git.eclipse.org/gitroot/jdt/eclipse.jdt.core.git</connection>
+        <developerConnection>scm:git:ssh://git.eclipse.org/gitroot/jdt/eclipse.jdt.core.git</developerConnection>
+        <url>http://git.eclipse.org/c/jdt/eclipse.jdt.core.git/tag/?id=I20140604-2000</url>
+    </scm>
+
+    <developers>
+        <developer>
+            <id>not_available</id>
+            <name>not available</name>
+        </developer>
+    </developers>
+
+</project>

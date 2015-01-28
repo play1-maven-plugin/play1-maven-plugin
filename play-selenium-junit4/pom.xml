@@ -42,7 +42,7 @@ limitations under the License.
         <dependency>
             <groupId>org.jsoup</groupId>
             <artifactId>jsoup</artifactId>
-            <version>1.7.3</version>
+            <version>1.8.1</version>
         </dependency>
 
         <dependency>

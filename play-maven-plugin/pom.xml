@@ -38,11 +38,11 @@ limitations under the License.
     </prerequisites>
 
     <properties>
-        <ant.version>1.9.3</ant.version>
+        <ant.version>1.9.4</ant.version>
         <maven.version>2.2.1</maven.version>
-        <maven-dependency-tree.version>2.1</maven-dependency-tree.version>
-        <maven-plugin-plugin.version>3.2</maven-plugin-plugin.version>
-        <plexus-archiver.version>2.4.4</plexus-archiver.version>
+        <maven-dependency-tree.version>2.2</maven-dependency-tree.version>
+        <maven-plugin-plugin.version>3.4</maven-plugin-plugin.version>
+        <plexus-archiver.version>3.0</plexus-archiver.version>
     </properties>
 
     <dependencies>
@@ -118,13 +118,13 @@ limitations under the License.
         <dependency>
             <groupId>org.codehaus.plexus</groupId>
             <artifactId>plexus-io</artifactId>
-            <version>2.0.10</version>
+            <version>2.5</version>
         </dependency>
 
         <dependency>
             <groupId>org.codehaus.plexus</groupId>
             <artifactId>plexus-utils</artifactId>
-            <version>3.0.17</version>
+            <version>3.0.21</version>
         </dependency>
 
         <dependency>

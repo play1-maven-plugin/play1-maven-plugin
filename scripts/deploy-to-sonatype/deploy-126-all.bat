@@ -1,10 +1,8 @@
-set VERSION=1.2.6
-call ..\set-play-home-%VERSION%.bat
-
 @rem call deploy-126-deps
-@rem call deploy-126-play
-@rem call deploy-126-play-crud
-@rem call deploy-126-play-docviewer
-@rem call deploy-126-play-grizzly
-@rem call deploy-126-play-secure
-@rem call deploy-126-play-testrunner
+
+call deploy-126-play
+call deploy-126-play-crud
+call deploy-126-play-docviewer
+call deploy-126-play-grizzly
+call deploy-126-play-secure
+call deploy-126-play-testrunner

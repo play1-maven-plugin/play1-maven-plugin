@@ -1,4 +1,5 @@
-rem call install-124-deps
+call install-124-deps
+
 call install-124-play
 call install-124-play-crud
 call install-124-play-docviewer

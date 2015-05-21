@@ -211,7 +211,7 @@ public class PlayDependenciesMojo
                     
                     if ( foundInReactor )
                     {
-                        break; // TODO-change it
+                        continue;
                     }
                     //already not needed checkPotentialReactorProblem( moduleZipArtifact );
 

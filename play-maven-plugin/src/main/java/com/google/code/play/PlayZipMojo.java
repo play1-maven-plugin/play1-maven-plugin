@@ -33,8 +33,10 @@ import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
+
 import org.apache.maven.shared.artifact.filter.PatternExcludesArtifactFilter;
 import org.apache.maven.shared.artifact.filter.PatternIncludesArtifactFilter;
+
 import org.apache.maven.shared.dependency.tree.DependencyTreeBuilderException;
 
 import org.codehaus.plexus.archiver.ArchiverException;
@@ -76,6 +78,22 @@ public class PlayZipMojo
     private boolean zipDependencies;
 
     /**
+     * Dependent modules resources include filter
+     * 
+     * @since 1.0.0
+     */
+    @Parameter( property = "play.zipModulesIncludes", defaultValue = "" )
+    private String zipModulesIncludes;
+
+    /**
+     * Dependent modules resources exclude filter.
+     * 
+     * @since 1.0.0
+     */
+    @Parameter( property = "play.zipModulesExcludes", defaultValue = "" )
+    private String zipModulesExcludes;
+
+    /**
      * Dependency include filter.
      * 
      * @since 1.0.0
@@ -104,8 +122,8 @@ public class PlayZipMojo
             ZipArchiver zipArchiver = getZipArchiver();
             zipArchiver.setDestFile( destFile );
 
-            getLog().debug( "Zip includes: " + zipApplicationIncludes );
-            getLog().debug( "Zip excludes: " + zipApplicationExcludes );
+            getLog().debug( "Zip application includes: " + zipApplicationIncludes );
+            getLog().debug( "Zip application excludes: " + zipApplicationExcludes );
             String[] includes = ( zipApplicationIncludes != null ? zipApplicationIncludes.split( "," ) : null );
             String[] excludes = ( zipApplicationExcludes != null ? zipApplicationExcludes.split( "," ) : null );
             zipArchiver.addDirectory( baseDir, includes, excludes );
@@ -184,7 +202,20 @@ public class PlayZipMojo
             }
         }
 
-        // modules/*/lib
+        // modules
+        getLog().debug( "Zip modules includes: " + zipModulesIncludes );
+        getLog().debug( "Zip modules excludes: " + zipModulesExcludes );
+        String[] modulesIncludes = null;
+        if ( zipModulesIncludes != null )
+        {
+            modulesIncludes = zipModulesIncludes.split( "," );
+        }
+        String[] modulesExcludes = null;
+        if ( zipModulesExcludes != null )
+        {
+            modulesExcludes = zipModulesExcludes.split( "," );
+        }
+
         Map<String, Artifact> moduleArtifacts = findAllModuleArtifacts( false );
         for ( Map.Entry<String, Artifact> moduleArtifactEntry : moduleArtifacts.entrySet() )
         {
@@ -193,7 +224,7 @@ public class PlayZipMojo
 
             File moduleZipFile = moduleZipArtifact.getFile();
             String moduleSubDir = String.format( "modules/%s-%s/", moduleName, moduleZipArtifact.getBaseVersion() );
-            zipArchiver.addArchivedFileSet( moduleZipFile, moduleSubDir );
+            zipArchiver.addArchivedFileSet( moduleZipFile, moduleSubDir, modulesIncludes, modulesExcludes );
             Set<Artifact> dependencySubtree = getModuleDependencyArtifacts( filteredArtifacts, moduleZipArtifact );
             for ( Artifact classPathArtifact : dependencySubtree )
             {

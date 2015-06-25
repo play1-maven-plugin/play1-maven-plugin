@@ -72,6 +72,38 @@ public abstract class AbstractPlayWarMojo
     private String warApplicationExcludes;
 
     /**
+     * Framework resources include filter
+     * 
+     * @since 1.0.0
+     */
+    @Parameter( property = "play.warFrameworkIncludes", defaultValue = "framework/templates/**,resources/messages" )
+    private String warFrameworkIncludes;
+
+    /**
+     * Framework resources exclude filter.
+     * 
+     * @since 1.0.0
+     */
+    @Parameter( property = "play.warFrameworkExcludes", defaultValue = "" )
+    private String warFrameworkExcludes;
+
+    /**
+     * Dependent modules resources include filter
+     * 
+     * @since 1.0.0
+     */
+    @Parameter( property = "play.warModulesIncludes", defaultValue = "" )
+    private String warModulesIncludes;
+
+    /**
+     * Dependent modules resources exclude filter.
+     * 
+     * @since 1.0.0
+     */
+    @Parameter( property = "play.warModulesExcludes", defaultValue = "" )
+    private String warModulesExcludes;
+
+    /**
      * Single directory for extra files to include in the WAR.
      *
      * @since 1.0.0
@@ -242,11 +274,23 @@ public abstract class AbstractPlayWarMojo
         }
 
         // framework
+        getLog().debug( "War framework includes: " + warFrameworkIncludes );
+        getLog().debug( "War framework excludes: " + warFrameworkExcludes );
+        String[] frameworkIncludes = null;
+        if ( warFrameworkIncludes != null )
+        {
+            frameworkIncludes = warFrameworkIncludes.split( "," );
+        }
+        String[] frameworkExcludes = null;
+        if ( warFrameworkExcludes != null )
+        {
+            frameworkExcludes = warFrameworkExcludes.split( "," );
+        }
+
         Artifact frameworkZipArtifact = findFrameworkArtifact( true );
         // TODO-validate not null
         File frameworkZipFile = frameworkZipArtifact.getFile();
-        warArchiver.addArchivedFileSet( frameworkZipFile, "WEB-INF/",
-                                        "framework/templates/**,resources/messages".split( "," ), null );
+        warArchiver.addArchivedFileSet( frameworkZipFile, "WEB-INF/", frameworkIncludes, frameworkExcludes );
         Artifact frameworkJarArtifact =
             getDependencyArtifact( filteredArtifacts, frameworkZipArtifact.getGroupId(),
                                    frameworkZipArtifact.getArtifactId(), "jar" );
@@ -260,6 +304,19 @@ public abstract class AbstractPlayWarMojo
         }
 
         // modules
+        getLog().debug( "War modules includes: " + warModulesIncludes );
+        getLog().debug( "War modules excludes: " + warModulesExcludes );
+        String[] modulesIncludes = null;
+        if ( warModulesIncludes != null )
+        {
+            modulesIncludes = warModulesIncludes.split( "," );
+        }
+        String[] modulesExcludes = null;
+        if ( warModulesExcludes != null )
+        {
+            modulesExcludes = warModulesExcludes.split( "," );
+        }
+
         Set<Artifact> notActiveProvidedModules = new HashSet<Artifact>();
         Map<String, Artifact> moduleArtifacts = findAllModuleArtifacts( false );
         for ( Map.Entry<String, Artifact> moduleArtifactEntry : moduleArtifacts.entrySet() )
@@ -280,7 +337,7 @@ public abstract class AbstractPlayWarMojo
                     {
                         moduleSubDir = String.format( "WEB-INF/modules/%s/", moduleName );
                     }
-                    warArchiver.addArchivedFileSet( moduleZipFile, moduleSubDir );
+                    warArchiver.addArchivedFileSet( moduleZipFile, moduleSubDir, modulesIncludes, modulesExcludes );
                     dependencySubtree = getModuleDependencyArtifacts( filteredArtifacts, moduleZipArtifact );
                     for ( Artifact classPathArtifact : dependencySubtree )
                     {
@@ -301,7 +358,7 @@ public abstract class AbstractPlayWarMojo
             }
             else
             {
-                warArchiver.addArchivedFileSet( moduleZipFile, moduleSubDir );
+                warArchiver.addArchivedFileSet( moduleZipFile, moduleSubDir, modulesIncludes, modulesExcludes );
                 dependencySubtree = getModuleDependencyArtifacts( filteredArtifacts, moduleZipArtifact );
                 for ( Artifact classPathArtifact : dependencySubtree )
                 {

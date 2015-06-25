@@ -29,8 +29,10 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.resolver.filter.AndArtifactFilter;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Parameter;
+
 import org.apache.maven.shared.artifact.filter.PatternExcludesArtifactFilter;
 import org.apache.maven.shared.artifact.filter.PatternIncludesArtifactFilter;
+
 import org.apache.maven.shared.dependency.tree.DependencyTreeBuilderException;
 
 import org.codehaus.plexus.archiver.manager.NoSuchArchiverException;
@@ -54,7 +56,7 @@ public abstract class AbstractPlayDistMojo
     private String playId;
 
     /**
-     * Distribution application resources include filter
+     * Application resources include filter
      * 
      * @since 1.0.0
      */
@@ -62,7 +64,7 @@ public abstract class AbstractPlayDistMojo
     private String distApplicationIncludes;
 
     /**
-     * Distribution application resources exclude filter.
+     * Application resources exclude filter.
      * 
      * @since 1.0.0
      */
@@ -70,7 +72,39 @@ public abstract class AbstractPlayDistMojo
     private String distApplicationExcludes;
 
     /**
-     * Distribution dependency include filter.
+     * Framework resources include filter
+     * 
+     * @since 1.0.0
+     */
+    @Parameter( property = "play.distFrameworkIncludes", defaultValue = "" )
+    private String distFrameworkIncludes;
+
+    /**
+     * Framework resources exclude filter.
+     * 
+     * @since 1.0.0
+     */
+    @Parameter( property = "play.distFrameworkExcludes", defaultValue = "" )
+    private String distFrameworkExcludes;
+
+    /**
+     * Dependent modules resources include filter
+     * 
+     * @since 1.0.0
+     */
+    @Parameter( property = "play.distModulesIncludes", defaultValue = "" )
+    private String distModulesIncludes;
+
+    /**
+     * Dependent modules resources exclude filter.
+     * 
+     * @since 1.0.0
+     */
+    @Parameter( property = "play.distModulesExcludes", defaultValue = "" )
+    private String distModulesExcludes;
+
+    /**
+     * Dependency include filter.
      * 
      * @since 1.0.0
      */
@@ -78,7 +112,7 @@ public abstract class AbstractPlayDistMojo
     private String distDependencyIncludes;
 
     /**
-     * Distribution dependency exclude filter.
+     * Dependency exclude filter.
      * 
      * @since 1.0.0
      */
@@ -95,8 +129,8 @@ public abstract class AbstractPlayDistMojo
         Set<String> providedModuleNames = getProvidedModuleNames( configParser, playId, false );
 
         // APPLICATION
-        getLog().debug( "Dist includes: " + distApplicationIncludes );
-        getLog().debug( "Dist excludes: " + distApplicationExcludes );
+        getLog().debug( "Dist application includes: " + distApplicationIncludes );
+        getLog().debug( "Dist application excludes: " + distApplicationExcludes );
         String[] applicationIncludes = null;
         if ( distApplicationIncludes != null )
         {
@@ -158,10 +192,23 @@ public abstract class AbstractPlayDistMojo
         }
 
         // framework
+        getLog().debug( "Dist framework includes: " + distFrameworkIncludes );
+        getLog().debug( "Dist framework excludes: " + distFrameworkExcludes );
+        String[] frameworkIncludes = null;
+        if ( distFrameworkIncludes != null )
+        {
+            frameworkIncludes = distFrameworkIncludes.split( "," );
+        }
+        String[] frameworkExcludes = null;
+        if ( distFrameworkExcludes != null )
+        {
+            frameworkExcludes = distFrameworkExcludes.split( "," );
+        }
+
         Artifact frameworkZipArtifact = findFrameworkArtifact( false );
         // TODO-validate not null
         File frameworkZipFile = frameworkZipArtifact.getFile();
-        zipArchiver.addArchivedFileSet( frameworkZipFile );
+        zipArchiver.addArchivedFileSet( frameworkZipFile, frameworkIncludes, frameworkExcludes );
         Artifact frameworkJarArtifact =
             getDependencyArtifact( filteredArtifacts/* ?? */, frameworkZipArtifact.getGroupId(),
                                    frameworkZipArtifact.getArtifactId(), "jar" );
@@ -185,6 +232,20 @@ public abstract class AbstractPlayDistMojo
             filteredArtifacts.remove( classPathArtifact );
         }
 
+        // modules
+        getLog().debug( "Dist modules includes: " + distModulesIncludes );
+        getLog().debug( "Dist modules excludes: " + distModulesExcludes );
+        String[] modulesIncludes = null;
+        if ( distModulesIncludes != null )
+        {
+            modulesIncludes = distModulesIncludes.split( "," );
+        }
+        String[] modulesExcludes = null;
+        if ( distModulesExcludes != null )
+        {
+            modulesExcludes = distModulesExcludes.split( "," );
+        }
+
         // modules/*/lib and application/modules/*/lib
         Set<Artifact> notActiveProvidedModules = new HashSet<Artifact>();
         Map<String, Artifact> moduleArtifacts = findAllModuleArtifacts( false );
@@ -204,7 +265,7 @@ public abstract class AbstractPlayDistMojo
                     {
                         moduleSubDir = String.format( "modules/%s/", moduleName );
                     }
-                    zipArchiver.addArchivedFileSet( moduleZipFile, moduleSubDir );
+                    zipArchiver.addArchivedFileSet( moduleZipFile, moduleSubDir, modulesIncludes, modulesExcludes );
                     dependencySubtree = getModuleDependencyArtifacts( filteredArtifacts, moduleZipArtifact );
                     for ( Artifact classPathArtifact : dependencySubtree )
                     {
@@ -229,7 +290,7 @@ public abstract class AbstractPlayDistMojo
             {
                 String moduleSubDir =
                     String.format( "application/modules/%s-%s/", moduleName, moduleZipArtifact.getBaseVersion() );
-                zipArchiver.addArchivedFileSet( moduleZipFile, moduleSubDir );
+                zipArchiver.addArchivedFileSet( moduleZipFile, moduleSubDir, modulesIncludes, modulesExcludes );
                 dependencySubtree = getModuleDependencyArtifacts( filteredArtifacts, moduleZipArtifact );
                 for ( Artifact classPathArtifact : dependencySubtree )
                 {

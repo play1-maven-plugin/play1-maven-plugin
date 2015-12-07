@@ -33,6 +33,7 @@ import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.taskdefs.Java;
 import org.apache.tools.ant.types.Path;
+import org.apache.tools.ant.util.JavaEnvUtils;
 
 /**
  * Base class for Play&#33; server mojos.
@@ -140,7 +141,13 @@ public abstract class AbstractPlayServerMojo
             }
 
             // JDK 7 compat
-            javaTask.createJvmarg().setValue( "-XX:-UseSplitVerifier" );
+            if (JavaEnvUtils.isJavaVersion(JavaEnvUtils.JAVA_1_7)) {
+                javaTask.createJvmarg().setValue( "-XX:-UseSplitVerifier" );
+            }
+            // JDK 8 compat
+            if (JavaEnvUtils.isAtLeastJavaVersion(JavaEnvUtils.JAVA_1_8)) {
+                javaTask.createJvmarg().setValue( "-noverify" );
+            }
 
             String javaPolicy = configParser.getProperty( "java.policy" );
             if ( javaPolicy != null && javaPolicy.length() > 0 )

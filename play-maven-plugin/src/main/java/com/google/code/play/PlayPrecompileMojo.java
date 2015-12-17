@@ -30,6 +30,7 @@ import org.apache.tools.ant.Project;
 import org.apache.tools.ant.taskdefs.Java;
 import org.apache.tools.ant.types.Path;
 
+import org.apache.tools.ant.util.JavaEnvUtils;
 import org.codehaus.plexus.util.FileUtils;
 
 /**
@@ -162,7 +163,13 @@ public class PlayPrecompileMojo
             }
 
             // JDK 7 compat
-            javaTask.createJvmarg().setValue( "-XX:-UseSplitVerifier" );
+            if (JavaEnvUtils.isJavaVersion(JavaEnvUtils.JAVA_1_7)) {
+                javaTask.createJvmarg().setValue( "-XX:-UseSplitVerifier" );
+            }
+            // JDK 8 compat
+            if (JavaEnvUtils.isAtLeastJavaVersion(JavaEnvUtils.JAVA_1_8)) {
+                javaTask.createJvmarg().setValue( "-noverify" );
+            }
         }
         else
         {

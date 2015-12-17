@@ -300,13 +300,13 @@ public class PlayDependenciesMojo
                     if ( dependenciesOverwrite )
                     {
                         FileUtils.copyFileToDirectory( jarFile, libDir );
-                        buildContext.refresh( new File(libDir, jarFile.getName()) );
+                        buildContext.refresh( new File( libDir, jarFile.getName() ) );
                     }
                     else
                     {
                         if ( FileUtils.copyFileIfModified( jarFile, new File( libDir, jarFile.getName() ) ) )
                         {
-                            buildContext.refresh( new File(libDir, jarFile.getName()) );
+                            buildContext.refresh( new File( libDir, jarFile.getName() ) );
                         }
                     }
                 }

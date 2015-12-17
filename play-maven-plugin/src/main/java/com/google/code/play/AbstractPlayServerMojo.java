@@ -141,12 +141,18 @@ public abstract class AbstractPlayServerMojo
             }
 
             // JDK 7 compat
-            if (JavaEnvUtils.isJavaVersion(JavaEnvUtils.JAVA_1_7)) {
-                javaTask.createJvmarg().setValue( "-XX:-UseSplitVerifier" );
+            if ( JavaEnvUtils.isJavaVersion( JavaEnvUtils.JAVA_1_7 ) )
+            {
+                String arg = "-XX:-UseSplitVerifier";
+                javaTask.createJvmarg().setValue( arg );
+                getLog().debug( "  Adding jvmarg '" + arg + "'" );
             }
             // JDK 8 compat
-            if (JavaEnvUtils.isAtLeastJavaVersion(JavaEnvUtils.JAVA_1_8)) {
-                javaTask.createJvmarg().setValue( "-noverify" );
+            else if ( JavaEnvUtils.isAtLeastJavaVersion( JavaEnvUtils.JAVA_1_8 ) )
+            {
+                String arg = "-noverify";
+                javaTask.createJvmarg().setValue( arg );
+                getLog().debug( "  Adding jvmarg '" + arg + "'" );
             }
 
             String javaPolicy = configParser.getProperty( "java.policy" );
@@ -278,8 +284,8 @@ public abstract class AbstractPlayServerMojo
             Artifact artifact = (Artifact) iter.next();
             if ( artifact.getArtifactHandler().isAddedToClasspath() && !excludedArtifacts.contains( artifact ) )
             {
-                getLog().debug( String.format( "CP: %s:%s:%s (%s)", artifact.getGroupId(),
-                                               artifact.getArtifactId(), artifact.getType(), artifact.getScope() ) );
+                getLog().debug( String.format( "CP: %s:%s:%s:%s (%s)", artifact.getGroupId(), artifact.getArtifactId(),
+                                               artifact.getVersion(), artifact.getType(), artifact.getScope() ) );
                 classPath.createPathElement().setLocation( artifact.getFile() );
             }
         }

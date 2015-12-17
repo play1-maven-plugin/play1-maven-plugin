@@ -163,12 +163,18 @@ public class PlayPrecompileMojo
             }
 
             // JDK 7 compat
-            if (JavaEnvUtils.isJavaVersion(JavaEnvUtils.JAVA_1_7)) {
-                javaTask.createJvmarg().setValue( "-XX:-UseSplitVerifier" );
+            if ( JavaEnvUtils.isJavaVersion( JavaEnvUtils.JAVA_1_7 ) )
+            {
+                String arg = "-XX:-UseSplitVerifier";
+                javaTask.createJvmarg().setValue( arg );
+                getLog().debug( "  Adding jvmarg '" + arg + "'" );
             }
             // JDK 8 compat
-            if (JavaEnvUtils.isAtLeastJavaVersion(JavaEnvUtils.JAVA_1_8)) {
-                javaTask.createJvmarg().setValue( "-noverify" );
+            else if ( JavaEnvUtils.isAtLeastJavaVersion( JavaEnvUtils.JAVA_1_8 ) )
+            {
+                String arg = "-noverify";
+                javaTask.createJvmarg().setValue( arg );
+                getLog().debug( "  Adding jvmarg '" + arg + "'" );
             }
         }
         else

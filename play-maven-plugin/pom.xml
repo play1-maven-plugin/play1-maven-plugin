@@ -70,24 +70,28 @@ limitations under the License.
             <groupId>org.apache.maven</groupId>
             <artifactId>maven-artifact</artifactId>
             <version>${maven.version}</version>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>org.apache.maven</groupId>
             <artifactId>maven-model</artifactId>
             <version>${maven.version}</version>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>org.apache.maven</groupId>
             <artifactId>maven-plugin-api</artifactId>
             <version>${maven.version}</version>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>org.apache.maven</groupId>
             <artifactId>maven-project</artifactId>
             <version>${maven.version}</version>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
@@ -101,6 +105,28 @@ limitations under the License.
             <groupId>org.apache.maven.shared</groupId>
             <artifactId>maven-common-artifact-filters</artifactId>
             <version>1.4</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.maven</groupId>
+                    <artifactId>maven-artifact</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.maven</groupId>
+                    <artifactId>maven-model</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.maven</groupId>
+                    <artifactId>maven-project</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.maven</groupId>
+                    <artifactId>maven-plugin-api</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.codehaus.plexus</groupId>
+                    <artifactId>plexus-container-default</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
@@ -137,30 +163,21 @@ limitations under the License.
     <build>
         <pluginManagement>
             <plugins>
-                <!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself. -->
                 <plugin>
-                    <groupId>org.eclipse.m2e</groupId>
-                    <artifactId>lifecycle-mapping</artifactId>
-                    <version>1.0.0</version>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-jxr-plugin</artifactId>
                     <configuration>
-                        <lifecycleMappingMetadata>
-                            <pluginExecutions>
-                                <pluginExecution>
-                                    <pluginExecutionFilter>
-                                        <groupId>org.apache.maven.plugins</groupId>
-                                        <artifactId>maven-plugin-plugin</artifactId>
-                                        <versionRange>[${maven-plugin-plugin.version},)</versionRange>
-                                        <goals>
-                                            <goal>descriptor</goal>
-                                            <goal>helpmojo</goal>
-                                        </goals>
-                                    </pluginExecutionFilter>
-                                    <action>
-                                        <ignore />
-                                    </action>
-                                </pluginExecution>
-                            </pluginExecutions>
-                        </lifecycleMappingMetadata>
+                        <excludes>
+                            <exclude>com/google/code/play/HelpMojo.java</exclude>
+                        </excludes>
+                    </configuration>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>findbugs-maven-plugin</artifactId>
+                    <configuration>
+                        <excludeFilterFile>${basedir}/findbugs-exclude.xml</excludeFilterFile>
                     </configuration>
                 </plugin>
 
@@ -173,22 +190,10 @@ limitations under the License.
                             <link>http://maven.apache.org/ref/${maven.version}/maven-artifact/apidocs/</link>
                             <link>http://maven.apache.org/ref/${maven.version}/maven-plugin-api/apidocs/</link>
                             <link>http://maven.apache.org/ref/${maven.version}/maven-project/apidocs/</link>
-                            <link>http://maven-play-plugin.googlecode.com/svn/apidocs/org/apache/ant/ant/${ant.version}/</link>
-                            <link>http://maven-play-plugin.googlecode.com/svn/apidocs/org/apache/maven/shared/maven-dependency-tree/${maven-dependency-tree.version}/</link>
-                            <link>http://maven-play-plugin.googlecode.com/svn/apidocs/org/codehaus/plexus/plexus-archiver/${plexus-archiver.version}/</link>
+                            <link>http://play2-maven-plugin.github.io/external-apidocs/org/apache/ant/ant/${ant.version}/</link>
+                            <link>http://play2-maven-plugin.github.io/external-apidocs/org/apache/maven/shared/maven-dependency-tree/${maven-dependency-tree.version}/</link>
+                            <link>http://play2-maven-plugin.github.io/external-apidocs/org/codehaus/plexus/plexus-archiver/${plexus-archiver.version}/</link>
                         </links>
-                        <tagletArtifacts>
-                            <tagletArtifact>
-                                <groupId>org.apache.maven.plugin-tools</groupId>
-                                <artifactId>maven-plugin-tools-javadoc</artifactId>
-                                <version>${maven-plugin-plugin.version}</version>
-                            </tagletArtifact>
-                            <tagletArtifact>
-                                <groupId>org.codehaus.plexus</groupId>
-                                <artifactId>plexus-javadoc</artifactId>
-                                <version>1.0</version>
-                            </tagletArtifact>
-                        </tagletArtifacts>
                     </configuration>
                 </plugin>
 
@@ -197,16 +202,11 @@ limitations under the License.
                     <artifactId>maven-plugin-plugin</artifactId>
                     <version>${maven-plugin-plugin.version}</version>
                     <configuration>
-                        <skipErrorNoDescriptorsFound>true</skipErrorNoDescriptorsFound>
+                        <extractors>
+                            <extractor>java-annotations</extractor>
+                        </extractors>
                     </configuration>
                     <executions>
-                        <execution>
-                            <id>mojo-descriptor</id>
-                            <phase>process-classes</phase>
-                            <goals>
-                                <goal>descriptor</goal>
-                            </goals>
-                        </execution>
                         <execution>
                             <id>help-goal</id>
                             <goals>
@@ -214,6 +214,16 @@ limitations under the License.
                             </goals>
                         </execution>
                     </executions>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-pmd-plugin</artifactId>
+                    <configuration>
+                        <excludes>
+                            <exclude>com/google/code/play/HelpMojo.java</exclude>
+                        </excludes>
+                    </configuration>
                 </plugin>
             </plugins>
         </pluginManagement>
@@ -225,16 +235,13 @@ limitations under the License.
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-plugin-plugin</artifactId>
                 <version>${maven-plugin-plugin.version}</version>
-                <configuration>
-                    <useJava5>true</useJava5>
-                </configuration>
             </plugin>
         </plugins>
     </reporting>
 
     <profiles>
         <profile>
-            <id>fullsite</id>
+            <id>publicsite</id> <!-- site version to be uploaded -->
 
             <reporting>
                 <plugins>
@@ -247,22 +254,62 @@ limitations under the License.
                                 <link>http://maven.apache.org/ref/${maven.version}/maven-artifact/apidocs/</link>
                                 <link>http://maven.apache.org/ref/${maven.version}/maven-plugin-api/apidocs/</link>
                                 <link>http://maven.apache.org/ref/${maven.version}/maven-project/apidocs/</link>
-                                <link>http://maven-play-plugin.googlecode.com/svn/apidocs/org/apache/ant/ant/${ant.version}/</link>
-                                <link>https://svn.apache.org/repos/infra/websites/production/maven/content/shared-archives/maven-dependency-tree-${maven-dependency-tree.version}/</link>
-                                <link>http://maven-play-plugin.googlecode.com/svn/apidocs/org/codehaus/plexus/plexus-archiver/${plexus-archiver.version}/</link>
+                                <link>http://play2-maven-plugin.github.io/external-apidocs/org/apache/ant/ant/${ant.version}/</link>
+                                <link>http://play2-maven-plugin.github.io/external-apidocs/org/apache/maven/shared/maven-dependency-tree/${maven-dependency-tree.version}/</link>
+                                <link>http://play2-maven-plugin.github.io/external-apidocs/org/codehaus/plexus/plexus-archiver/${plexus-archiver.version}/</link>
                             </links>
-                            <tagletArtifacts>
-                                <tagletArtifact>
-                                    <groupId>org.apache.maven.plugin-tools</groupId>
-                                    <artifactId>maven-plugin-tools-javadoc</artifactId>
-                                    <version>${maven-plugin-plugin.version}</version>
-                                </tagletArtifact>
-                                <tagletArtifact>
-                                    <groupId>org.codehaus.plexus</groupId>
-                                    <artifactId>plexus-javadoc</artifactId>
-                                    <version>1.0</version>
-                                </tagletArtifact>
-                            </tagletArtifacts>
+                        </configuration>
+                    </plugin>
+
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-jxr-plugin</artifactId>
+                        <configuration>
+                            <excludes>
+                                <exclude>com/google/code/play/HelpMojo.java</exclude>
+                            </excludes>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </reporting>
+        </profile>
+
+        <profile>
+            <id>fullsite</id>
+
+            <reporting>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-checkstyle-plugin</artifactId>
+                        <configuration>
+                            <excludes>com/google/code/play/HelpMojo.java</excludes>
+                        </configuration>
+                    </plugin>
+
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <configuration>
+                            <links>
+                                <link>http://download.oracle.com/javase/5/docs/api/</link>
+                                <link>http://maven.apache.org/ref/${maven.version}/maven-artifact/apidocs/</link>
+                                <link>http://maven.apache.org/ref/${maven.version}/maven-plugin-api/apidocs/</link>
+                                <link>http://maven.apache.org/ref/${maven.version}/maven-project/apidocs/</link>
+                                <link>http://play2-maven-plugin.github.io/external-apidocs/org/apache/ant/ant/${ant.version}/</link>
+                                <link>http://play2-maven-plugin.github.io/external-apidocs/org/apache/maven/shared/maven-dependency-tree/${maven-dependency-tree.version}/</link>
+                                <link>http://play2-maven-plugin.github.io/external-apidocs/org/codehaus/plexus/plexus-archiver/${plexus-archiver.version}/</link>
+                            </links>
+                        </configuration>
+                    </plugin>
+
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-jxr-plugin</artifactId>
+                        <configuration>
+                            <excludes>
+                                <exclude>com/google/code/play/HelpMojo.java</exclude>
+                            </excludes>
                         </configuration>
                     </plugin>
 
@@ -271,6 +318,16 @@ limitations under the License.
                         <artifactId>findbugs-maven-plugin</artifactId>
                         <configuration>
                             <excludeFilterFile>${basedir}/findbugs-exclude.xml</excludeFilterFile>
+                        </configuration>
+                    </plugin>
+
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-pmd-plugin</artifactId>
+                        <configuration>
+                            <excludes>
+                                <exclude>com/google/code/play/HelpMojo.java</exclude>
+                            </excludes>
                         </configuration>
                     </plugin>
                 </plugins>

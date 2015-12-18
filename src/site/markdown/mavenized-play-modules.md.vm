@@ -1,0 +1,56 @@
+#set($h1 = '#')
+#set($h2 = '##')
+#set($h3 = '###')
+#set($h4 = '####')
+
+#set($repoUrlPrefix = "http://repo2.maven.org/maven2/com/google/code/maven-play-plugin/org/playframework/modules")
+
+#if($project.version.endsWith("SNAPSHOT"))
+#set($testProjectsGitBranch = 'master')
+#else
+#set($testProjectsGitBranch = "test-projects-${project.version}")
+#end
+#set($testProjectsUrlPrefix = "https://github.com/play1-maven-plugin/play1-maven-test-projects/tree/${testProjectsGitBranch}/external-modules")
+
+$h2 Mavenized Play! Framework modules
+
+| Name                                                               | Latest version                                                    | Test projects                                    |
+|--------------------------------------------------------------------|-------------------------------------------------------------------|--------------------------------------------------|
+| [AccessLog](${repoUrlPrefix}/accesslog/play-accesslog/)            | [1.2](${repoUrlPrefix}/accesslog/play-accesslog/1.2/)             |                                                  |
+| [Associations](${repoUrlPrefix}/associations/play-associations/)   | [1.0.1](${repoUrlPrefix}/associations/play-associations/1.0.1/)   | [project](${testProjectsUrlPrefix}/associations/)|
+| [BetterLogs](${repoUrlPrefix}/betterlogs/play-betterlogs/)         | [1.0](${repoUrlPrefix}/betterlogs/play-betterlogs/1.0/)           |                                                  |
+| [Cobertura](${repoUrlPrefix}/cobertura/play-cobertura/)            | [2.4](${repoUrlPrefix}/cobertura/play-cobertura/2.4/)<br/>[2.4-jdk15](${repoUrlPrefix}/cobertura/play-cobertura/2.4-jdk15/) | [project](${testProjectsUrlPrefix}/cobertura/) |
+| [Coffee 1.0](${repoUrlPrefix}/coffee/play-coffee/)                 | [1.0](${repoUrlPrefix}/coffee/play-coffee/1.0/)                   | [project](${testProjectsUrlPrefix}/coffee/)      |
+| [Constretto](${repoUrlPrefix}/constretto/play-constretto/)         | [0.1.1](${repoUrlPrefix}/constretto/play-constretto/0.1.1/)       | [project](${testProjectsUrlPrefix}/constretto/)  |
+| [DB](${repoUrlPrefix}/db/play-db/)                                 | [1.1.1](${repoUrlPrefix}/db/play-db/1.1.1/)                       |                                                  |
+| [Deadbolt](${repoUrlPrefix}/deadbolt/play-deadbolt/)               | [1.5.4](${repoUrlPrefix}/deadbolt/play-deadbolt/1.5.4/)           | [project](${testProjectsUrlPrefix}/deadbolt/)    |
+| [Ebean](${repoUrlPrefix}/ebean/play-ebean/)                        | [1.0.6](${repoUrlPrefix}/ebean/play-ebean/1.0.6/)                 | [project](${testProjectsUrlPrefix}/ebean/)       |
+| [Excel](${repoUrlPrefix}/excel/play-excel/)                        | [1.2.3](${repoUrlPrefix}/excel/play-excel/1.2.3/)                 | [project](${testProjectsUrlPrefix}/excel/)       |
+| [Faster Groovy Templates](${repoUrlPrefix}/fastergt/play-fastergt/)| [1.7\_1](${repoUrlPrefix}/fastergt/play-fastergt/1.7_1/)          | [project](${testProjectsUrlPrefix}/fastergt/)    |
+| [FBGraph](${repoUrlPrefix}/fbgraph/play-fbgraph/)                  | [0.4](${repoUrlPrefix}/fbgraph/play-fbgraph/0.4/)                 |                                                  |
+| [GAE](${repoUrlPrefix}/gae/play-gae/)                              | [1.6.0](${repoUrlPrefix}/gae/play-gae/1.6.0/)                     | [project](${testProjectsUrlPrefix}/gae/)         |
+| [Gravatar](${repoUrlPrefix}/gravatar/play-gravatar/)               | [1.0.2](${repoUrlPrefix}/gravatar/play-gravatar/1.0.2/)           |                                                  |
+| [Guice](${repoUrlPrefix}/guice/play-guice/)                        | [1.2](${repoUrlPrefix}/guice/play-guice/1.2/)                     | [project](${testProjectsUrlPrefix}/guice/)       |
+| [Hazelcast](${repoUrlPrefix}/hazelcast/play-hazelcast/)            | [0.6](${repoUrlPrefix}/hazelcast/play-hazelcast/0.6/)             | [project](${testProjectsUrlPrefix}/hazelcast/)   |
+| [Japid](${repoUrlPrefix}/japid/play-japid/)                        | [0.9.5](${repoUrlPrefix}/japid/play-japid/0.9.5/)                 | [project](${testProjectsUrlPrefix}/japid/)       |
+| [Less](${repoUrlPrefix}/less/play-less/)                           | [0.9.1](${repoUrlPrefix}/less/play-less/0.9.1/)                   | [project](${testProjectsUrlPrefix}/less/)        |
+| [Markdown](${repoUrlPrefix}/markdown/play-markdown/)               | [1.7](${repoUrlPrefix}/markdown/play-markdown/1.7/)               | [project](${testProjectsUrlPrefix}/markdown/)    |
+| [Messages](${repoUrlPrefix}/messages/play-messages/)               | [1.3](${repoUrlPrefix}/messages/play-messages/1.3/)               | [project](${testProjectsUrlPrefix}/messages/)    |
+| [Mockito](${repoUrlPrefix}/mockito/play-mockito/)                  | [0.1](${repoUrlPrefix}/mockito/play-mockito/0.1/)                 |                                                  |
+| [Morphia](${repoUrlPrefix}/morphia/play-morphia/)                  | [1.2.12](${repoUrlPrefix}/morphia/play-morphia/1.2.12/)           | [project](${testProjectsUrlPrefix}/morphia/)     |
+| [Paginate](${repoUrlPrefix}/paginate/play-paginate/)               | [0.14](${repoUrlPrefix}/paginate/play-paginate/0.14/)             |                                                  |
+| [PDF](${repoUrlPrefix}/pdf/play-pdf/)                              | [0.9](${repoUrlPrefix}/pdf/play-pdf/0.9/)                         |                                                  |
+| [Postmark](${repoUrlPrefix}/postmark/play-postmark/)               | [1.0](${repoUrlPrefix}/postmark/play-postmark/1.0/)               | [project](${testProjectsUrlPrefix}/postmark/)    |
+| [QUnit](${repoUrlPrefix}/qunit/play-qunit/)                        | [1.0](${repoUrlPrefix}/qunit/play-qunit/1.0/)                     |                                                  |
+| [Recaptcha](${repoUrlPrefix}/recaptcha/play-recaptcha/)            | [1.3](${repoUrlPrefix}/recaptcha/play-recaptcha/1.3/)             | [project](${testProjectsUrlPrefix}/recaptcha/)   |
+| [Redis](${repoUrlPrefix}/redis/play-redis/)                        | [0.3](${repoUrlPrefix}/redis/play-redis/0.3/)                     | [project](${testProjectsUrlPrefix}/redis/)       |
+| [Router](${repoUrlPrefix}/router/play-router/)                     | [1.2](${repoUrlPrefix}/router/play-router/1.2/)                   |                                                  |
+| [Sass](${repoUrlPrefix}/sass/play-sass/)                           | [1.1](${repoUrlPrefix}/sass/play-sass/1.1/)                       | [project](${testProjectsUrlPrefix}/sass/)        |
+| [Search](${repoUrlPrefix}/search/play-search/)                     | [2.0](${repoUrlPrefix}/search/play-search/2.0/)                   |                                                  |
+| [SecureSocial](${repoUrlPrefix}/securesocial/play-securesocial/)   | [0.2.6](${repoUrlPrefix}/securesocial/play-securesocial/0.2.6/)   | [project](${testProjectsUrlPrefix}/securesocial/)|
+| [Shibboleth](${repoUrlPrefix}/shibboleth/play-shibboleth/)         | [1.2](${repoUrlPrefix}/shibboleth/play-shibboleth/1.2/)           | [project](${testProjectsUrlPrefix}/shibboleth/)  |
+| [Siena](${repoUrlPrefix}/siena/play-siena/)                        | [2.0.7](${repoUrlPrefix}/siena/play-siena/2.0.7/)                 | [project](${testProjectsUrlPrefix}/siena/)       |
+| [Spring](${repoUrlPrefix}/spring/play-spring/)                     | [1.0.3](${repoUrlPrefix}/spring/play-spring/1.0.3/)               | [project](${testProjectsUrlPrefix}/spring/)      |
+| [SpringTester](${repoUrlPrefix}/springtester/play-springtester/)   | [0.1](${repoUrlPrefix}/springtester/play-springtester/0.1/)       | [project](${testProjectsUrlPrefix}/springtester/)|
+| [Table](${repoUrlPrefix}/table/play-table/)                        | [1.2.2](${repoUrlPrefix}/table/play-table/1.2.2/)                 |                                                  |
+| [WebDrive](${repoUrlPrefix}/webdrive/play-webdrive/)               | [0.2](${repoUrlPrefix}/webdrive/play-webdrive/0.2/)               |                                                  |

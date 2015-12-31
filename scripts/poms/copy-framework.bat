@@ -25,7 +25,10 @@ copy %SRC_DIR%\modules\docviewer\pom-dist.xml %DST_DIR%\modules\docviewer\pom-di
 copy %SRC_DIR%\modules\docviewer\pom-build-dist.xml %DST_DIR%\modules\docviewer\pom-build-dist.xml
 copy %SRC_DIR%\modules\grizzly\assembly-module.xml %DST_DIR%\modules\grizzly\assembly-module.xml
 copy %SRC_DIR%\modules\grizzly\assembly-module-build-dist.xml %DST_DIR%\modules\grizzly\assembly-module-build-dist.xml
+copy %SRC_DIR%\modules\grizzly\assembly-module-min.xml %DST_DIR%\modules\grizzly\assembly-module-min.xml
+copy %SRC_DIR%\modules\grizzly\no-content.txt %DST_DIR%\modules\grizzly\no-content.txt
 copy %SRC_DIR%\modules\grizzly\pom.xml %DST_DIR%\modules\grizzly\pom.xml
+copy %SRC_DIR%\modules\grizzly\pom-build-dist.xml %DST_DIR%\modules\grizzly\pom-build-dist.xml
 copy %SRC_DIR%\modules\grizzly\pom-dist.xml %DST_DIR%\modules\grizzly\pom-dist.xml
 copy %SRC_DIR%\modules\parent\pom.xml %DST_DIR%\modules\parent\pom.xml
 copy %SRC_DIR%\modules\secure\assembly-module.xml %DST_DIR%\modules\secure\assembly-module.xml

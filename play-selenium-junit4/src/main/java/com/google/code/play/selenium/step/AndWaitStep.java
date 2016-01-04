@@ -16,37 +16,22 @@
 
 package com.google.code.play.selenium.step;
 
-//import com.thoughtworks.selenium.SeleniumException;
-
-import com.google.code.play.selenium.Timeout;
-
 public class AndWaitStep
     extends AbstractSeleniumStep
 {
 
     private VoidSeleniumCommand innerCommand;
 
-    private Timeout timeout;
-
-    public AndWaitStep( VoidSeleniumCommand innerCommand, Timeout timeout )
+    public AndWaitStep( VoidSeleniumCommand innerCommand )
     {
         this.innerCommand = innerCommand;
-        this.timeout = timeout;
     }
 
     protected void doExecute()
         throws Exception
     {
         innerCommand.execute();
-//        try
-//        {
-            innerCommand.commandProcessor.doCommand( "waitForPageToLoad", new String[] { String.valueOf( timeout.get() ) } );
-//        }
-//        catch ( SeleniumException e )
-//        {
-//            String message = e.getMessage();
-//            Verify.fail( message );
-//        }
+        innerCommand.commandProcessor.doCommand( "waitForPageToLoad", new String[] { "30000" } );
     }
 
     public String toString()

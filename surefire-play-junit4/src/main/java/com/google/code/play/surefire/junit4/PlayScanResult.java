@@ -18,12 +18,11 @@ package com.google.code.play.surefire.junit4;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.Properties;
 
 import org.apache.maven.surefire.report.ConsoleLogger;
+import org.apache.maven.surefire.util.NestedRuntimeException;
 import org.apache.maven.surefire.util.ScanResult;
 import org.apache.maven.surefire.util.ScannerFilter;
 import org.apache.maven.surefire.util.TestsToRun;
@@ -33,7 +32,7 @@ public class PlayScanResult
 {
     private final List<String> files;
 
-    private static final String SCAN_RESULT_NUMBER = "tc.";
+    private static final String scanResultNo = "tc.";
 
     private final ConsoleLogger consoleLogger;
 
@@ -53,21 +52,22 @@ public class PlayScanResult
         return files.get( index );
     }
 
-    public void writeTo( Map<String, String> properties )
+    public void writeTo( Properties properties )
     {
-        for ( int i = 0, size = files.size(); i < size; i++ )
+        int size = files.size();
+        for ( int i = 0; i < size; i++ )
         {
-            properties.put( SCAN_RESULT_NUMBER + i, files.get( i ) );
+            properties.setProperty( scanResultNo + i, files.get( i ) );
         }
     }
 
-    public static PlayScanResult from( Map<String, String> properties, ConsoleLogger consoleLogger )
+    public static PlayScanResult from( Properties properties, ConsoleLogger consoleLogger )
     {
         List<String> result = new ArrayList<String>();
         int i = 0;
         while ( true )
         {
-            String item = properties.get( SCAN_RESULT_NUMBER + ( i++ ) );
+            String item = properties.getProperty( scanResultNo + ( i++ ) );
             if ( item == null )
             {
                 return new PlayScanResult( result, consoleLogger );
@@ -88,7 +88,7 @@ public class PlayScanResult
 
     public TestsToRun applyFilter( ScannerFilter scannerFilter, ClassLoader testClassLoader )
     {
-        Set<Class<?>> result = new LinkedHashSet<Class<?>>();
+        List<Class> result = new ArrayList<Class>();
 
         int size = size();
         for ( int i = 0; i < size; i++ )
@@ -133,14 +133,16 @@ public class PlayScanResult
 
     private static Class<?> loadClass( ClassLoader classLoader, String className )
     {
+        Class<?> testClass;
         try
         {
-            return classLoader.loadClass( className );
+            testClass = classLoader.loadClass( className );
         }
         catch ( ClassNotFoundException e )
         {
-            throw new RuntimeException( "Unable to create test class '" + className + "'", e );
+            throw new NestedRuntimeException( "Unable to create test class '" + className + "'", e );
         }
+        return testClass;
     }
 
     public PlayScanResult append( PlayScanResult other )
@@ -156,5 +158,6 @@ public class PlayScanResult
             return this;
         }
     }
+
 
 }

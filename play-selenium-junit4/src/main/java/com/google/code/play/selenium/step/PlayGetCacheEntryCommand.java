@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2014 Grzegorz Slowikowski
+ * Copyright 2010-2015 Grzegorz Slowikowski
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,20 +19,18 @@ package com.google.code.play.selenium.step;
 import com.google.code.play.selenium.StoredVars;
 import com.thoughtworks.selenium.CommandProcessor;
 
-// "store" command is a synonym for "storeExpression".
-public class SimpleStoreStep
-    extends StoreStep
+public class PlayGetCacheEntryCommand
+    extends AbstractPlayHttpGetCommand
 {
-    public SimpleStoreStep( StoredVars storedVars, CommandProcessor commandProcessor, String param1, String param2 )
+
+    public PlayGetCacheEntryCommand( StoredVars storedVars, CommandProcessor commandProcessor, String applicationRootUrl, String param1 )
     {
-        super( new VoidSeleniumCommand( storedVars, commandProcessor, "storeExpression", param1, param2 ) );
+        super( storedVars, commandProcessor, "getCacheEntry", param1, applicationRootUrl );
     }
 
-    public String toString()
+    protected String getCommandRelativeUrl()
     {
-        String result = super.toString();
-        result = result.replace( "storeExpression(", "store(" );
-        return result;
+        return String.format( "@tests/cache?key=%s", param1 );
     }
 
 }

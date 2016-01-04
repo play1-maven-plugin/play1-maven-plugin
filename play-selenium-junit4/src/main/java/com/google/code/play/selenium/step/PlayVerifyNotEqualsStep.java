@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2014 Grzegorz Slowikowski
+ * Copyright 2010-2015 Grzegorz Slowikowski
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,43 +16,42 @@
 
 package com.google.code.play.selenium.step;
 
-import org.junit.Assert;
+import com.google.code.play.selenium.StoredVars;
 
-import com.thoughtworks.selenium.SeleniumException;
-
-public class AssertStep
+public class PlayVerifyNotEqualsStep
     extends AbstractSeleniumStep
 {
 
-    private VoidSeleniumCommand assertCommand;
+    private StoredVars storedVars;
 
-    public AssertStep( VoidSeleniumCommand assertCommand )
+    private String param1;
+
+    private String param2;
+
+    public PlayVerifyNotEqualsStep( StoredVars storedVars, String param1, String param2 )
     {
-        this.assertCommand = assertCommand;
+        this.storedVars = storedVars;
+        this.param1 = param1;
+        this.param2 = param2;
     }
 
     public void doExecute()
         throws Exception
     {
-        try
+        String param1Filtered = storedVars.fillValues( param1 );
+        String param2Filtered = storedVars.fillValues( param2 );
+
+        if ( param1Filtered.equals( param2Filtered ) )
         {
-            assertCommand.execute();
-        }
-        catch ( SeleniumException e )
-        {
-            String message = e.getMessage();
-            if ( message.startsWith( "ERROR: " ) )
-            {
-                message = message.substring( "ERROR: ".length() );
-            }
-            Assert.fail( message );
+            String verifyMessage = String.format( "%s == %s", param1Filtered, param2Filtered );
+            Verify.fail( verifyMessage );
         }
     }
 
     public String toString()
     {
         StringBuffer buf = new StringBuffer();
-        buf.append( assertCommand.command ).append( "('" ).append( assertCommand.param1 ).append( "', '" ).append( assertCommand.param2 ).append( "')" );
+        buf.append( "verifyNotEquals('" ).append( param1 ).append( "', '" ).append( param2 ).append( "')" );
         return buf.toString();
     }
 

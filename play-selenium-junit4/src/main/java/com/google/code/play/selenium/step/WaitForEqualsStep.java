@@ -16,7 +16,7 @@
 
 package com.google.code.play.selenium.step;
 
-import com.google.code.play.selenium.Timeout;
+import junit.framework.Assert;
 
 public class WaitForEqualsStep
     extends AbstractSeleniumStep
@@ -26,13 +26,10 @@ public class WaitForEqualsStep
 
     private String expected;
 
-    private Timeout timeout;
-
-    public WaitForEqualsStep( StringSeleniumCommand innerCommand, String expected, Timeout timeout )
+    public WaitForEqualsStep( StringSeleniumCommand innerCommand, String expected )
     {
         this.innerCommand = innerCommand;
         this.expected = expected;
-        this.timeout = timeout;
     }
 
     protected void doExecute()
@@ -41,35 +38,27 @@ public class WaitForEqualsStep
         String innerCommandResult = null;
         String xexpected = innerCommand.storedVars.fillValues( expected );
         xexpected = MultiLineHelper.brToNewLine( xexpected );
-
-        boolean success = false;
-        long endTimeMillis = System.currentTimeMillis() + timeout.get();
-
-        while ( !success && System.currentTimeMillis() < endTimeMillis )
+        for ( int second = 0;; second++ )
         {
-            innerCommandResult = innerCommand.getString();
-            success = EqualsHelper.seleniumEquals( xexpected, innerCommandResult );
-            /*TEMP if ( !success )
+            if ( second >= 60 )
             {
-                long remainingWaitTimeMillis = endTimeMillis - System.currentTimeMillis();
-                if ( remainingWaitTimeMillis > 0L )
+                String assertMessage =
+                    "Actual value \"" + innerCommandResult + "\" did not match \"" + xexpected + "\"";
+                Assert.fail( assertMessage );
+            }
+            try
+            {
+                innerCommandResult = innerCommand.getString();
+                boolean seleniumEqualsResult = EqualsHelper.seleniumEquals( xexpected, innerCommandResult );
+                if ( seleniumEqualsResult )
                 {
-                    long sleepTimeMillis = remainingWaitTimeMillis >= 1000L ? 1000L : remainingWaitTimeMillis;
-                    try
-                    {
-                        Thread.sleep( sleepTimeMillis );
-                    }
-                    catch ( InterruptedException e )
-                    {
-                        throw new RuntimeException( e );
-                    }
+                    break;
                 }
-            }*/
-        }
-        if ( !success )
-        {
-            String assertMessage = "Actual value \"" + innerCommandResult + "\" did not match \"" + xexpected + "\"";
-            Verify.fail( assertMessage );
+            }
+            catch ( Exception e )
+            {
+            }
+            Thread.sleep( 1000 );
         }
     }
 

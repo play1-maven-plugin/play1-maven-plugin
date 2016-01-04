@@ -16,6 +16,11 @@
 
 package com.google.code.play.surefire.junit4;
 
+import java.lang.reflect.Method;
+
+import org.apache.maven.shared.utils.io.SelectorUtils;
+
+import org.junit.runner.Request;
 import org.junit.runner.Runner;
 import org.junit.runner.notification.RunNotifier;
 
@@ -24,20 +29,42 @@ import play.Invoker;
 public class TestInvocation
     extends Invoker.DirectInvocation
 {
-    private Runner runner;
-    
-    private RunNotifier notifier;
+    private Class<?> testClass;
 
-    public TestInvocation( Runner runner, RunNotifier notifier )
+    private RunNotifier fNotifier;
+    
+    private String[] testMethods;
+
+    public TestInvocation( Class<?> testClass, RunNotifier fNotifier, String[] testMethods )
     {
-        this.runner = runner;
-        this.notifier = notifier;
+        this.testClass = testClass;
+        this.fNotifier = fNotifier;
+        this.testMethods = testMethods;
     }
 
     @Override
     public void execute()
     {
-        runner.run( notifier );
+        if ( null != testMethods )
+        {
+            Method[] methods = testClass.getMethods();
+            for ( Method method : methods )
+            {
+                for ( String testMethod : testMethods )
+                {
+                    if ( SelectorUtils.match( testMethod, method.getName() ) )
+                    {
+                        Runner junitTestRunner = Request.method( testClass, method.getName() ).getRunner();
+                        junitTestRunner.run( fNotifier );
+                    }
+                }
+            }
+            return;
+        }
+
+        Runner junitTestRunner = Request.aClass( testClass ).getRunner();
+        
+        junitTestRunner.run( fNotifier );
     }
 
     // @Override

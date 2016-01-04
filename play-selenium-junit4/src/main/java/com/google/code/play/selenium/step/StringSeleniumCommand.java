@@ -66,7 +66,7 @@ public class StringSeleniumCommand
         }
         else
         {
-            result = commandProcessor.getString( command, new String[] {} );
+            result = commandProcessor.getString( command, new String[] {} ); // czy to moze sie zdarzyc?
         }
         return result;
     }

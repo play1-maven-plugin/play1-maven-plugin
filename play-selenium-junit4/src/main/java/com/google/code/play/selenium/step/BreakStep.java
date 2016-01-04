@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2015 Grzegorz Slowikowski
+ * Copyright 2010-2014 Grzegorz Slowikowski
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,21 +16,23 @@
 
 package com.google.code.play.selenium.step;
 
-import com.google.code.play.selenium.StoredVars;
-import com.thoughtworks.selenium.CommandProcessor;
-
-public class PlayGetLastReceivedEmailByCommand
-    extends AbstractPlayHttpGetCommand
+public class BreakStep
+    extends AbstractSeleniumStep
 {
 
-    public PlayGetLastReceivedEmailByCommand( StoredVars storedVars, CommandProcessor commandProcessor, String applicationRootUrl, String param1 )
+    public BreakStep()
     {
-        super( storedVars, commandProcessor, "getLastReceivedEmailBy", param1, applicationRootUrl );
     }
 
-    protected String getCommandRelativeUrl()
+    public void doExecute()
+        throws Exception
     {
-        return String.format( "@tests/emails?by=%s", param1 );
+        System.out.println( "break: not implemented" );
+    }
+
+    public String toString()
+    {
+        return "break()";
     }
 
 }

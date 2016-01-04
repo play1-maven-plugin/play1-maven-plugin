@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2015 Grzegorz Slowikowski
+ * Copyright 2010-2014 Grzegorz Slowikowski
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,42 +16,42 @@
 
 package com.google.code.play.selenium.step;
 
-import com.google.code.play.selenium.StoredVars;
+import com.thoughtworks.selenium.SeleniumException;
 
-public class PlayVerifyEqualsStep
+public class VerifyStep
     extends AbstractSeleniumStep
 {
 
-    private StoredVars storedVars;
+    private VoidSeleniumCommand assertCommand;
 
-    private String param1;
-
-    private String param2;
-
-    public PlayVerifyEqualsStep( StoredVars storedVars, String param1, String param2 )
+    public VerifyStep( VoidSeleniumCommand assertCommand )
     {
-        this.storedVars = storedVars;
-        this.param1 = param1;
-        this.param2 = param2;
+        this.assertCommand = assertCommand;
     }
 
     public void doExecute()
         throws Exception
     {
-        String param1Filtered = storedVars.fillValues( param1 );
-        String param2Filtered = storedVars.fillValues( param2 );
-
-        if ( !param1Filtered.equals( param2Filtered ) )
+        try
         {
-            String verifyMessage = String.format( "%s != %s", param1Filtered, param2Filtered );
-            Verify.fail( verifyMessage );
+            assertCommand.execute();
+        }
+        catch ( SeleniumException e )
+        {
+            String message = e.getMessage();
+            if ( message.startsWith( "ERROR: " ) )
+            {
+                message = message.substring( "ERROR: ".length() );
+            }
+            Verify.fail( message );
         }
     }
 
     public String toString()
     {
+        String command = assertCommand.command.replace( "assert", "verify" );
         StringBuffer buf = new StringBuffer();
-        buf.append( "verifyEquals('" ).append( param1 ).append( "', '" ).append( param2 ).append( "')" );
+        buf.append( command ).append( "('" ).append( assertCommand.param1 ).append( "', '" ).append( assertCommand.param2 ).append( "')" );
         return buf.toString();
     }
 

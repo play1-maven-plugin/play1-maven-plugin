@@ -16,29 +16,57 @@
 
 package com.google.code.play.selenium.step;
 
-import com.google.code.play.selenium.StoredVars;
-
 public class StoreStep
     extends CommandStep
 {
-    private StoredVars storedVars;
 
-    private StringSeleniumCommand innerGetCommand;
-
-    public StoreStep( StoredVars storedVars, VoidSeleniumCommand innerStoreCommand,
-                      StringSeleniumCommand innerGetCommand )
+    public StoreStep( VoidSeleniumCommand innerStoreCommand )
     {
         super( innerStoreCommand );
-        this.storedVars = storedVars;
-        this.innerGetCommand = innerGetCommand;
     }
 
     protected void doExecute()
         throws Exception
     {
         super.doExecute();
-        String result = innerGetCommand.getString();
-        storedVars.setVariable( command.param2, result );
+        String varName = "".equals( command.param2 ) ? command.param1 : command.param2;
+        updateLocalVar( varName );
+        //updateLocalVar( command.param1 );
+        //updateLocalVar( command.param2 );
+    }
+
+    private void updateLocalVar( String varName )
+    {
+        if ( !"".equals( varName ) )
+        {
+            String varValue = command.commandProcessor.getString( "getEval", new String[] { "storedVars['" + varName + "']" } );
+            if ( varValue != null )
+            {
+                if ( !"null".equals( varValue ) )
+                {
+                    command.storedVars.setVariable( varName, varValue );
+                }
+                else
+                {
+                    // Variable value is "null" or (more probably) variable undefined.
+                    boolean varUndefined =
+                        command.commandProcessor.getBoolean( "getEval", new String[] { "storedVars['" + varName
+                            + "'] === undefined" } );
+                    if ( varUndefined )
+                    {
+                        command.storedVars.removeVariable( varName );
+                    }
+                    else
+                    {
+                        command.storedVars.setVariable( varName, varValue );
+                    }
+                }
+            }
+            else
+            {
+                command.storedVars.removeVariable( varName );
+            }
+        }
     }
 
 }

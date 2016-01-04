@@ -16,7 +16,7 @@
 
 package com.google.code.play.selenium.step;
 
-import junit.framework.Assert;
+import com.google.code.play.selenium.Timeout;
 
 public class WaitForTrueStep
     extends AbstractSeleniumStep
@@ -24,45 +24,56 @@ public class WaitForTrueStep
 
     private BooleanSeleniumCommand innerCommand;
 
-    public WaitForTrueStep( BooleanSeleniumCommand innerCommand )
+    private Timeout timeout;
+
+    public WaitForTrueStep( BooleanSeleniumCommand innerCommand, Timeout timeout )
     {
         this.innerCommand = innerCommand;
+        this.timeout = timeout;
     }
 
     protected void doExecute()
         throws Exception
     {
-        for ( int second = 0;; second++ )
+        boolean success = false;
+        long endTimeMillis = System.currentTimeMillis() + timeout.get();
+
+        while ( !success && System.currentTimeMillis() < endTimeMillis )
         {
-            if ( second >= 60 )
+            success = innerCommand.getBoolean();
+            /*TEMP if ( !success )
             {
-                String assertMessage = "false";
-                String cmd = innerCommand.command.substring( "is".length() );
-                if ( cmd.endsWith( "Present" ) )
+                long remainingWaitTimeMillis = endTimeMillis - System.currentTimeMillis();
+                if ( remainingWaitTimeMillis > 0L )
                 {
-                    assertMessage =
-                        cmd.replace( "Present", ( !"".equals( innerCommand.param1 ) ? " '" + innerCommand.param1 + "'"
-                                        : "" ) + " not present" );
+                    long sleepTimeMillis = remainingWaitTimeMillis >= 1000L ? 1000L : remainingWaitTimeMillis;
+                    try
+                    {
+                        Thread.sleep( sleepTimeMillis );
+                    }
+                    catch ( InterruptedException e )
+                    {
+                        throw new RuntimeException( e );
+                    }
                 }
-                else
-                {
-                    assertMessage = "'" + innerCommand.param1 + "' not " + cmd; // in this case the parameters is always
-                                                                                // not empty
-                }
-                Assert.fail( assertMessage );
-            }
-            try
+            }*/
+        }
+        if ( !success )
+        {
+            String assertMessage = null;
+            String cmd = innerCommand.command.substring( "is".length() );
+            if ( cmd.endsWith( "Present" ) )
             {
-                boolean innerCommandResult = innerCommand.getBoolean();
-                if ( innerCommandResult )
-                {
-                    break;
-                }
+                assertMessage =
+                    cmd.replace( "Present", ( !"".equals( innerCommand.param1 ) ? " '" + innerCommand.param1 + "'"
+                                    : "" ) + " not present" );
             }
-            catch ( Exception e )
+            else
             {
+                assertMessage = "'" + innerCommand.param1 + "' not " + cmd; // in this case the parameters is always
+                                                                            // not empty
             }
-            Thread.sleep( 1000 );
+            Verify.fail( assertMessage );
         }
     }
 

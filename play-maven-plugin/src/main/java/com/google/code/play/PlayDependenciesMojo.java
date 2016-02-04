@@ -93,6 +93,12 @@ public class PlayDependenciesMojo
     private boolean dependenciesSkipJars; // TODO-change default value to true
 
     /**
+     * Never create files pointing to the original folder, always copy the folder instead.
+     */
+    @Parameter( property = "play.dependenciesForceCopy", defaultValue = "false")
+    private boolean dependenciesForceCopy;
+
+    /**
      * To look up Archiver/UnArchiver implementations.
      * 
      */
@@ -200,7 +206,14 @@ public class PlayDependenciesMojo
                                     }
                                 }
 
-                                writeToFile( moduleLinkFile, relativePath );
+                                if ( dependenciesForceCopy )
+                                {
+                                    org.apache.commons.io.FileUtils.copyDirectory( reactorProjectBasedir , moduleLinkFile );
+                                }
+                                else
+                                {
+                                    writeToFile( moduleLinkFile, relativePath );
+                                }
                                 buildContext.refresh( moduleLinkFile );
                                 foundInReactor = true;
                                 getLog().info( String.format( "Play! module dependency found in reactor, relative path is \"%s\"", relativePath ) );

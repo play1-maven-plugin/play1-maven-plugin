@@ -290,7 +290,7 @@ public abstract class PlaySeleniumTest
                     {
                         String innerCmd = verifyWhat.replace( "NotPresent", "Present" );
                         BooleanSeleniumCommand innerCommand =
-                            new BooleanSeleniumCommand( storedVars, commandProcessor, "is" + innerCmd, param1 );
+                            getInnerBooleanCommand( "is" + innerCmd, storedVars, param1 );
                         cmd = new VerifyFalseStep( innerCommand );
                     }
                     else if ( verifyWhat.startsWith( "Not" ) )
@@ -299,7 +299,10 @@ public abstract class PlaySeleniumTest
                         if ( "Equals".equals( innerCmd ) )
                         {
                             // Play! extension (see "user-extensions.js" file)
-                            cmd = new PlayVerifyNotEqualsStep( storedVars, param1, param2 );
+                            VoidSeleniumCommand assertCommand =
+                                new VoidSeleniumCommand( storedVars, commandProcessor, "assertNotEquals", param1,
+                                                         param2 );
+                            cmd = new VerifyStep( assertCommand );
                         }
                         else
                         {
@@ -312,13 +315,13 @@ public abstract class PlaySeleniumTest
                             if ( isBooleanCommand( innerCmd ) )
                             {
                                 BooleanSeleniumCommand innerCommand =
-                                    new BooleanSeleniumCommand( storedVars, commandProcessor, "is" + innerCmd, param1 );
+                                    getInnerBooleanCommand( "is" + innerCmd, storedVars, param1 );
                                 cmd = new VerifyFalseStep( innerCommand );
                             }
                             else
                             {
                                 StringSeleniumCommand innerCommand =
-                                    getInnerStringCommandByName( innerCmd, storedVars, param1 );
+                                    getInnerStringCommand( innerCmd, storedVars, param1 );
                                 cmd = new VerifyNotEqualsStep( innerCommand, param2 );
                             }
                         }
@@ -329,12 +332,16 @@ public abstract class PlaySeleniumTest
                         if ( "Equals".equals( innerCmd ) )
                         {
                             // Play! extension (see "user-extensions.js" file)
-                            cmd = new PlayVerifyEqualsStep( storedVars, param1, param2 );
+                            VoidSeleniumCommand assertCommand =
+                                new VoidSeleniumCommand( storedVars, commandProcessor, "assertEquals", param1, param2 );
+                            cmd = new VerifyStep( assertCommand );
                         }
                         else if ( "TextLike".equals( innerCmd ) )
                         {
                             // Play! extension (see "user-extensions.js" file)
-                            cmd = new PlayVerifyTextLikeStep( storedVars, param1, param2 );
+                            VoidSeleniumCommand assertCommand =
+                                new VoidSeleniumCommand( storedVars, commandProcessor, "assertTextLike", param1, param2 );
+                            cmd = new VerifyStep( assertCommand );
                         }
                         else if ( "Selected".equals( innerCmd ) )
                         {
@@ -352,13 +359,13 @@ public abstract class PlaySeleniumTest
                             if ( isBooleanCommand( innerCmd ) )
                             {
                                 BooleanSeleniumCommand innerCommand =
-                                    new BooleanSeleniumCommand( storedVars, commandProcessor, "is" + innerCmd, param1 );
+                                    getInnerBooleanCommand( "is" + innerCmd, storedVars, param1 );
                                 cmd = new VerifyTrueStep( innerCommand );
                             }
                             else
                             {
                                 StringSeleniumCommand innerCommand =
-                                    getInnerStringCommandByName( innerCmd, storedVars, param1 );
+                                    getInnerStringCommand( innerCmd, storedVars, param1 );
                                 cmd = new VerifyEqualsStep( innerCommand, param2 );
                             }
                         }
@@ -371,7 +378,7 @@ public abstract class PlaySeleniumTest
                     {
                         String innerCmd = "is" + assertWhat.replace( "NotPresent", "Present" );
                         BooleanSeleniumCommand innerCommand =
-                            new BooleanSeleniumCommand( storedVars, commandProcessor, innerCmd, param1 );
+                            getInnerBooleanCommand( innerCmd, storedVars, param1 );
                         cmd = new AssertFalseStep( innerCommand );
                     }
                     else if ( assertWhat.startsWith( "Not" ) )
@@ -380,7 +387,10 @@ public abstract class PlaySeleniumTest
                         if ( "Equals".equals( innerCmd ) )
                         {
                             // Play! extension (see "user-extensions.js" file)
-                            cmd = new PlayAssertNotEqualsStep( storedVars, param1, param2 );
+                            VoidSeleniumCommand assertCommand =
+                                new VoidSeleniumCommand( storedVars, commandProcessor, "assertNotEquals", param1,
+                                                         param2 );
+                            cmd = new AssertStep( assertCommand );
                         }
                         else
                         {
@@ -393,13 +403,13 @@ public abstract class PlaySeleniumTest
                             if ( isBooleanCommand( innerCmd ) )
                             {
                                 BooleanSeleniumCommand innerCommand =
-                                    new BooleanSeleniumCommand( storedVars, commandProcessor, "is" + innerCmd, param1 );
+                                    getInnerBooleanCommand( "is" + innerCmd, storedVars, param1 );
                                 cmd = new AssertFalseStep( innerCommand );
                             }
                             else
                             {
                                 StringSeleniumCommand innerCommand =
-                                    getInnerStringCommandByName( innerCmd, storedVars, param1 );
+                                    getInnerStringCommand( innerCmd, storedVars, param1 );
                                 cmd = new AssertNotEqualsStep( innerCommand, param2 );
                             }
                         }
@@ -410,12 +420,16 @@ public abstract class PlaySeleniumTest
                         if ( "Equals".equals( innerCmd ) )
                         {
                             // Play! extension (see "user-extensions.js" file)
-                            cmd = new PlayAssertEqualsStep( storedVars, param1, param2 );
+                            VoidSeleniumCommand assertCommand =
+                                new VoidSeleniumCommand( storedVars, commandProcessor, "assertEquals", param1, param2 );
+                            cmd = new AssertStep( assertCommand );
                         }
                         else if ( "TextLike".equals( innerCmd ) )
                         {
                             // Play! extension (see "user-extensions.js" file)
-                            cmd = new PlayAssertTextLikeStep( storedVars, param1, param2 );
+                            VoidSeleniumCommand assertCommand =
+                                new VoidSeleniumCommand( storedVars, commandProcessor, "assertTextLike", param1, param2 );
+                            cmd = new AssertStep( assertCommand );
                         }
                         else if ( "Selected".equals( innerCmd ) )
                         {
@@ -433,13 +447,13 @@ public abstract class PlaySeleniumTest
                             if ( isBooleanCommand( innerCmd ) )
                             {
                                 BooleanSeleniumCommand innerCommand =
-                                    new BooleanSeleniumCommand( storedVars, commandProcessor, "is" + innerCmd, param1 );
+                                    getInnerBooleanCommand( "is" + innerCmd, storedVars, param1 );
                                 cmd = new AssertTrueStep( innerCommand );
                             }
                             else
                             {
                                 StringSeleniumCommand innerCommand =
-                                    getInnerStringCommandByName( innerCmd, storedVars, param1 );
+                                    getInnerStringCommand( innerCmd, storedVars, param1 );
                                 cmd = new AssertEqualsStep( innerCommand, param2 );
                             }
                         }
@@ -461,7 +475,7 @@ public abstract class PlaySeleniumTest
                         {
                             String innerCmd = waitForWhat.replace( "NotPresent", "Present" );
                             BooleanSeleniumCommand innerCommand =
-                                new BooleanSeleniumCommand( storedVars, commandProcessor, "is" + innerCmd, param1 );
+                                getInnerBooleanCommand( "is" + innerCmd, storedVars, param1 );
                             cmd = new WaitForFalseStep( innerCommand, timeout );
                         }
                         else if ( waitForWhat.startsWith( "Not" ) )
@@ -475,13 +489,13 @@ public abstract class PlaySeleniumTest
                             if ( isBooleanCommand( innerCmd ) )
                             {
                                 BooleanSeleniumCommand innerCommand =
-                                    new BooleanSeleniumCommand( storedVars, commandProcessor, "is" + innerCmd, param1 );
+                                    getInnerBooleanCommand( "is" + innerCmd, storedVars, param1 );
                                 cmd = new WaitForFalseStep( innerCommand, timeout );
                             }
                             else
                             {
                                 StringSeleniumCommand innerCommand =
-                                    getInnerStringCommandByName( innerCmd, storedVars, param1 );
+                                    getInnerStringCommand( innerCmd, storedVars, param1 );
                                 cmd = new WaitForNotEqualsStep( innerCommand, param2, timeout );
                             }
                         }
@@ -496,13 +510,13 @@ public abstract class PlaySeleniumTest
                             if ( isBooleanCommand( innerCmd ) )
                             {
                                 BooleanSeleniumCommand innerCommand =
-                                    new BooleanSeleniumCommand( storedVars, commandProcessor, "is" + innerCmd, param1 );
+                                    getInnerBooleanCommand( "is" + innerCmd, storedVars, param1 );
                                 cmd = new WaitForTrueStep( innerCommand, timeout );
                             }
                             else
                             {
                                 StringSeleniumCommand innerCommand =
-                                    getInnerStringCommandByName( innerCmd, storedVars, param1 );
+                                    getInnerStringCommand( innerCmd, storedVars, param1 );
                                 cmd = new WaitForEqualsStep( innerCommand, param2, timeout );
                             }
                         }
@@ -694,22 +708,14 @@ public abstract class PlaySeleniumTest
         return sb.toString();
     }
 
-    private StringSeleniumCommand getInnerStringCommandByName( String innerCmd, StoredVars storedVars, String param1 )
+    private BooleanSeleniumCommand getInnerBooleanCommand( String innerCmd, StoredVars storedVars, String param1 )
     {
-        StringSeleniumCommand result = null;
-        if ( "CacheEntry".equals( innerCmd ) )
-        {
-            result = new PlayGetCacheEntryCommand( storedVars, commandProcessor, seleniumUrl, param1 );
-        }
-        else if ( "LastReceivedEmailBy".equals( innerCmd ) )
-        {
-            result = new PlayGetLastReceivedEmailByCommand( storedVars, commandProcessor, seleniumUrl, param1 );
-        }
-        else
-        {
-            result = new StringSeleniumCommand( storedVars, commandProcessor, "get" + innerCmd, param1 );
-        }
-        return result;
+        return new BooleanSeleniumCommand( storedVars, commandProcessor, "is" + innerCmd, param1 );
+    }
+
+    private StringSeleniumCommand getInnerStringCommand( String innerCmd, StoredVars storedVars, String param1 )
+    {
+        return new StringSeleniumCommand( storedVars, commandProcessor, "get" + innerCmd, param1 );
     }
 
 }

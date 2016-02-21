@@ -245,7 +245,11 @@ public abstract class PlaySeleniumTest
                 // param2 = xmlUnescape( param2 );
                 // }
 
-                if ( "echo".equals( command ) )
+                if ( "break".equals( command ) )
+                {
+                    cmd = new BreakStep();
+                }
+                else if ( "echo".equals( command ) )
                 {
                     cmd = new EchoStep( storedVars, param1 );
                 }

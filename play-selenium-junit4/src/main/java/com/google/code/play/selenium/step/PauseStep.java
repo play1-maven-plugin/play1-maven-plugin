@@ -35,9 +35,23 @@ public class PauseStep
     public void doExecute()
         throws Exception
     {
-        String millisStr = storedVars.fillValues( param );
-        long millis = Long.parseLong( millisStr );
-        Thread.sleep( millis );
+        long pauseTimeMillis = 0L;
+        if ( !"".equals( param ) )
+        {
+            String millisStr = storedVars.fillValues( param );
+            pauseTimeMillis = Long.parseLong( millisStr );
+            if ( pauseTimeMillis > 0L )
+            {
+                try
+                {
+                    Thread.sleep( pauseTimeMillis );
+                }
+                catch ( InterruptedException e )
+                {
+                    throw new RuntimeException( e );
+                }
+            }
+        }
     }
 
     public String toString()

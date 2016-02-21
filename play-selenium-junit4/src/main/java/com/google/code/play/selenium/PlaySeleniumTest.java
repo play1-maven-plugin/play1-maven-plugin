@@ -559,8 +559,8 @@ public abstract class PlaySeleniumTest
     private void executeTestSteps( List<Step> steps )
         throws Exception
     {
-        StringBuffer testTraceBuf = new StringBuffer();
-        StringBuffer verificationFailuresBuf = new StringBuffer();
+        StringBuilder testTraceBuf = new StringBuilder();
+        StringBuilder verificationFailuresBuf = new StringBuilder();
         int line = 0;
         for ( Step step : steps )
         {
@@ -580,80 +580,36 @@ public abstract class PlaySeleniumTest
             }
             catch ( VerificationError e )
             {
-                String msg = e.getMessage();
-                String logLine = dumpTestStepWhenError( line, step, msg );
-                if ( traceTest )
-                {
-                    System.out.println( logLine );
-                }
-                else
-                {
-                    testTraceBuf.append( logLine ).append( '\n' );
-                }
-                verificationFailuresBuf.append( '\n' ).append( e.getMessage() );
+                logNonFatalProblem( line, step, e.getMessage(), testTraceBuf, verificationFailuresBuf );
             }
             catch ( AssertionError e )
             {
-                String msg = e.getMessage();
-                String logLine = dumpTestStepWhenError( line, step, msg );
-                if ( traceTest )
-                {
-                    System.out.println( logLine );
-                }
-                else
-                {
-                    testTraceBuf.append( logLine );
-                    System.out.println( testTraceBuf.toString() );
-                }
+                logFatalProblem( line, step, e.getMessage(), testTraceBuf, verificationFailuresBuf );
                 throw e;
             }
             catch ( SeleniumException e )
             {
                 String msg = e.getMessage();
-                if ( msg.startsWith( "ERROR: " ) )
+                boolean isError = msg.startsWith( "ERROR: " );
+                if ( isError )
                 {
                     msg = msg.substring( "ERROR: ".length() );
-                }
-                String logLine = dumpTestStepWhenError( line, step, msg );
-                if ( traceTest )
-                {
-                    System.out.println( logLine );
+                    logFatalProblem( line, step, msg, testTraceBuf, verificationFailuresBuf );
+                    throw e;
                 }
                 else
                 {
-                    testTraceBuf.append( logLine );
-                    System.out.println( testTraceBuf.toString() );
+                    logNonFatalProblem( line, step, msg, testTraceBuf, verificationFailuresBuf );
                 }
-                throw e;
             }
             catch ( RuntimeException e ) // 'testTraceBuf' must be dumped before continuing
             {
-                String msg = e.getMessage();
-                String logLine = dumpTestStepWhenError( line, step, msg );
-                if ( traceTest )
-                {
-                    System.out.println( logLine );
-                }
-                else
-                {
-                    testTraceBuf.append( logLine );
-                    System.out.println( testTraceBuf.toString() );
-                }
+                logFatalProblem( line, step, e.getMessage(), testTraceBuf, verificationFailuresBuf );
                 throw e;
             }
             catch ( Error e ) // 'testTraceBuf' must be dumped before continuing
             {
-                String msg = e.getMessage();
-                String logLine = dumpTestStepWhenError( line, step, msg );
-                if ( traceTest )
-                {
-                    System.out.println( logLine );
-                }
-                else
-                {
-                    testTraceBuf.append( logLine );
-                    System.out.println( testTraceBuf.toString() );
-                }
+                logFatalProblem( line, step, e.getMessage(), testTraceBuf, verificationFailuresBuf );
                 throw e;
             }
         }
@@ -685,6 +641,35 @@ public abstract class PlaySeleniumTest
         }
 
         return sb.toString();
+    }
+
+    private void logNonFatalProblem( int line, Step step, String errorMessage, StringBuilder testTraceBuf,
+                                     StringBuilder verificationFailuresBuf )
+    {
+        String logLine = dumpTestStepWhenError( line, step, errorMessage );
+        if ( traceTest )
+        {
+            System.out.println( logLine );
+        }
+        else
+        {
+            testTraceBuf.append( logLine ).append( '\n' );
+        }
+        verificationFailuresBuf.append( '\n' ).append( errorMessage );
+    }
+
+    private void logFatalProblem( int line, Step step, String errorMessage, StringBuilder testTraceBuf, StringBuilder verificationFailuresBuf )
+    {
+        String logLine = dumpTestStepWhenError( line, step, errorMessage );
+        if ( traceTest )
+        {
+            System.out.println( logLine );
+        }
+        else
+        {
+            testTraceBuf.append( logLine );
+            System.out.println( testTraceBuf.toString() );
+        }
     }
 
     private String dumpTestStepWhenError( int line, Step step, String errorMessage )

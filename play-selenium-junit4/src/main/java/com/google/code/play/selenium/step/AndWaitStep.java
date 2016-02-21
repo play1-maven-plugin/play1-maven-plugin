@@ -16,8 +16,6 @@
 
 package com.google.code.play.selenium.step;
 
-import com.thoughtworks.selenium.SeleniumException;
-
 import com.google.code.play.selenium.Timeout;
 
 public class AndWaitStep
@@ -36,22 +34,7 @@ public class AndWaitStep
         throws Exception
     {
         innerCommand.execute();
-        try
-        {
-            innerCommand.commandProcessor.doCommand( "waitForPageToLoad", new String[] { getTimeout() } );
-        }
-        catch ( SeleniumException e )
-        {
-            String msg = e.getMessage();
-            if ( msg.startsWith( "Timed out" ) )
-            {
-                Verify.fail( msg );
-            }
-            else
-            {
-                throw e;
-            }
-        }
+        innerCommand.commandProcessor.doCommand( "waitForPageToLoad", new String[] { getTimeout() } );
     }
 
     public String toString()

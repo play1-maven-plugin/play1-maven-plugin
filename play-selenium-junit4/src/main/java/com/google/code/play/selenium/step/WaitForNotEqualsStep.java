@@ -53,7 +53,7 @@ public class WaitForNotEqualsStep
         if ( !success )
         {
             String assertMessage = "Actual value \"" + innerCommandResult + "\" did match \"" + xexpected + "\"";
-            Verify.fail( "Timed out after " + getTimeout() + "ms (" + assertMessage + ")" );
+            throwTimeoutException( assertMessage );
         }
     }
 

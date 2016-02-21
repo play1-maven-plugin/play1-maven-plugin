@@ -16,9 +16,9 @@
 
 package com.google.code.play.selenium.step;
 
-import com.google.code.play.selenium.Timeout;
+import com.thoughtworks.selenium.SeleniumException;
 
-import junit.framework.Assert;
+import com.google.code.play.selenium.Timeout;
 
 public abstract class AbstractTimedSeleniumStep
     extends AbstractSeleniumStep
@@ -48,6 +48,12 @@ public abstract class AbstractTimedSeleniumStep
             String errorMessage = String.format( "Timeout is not a number: '%s'", timeoutString );
             throw new RuntimeException( errorMessage, e );
         }
+    }
+
+    protected void throwTimeoutException( String assertMessage )
+    {
+        String errorMessage = "Timed out after " + timeout.get() + "ms (" + assertMessage + ")";
+        throw new SeleniumException( errorMessage );
     }
 
 }

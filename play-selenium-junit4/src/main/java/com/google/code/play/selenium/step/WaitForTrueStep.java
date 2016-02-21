@@ -57,7 +57,7 @@ public class WaitForTrueStep
                 assertMessage = "'" + innerCommand.param1 + "' not " + cmd; // in this case the parameters is always
                                                                             // not empty
             }
-            Verify.fail( "Timed out after " + getTimeout() + "ms (" + assertMessage + ")" );
+            throwTimeoutException( assertMessage );
         }
     }
 

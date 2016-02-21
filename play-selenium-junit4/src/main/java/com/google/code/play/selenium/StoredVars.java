@@ -45,6 +45,11 @@ public class StoredVars
         storedVars.put( name, value );
     }
 
+    public void removeVariable( String name )
+    {
+        storedVars.remove( name );
+    }
+
     public String fillValues( String text )
     {
         String result = text;

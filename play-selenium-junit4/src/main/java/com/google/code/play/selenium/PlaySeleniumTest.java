@@ -272,12 +272,9 @@ public abstract class PlaySeleniumTest
                 }
                 else if ( command.startsWith( "store" ) )
                 {
-                    String storeWhat = command.substring( "store".length() );
-                    cmd =
-                        new StoreStep( storedVars, new VoidSeleniumCommand( storedVars, commandProcessor, command,
-                                                                            param1, param2 ),
-                                       new StringSeleniumCommand( storedVars, commandProcessor, "get" + storeWhat,
-                                                                  param1 ) );
+                    VoidSeleniumCommand storeCmd =
+                        new VoidSeleniumCommand( storedVars, commandProcessor, command, param1, param2 );
+                    cmd = new StoreStep( storeCmd );
                 }
                 else if ( command.startsWith( "verify" ) )
                 {

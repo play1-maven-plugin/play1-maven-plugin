@@ -16,18 +16,19 @@
 
 package com.google.code.play.selenium.step;
 
-import junit.framework.Assert;
+import com.google.code.play.selenium.Timeout;
 
 public class WaitForEqualsStep
-    extends AbstractSeleniumStep
+    extends AbstractTimedSeleniumStep
 {
 
     private StringSeleniumCommand innerCommand;
 
     private String expected;
 
-    public WaitForEqualsStep( StringSeleniumCommand innerCommand, String expected )
+    public WaitForEqualsStep( StringSeleniumCommand innerCommand, String expected, Timeout timeout )
     {
+        super( timeout );
         this.innerCommand = innerCommand;
         this.expected = expected;
     }
@@ -35,30 +36,24 @@ public class WaitForEqualsStep
     protected void doExecute()
         throws Exception
     {
-        String innerCommandResult = null;
+        long endTimeMillis = System.currentTimeMillis() + getTimeoutAsInt();
+
         String xexpected = innerCommand.storedVars.fillValues( expected );
         xexpected = MultiLineHelper.brToNewLine( xexpected );
-        for ( int second = 0;; second++ )
+
+        String innerCommandResult = innerCommand.getString();
+        boolean success = EqualsHelper.seleniumEquals( xexpected, innerCommandResult );
+        while ( !success && System.currentTimeMillis() < endTimeMillis )
         {
-            if ( second >= 60 )
-            {
-                String assertMessage =
-                    "Actual value \"" + innerCommandResult + "\" did not match \"" + xexpected + "\"";
-                Assert.fail( assertMessage );
-            }
-            try
-            {
-                innerCommandResult = innerCommand.getString();
-                boolean seleniumEqualsResult = EqualsHelper.seleniumEquals( xexpected, innerCommandResult );
-                if ( seleniumEqualsResult )
-                {
-                    break;
-                }
-            }
-            catch ( Exception e )
-            {
-            }
-            Thread.sleep( 1000 );
+            Thread.sleep( 10L );
+
+            innerCommandResult = innerCommand.getString();
+            success = EqualsHelper.seleniumEquals( xexpected, innerCommandResult );
+        }
+        if ( !success )
+        {
+            String assertMessage = "actual value \"" + innerCommandResult + "\" did not match \"" + xexpected + "\"";
+            Verify.fail( "Timed out after " + getTimeout() + "ms (" + assertMessage + ")" );
         }
     }
 

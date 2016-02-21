@@ -16,53 +16,48 @@
 
 package com.google.code.play.selenium.step;
 
-import junit.framework.Assert;
+import com.google.code.play.selenium.Timeout;
 
 public class WaitForFalseStep
-    extends AbstractSeleniumStep
+    extends AbstractTimedSeleniumStep
 {
 
     private BooleanSeleniumCommand innerCommand;
 
-    public WaitForFalseStep( BooleanSeleniumCommand innerCommand )
+    public WaitForFalseStep( BooleanSeleniumCommand innerCommand, Timeout timeout )
     {
+        super( timeout );
         this.innerCommand = innerCommand;
     }
 
     protected void doExecute()
         throws Exception
     {
-        for ( int second = 0;; second++ )
+        long endTimeMillis = System.currentTimeMillis() + getTimeoutAsInt();
+
+        boolean success = !innerCommand.getBoolean();
+        while ( !success && System.currentTimeMillis() < endTimeMillis )
         {
-            if ( second >= 60 )
+            Thread.sleep( 10L );
+
+            success = !innerCommand.getBoolean();
+        }
+        if ( !success )
+        {
+            String assertMessage = null;
+            String cmd = innerCommand.command.substring( "is".length() );
+            if ( cmd.endsWith( "Present" ) )
             {
-                String assertMessage = null;
-                String cmd = innerCommand.command.substring( "is".length() );
-                if ( cmd.endsWith( "Present" ) )
-                {
-                    assertMessage =
-                        cmd.replace( "Present", ( !"".equals( innerCommand.param1 ) ? " '" + innerCommand.param1 + "'"
-                                        : "" ) + " present" );
-                }
-                else
-                {
-                    assertMessage = "'" + innerCommand.param1 + "' " + cmd; // in this case the parameters is always not
-                                                                            // empty
-                }
-                Assert.fail( assertMessage );
+                assertMessage =
+                    cmd.replace( "Present", ( !"".equals( innerCommand.param1 ) ? " '" + innerCommand.param1 + "'"
+                                    : "" ) + " present" );
             }
-            try
+            else
             {
-                boolean innerCommandResult = !innerCommand.getBoolean();
-                if ( innerCommandResult )
-                {
-                    break;
-                }
+                assertMessage = "'" + innerCommand.param1 + "' " + cmd; // in this case the parameters is always not
+                                                                        // empty
             }
-            catch ( Exception e )
-            {
-            }
-            Thread.sleep( 1000 );
+            Verify.fail( "Timed out after " + getTimeout() + "ms (" + assertMessage + ")" );
         }
     }
 

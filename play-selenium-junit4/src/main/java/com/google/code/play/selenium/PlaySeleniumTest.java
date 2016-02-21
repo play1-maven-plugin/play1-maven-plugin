@@ -20,6 +20,7 @@ import com.thoughtworks.selenium.CommandProcessor;
 import com.thoughtworks.selenium.DefaultSelenium;
 import com.thoughtworks.selenium.HttpCommandProcessor;
 import com.thoughtworks.selenium.Selenium;
+import com.thoughtworks.selenium.SeleniumException;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -551,7 +552,7 @@ public abstract class PlaySeleniumTest
             }
             catch ( VerificationError e )
             {
-                String msg = "verification failure: " + e.getMessage();
+                String msg = e.getMessage();
                 String logLine = dumpTestStepWhenError( line, step, msg );
                 if ( traceTest )
                 {
@@ -565,7 +566,7 @@ public abstract class PlaySeleniumTest
             }
             catch ( AssertionError e )
             {
-                String msg = "assertion failure: " + e.getMessage();
+                String msg = e.getMessage();
                 String logLine = dumpTestStepWhenError( line, step, msg );
                 if ( traceTest )
                 {
@@ -573,15 +574,18 @@ public abstract class PlaySeleniumTest
                 }
                 else
                 {
-                    // buf.append( logLine ).append( '\n' );
                     testTraceBuf.append( logLine );
                     System.out.println( testTraceBuf.toString() );
                 }
                 throw e;
             }
-            catch ( Error e )//TODO-should I handle errors?
+            catch ( SeleniumException e )
             {
-                String msg = "error: " + e.getMessage();
+                String msg = e.getMessage();
+                if ( msg.startsWith( "ERROR: " ) )
+                {
+                    msg = msg.substring( "ERROR: ".length() );
+                }
                 String logLine = dumpTestStepWhenError( line, step, msg );
                 if ( traceTest )
                 {
@@ -589,15 +593,14 @@ public abstract class PlaySeleniumTest
                 }
                 else
                 {
-                    // buf.append( logLine ).append( '\n' );
                     testTraceBuf.append( logLine );
                     System.out.println( testTraceBuf.toString() );
                 }
                 throw e;
             }
-            catch ( RuntimeException e )
+            catch ( RuntimeException e ) // 'testTraceBuf' must be dumped before continuing
             {
-                String msg = "runtime exception: " + e.getMessage();
+                String msg = e.getMessage();
                 String logLine = dumpTestStepWhenError( line, step, msg );
                 if ( traceTest )
                 {
@@ -605,7 +608,21 @@ public abstract class PlaySeleniumTest
                 }
                 else
                 {
-                    // buf.append( logLine ).append( '\n' );
+                    testTraceBuf.append( logLine );
+                    System.out.println( testTraceBuf.toString() );
+                }
+                throw e;
+            }
+            catch ( Error e ) // 'testTraceBuf' must be dumped before continuing
+            {
+                String msg = e.getMessage();
+                String logLine = dumpTestStepWhenError( line, step, msg );
+                if ( traceTest )
+                {
+                    System.out.println( logLine );
+                }
+                else
+                {
                     testTraceBuf.append( logLine );
                     System.out.println( testTraceBuf.toString() );
                 }

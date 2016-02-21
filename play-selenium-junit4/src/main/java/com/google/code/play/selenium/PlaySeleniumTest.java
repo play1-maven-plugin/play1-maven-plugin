@@ -142,8 +142,7 @@ public abstract class PlaySeleniumTest
                 {
                     SeleneseParser parser = new JSoupSeleneseParser();
                     List<List<String>> commands = parser.parseSeleneseContent( content );
-                    StoredVars storedVars = new StoredVars();
-                    List<Step> steps = processContent( commands, storedVars );
+                    List<Step> steps = processContent( commands );
                     executeTestSteps( steps );
                 }
                 else if ( contentType.startsWith( "text/plain" ) )
@@ -217,9 +216,9 @@ public abstract class PlaySeleniumTest
         return buf.toString();
     }
 
-    private List<Step> processContent( List<List<String>> content, StoredVars storedVars )
+    private List<Step> processContent( List<List<String>> content )
     {
-        // StoredVars storedVars = new StoredVars();
+        StoredVars storedVars = new StoredVars();
         Timeout timeout = new Timeout();
         List<Step> result = new ArrayList<Step>();
 

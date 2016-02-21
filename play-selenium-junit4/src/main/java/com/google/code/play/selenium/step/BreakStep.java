@@ -27,7 +27,7 @@ public class BreakStep
     public void doExecute()
         throws Exception
     {
-        System.out.println( "break: not implemented" );
+        // no implementation
     }
 
     public String toString()

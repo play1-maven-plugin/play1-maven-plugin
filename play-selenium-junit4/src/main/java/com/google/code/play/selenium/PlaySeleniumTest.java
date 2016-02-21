@@ -272,9 +272,16 @@ public abstract class PlaySeleniumTest
                 }
                 else if ( command.startsWith( "store" ) )
                 {
-                    VoidSeleniumCommand storeCmd =
-                        new VoidSeleniumCommand( storedVars, commandProcessor, command, param1, param2 );
-                    cmd = new StoreStep( storeCmd );
+                    if ( "store".equals( command ) )
+                    {
+                        cmd = new SimpleStoreStep( storedVars, commandProcessor, param1, param2 );
+                    }
+                    else
+                    {
+                        VoidSeleniumCommand storeCmd =
+                            new VoidSeleniumCommand( storedVars, commandProcessor, command, param1, param2 );
+                        cmd = new StoreStep( storeCmd );
+                    }
                 }
                 else if ( command.startsWith( "verify" ) )
                 {

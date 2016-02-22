@@ -61,7 +61,7 @@ limitations under the License.
                         <links>
                             <link>http://download.oracle.com/javase/5/docs/api/</link>
                             <link>http://junit.sourceforge.net/javadoc_40/</link>
-                            <link>http://www.playframework.com/documentation/api/${play.version}/</link>
+                            <link>https://www.playframework.com/documentation/${play.version}/api/</link>
                         </links>
                     </configuration>
                 </plugin>
@@ -70,6 +70,26 @@ limitations under the License.
     </build>
 
     <profiles>
+        <profile>
+            <id>publicsite</id> <!-- site version to be uploaded -->
+
+            <reporting>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <configuration>
+                            <links>
+                                <link>http://download.oracle.com/javase/5/docs/api/</link>
+                                <link>http://junit.sourceforge.net/javadoc_40/</link>
+                                <link>https://www.playframework.com/documentation/${play.version}/api/</link>
+                            </links>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </reporting>
+        </profile>
+
         <profile>
             <id>fullsite</id>
 
@@ -82,7 +102,7 @@ limitations under the License.
                             <links>
                                 <link>http://download.oracle.com/javase/5/docs/api/</link>
                                 <link>http://junit.sourceforge.net/javadoc_40/</link>
-                                <link>http://www.playframework.com/documentation/api/${play.version}/</link>
+                                <link>https://www.playframework.com/documentation/${play.version}/api/</link>
                             </links>
                         </configuration>
                     </plugin>

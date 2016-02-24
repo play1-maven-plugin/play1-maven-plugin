@@ -208,7 +208,20 @@ public class PlayDependenciesMojo
 
                                 if ( dependenciesForceCopy )
                                 {
-                                    org.apache.commons.io.FileUtils.copyDirectory( reactorProjectBasedir , moduleLinkFile );
+                                    if ( moduleLinkFile.isFile() && !moduleLinkFile.delete() )
+                                    {
+                                        throw new IOException( String.format( "Cannot delete \"%s\" file",
+                                                                              moduleLinkFile.getCanonicalPath() ) );
+                                    }
+                                    List<String> moduleFileNames =
+                                        FileUtils.getFileAndDirectoryNames( reactorProjectBasedir, "**", "logs/**,precompiled/**,target/**,tmp/**",
+                                                                            false, true, true, false );
+                                    for ( String fileName: moduleFileNames )
+                                    {
+                                        File srcFile = new File( reactorProjectBasedir, fileName );
+                                        File dstFile = new File( moduleLinkFile, fileName );
+                                        FileUtils.copyFileToDirectory( srcFile, dstFile.getParentFile() ) ;
+                                    }
                                 }
                                 else
                                 {

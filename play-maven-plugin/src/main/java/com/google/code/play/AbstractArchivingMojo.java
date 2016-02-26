@@ -16,12 +16,16 @@
 
 package com.google.code.play;
 
+import java.lang.reflect.Method;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
 import org.apache.maven.plugins.annotations.Component;
+
+import org.codehaus.plexus.archiver.AbstractArchiver;
 import org.codehaus.plexus.archiver.ArchiveEntry;
+import org.codehaus.plexus.archiver.ArchiverException;
 import org.codehaus.plexus.archiver.Archiver;
 import org.codehaus.plexus.archiver.ResourceIterator;
 import org.codehaus.plexus.archiver.manager.ArchiverManager;
@@ -65,7 +69,7 @@ public abstract class AbstractArchivingMojo
                 long resLastModified = resource.getLastModified();
                 if ( resLastModified != PlexusIoResource.UNKNOWN_MODIFICATION_DATE )
                 {
-                    long destFileLastModified = destFile.lastModified(); // TODO-use this
+                    long destFileLastModified = destFile.lastModified();
                     if ( resLastModified <= destFileLastModified )
                     {
                         skip = true;
@@ -78,7 +82,10 @@ public abstract class AbstractArchivingMojo
                 switch ( entry.getType() )
                 {
                     case ArchiveEntry.DIRECTORY:
-                        destFile.mkdirs(); // TODO-change to PlexusUtils, check result
+                        if ( !destFile.mkdirs() )
+                        {
+                            throw new IOException( "Unable to create directory: " + destFile );
+                        }
                         break;
                     case ArchiveEntry.FILE:
                         InputStream contents = resource.getContents();
@@ -86,10 +93,22 @@ public abstract class AbstractArchivingMojo
                         FileUtils.copyStreamToFile( facade, destFile );
                         break;
                     default:
-                        throw new RuntimeException( "Unknown archive entry type: " + entry.getType() ); // TODO-polish, what exception class?
+                        throw new ArchiverException( "Unknown archive entry type: " + entry.getType() );
                 }
-                // System.out.println(entry.getName());
             }
+        }
+
+        // Ugly hack to close input streams (cleanUp() method is protected)
+        try
+        {
+            Method cleanUpMethod = AbstractArchiver.class.getDeclaredMethod( "cleanUp" );
+            cleanUpMethod.setAccessible( true );
+            cleanUpMethod.invoke( archiver );
+        }
+        catch ( Exception e )
+        {
+            getLog().info( "Error: " + e.getMessage() ); //FIXME
+            // ignore
         }
     }
     

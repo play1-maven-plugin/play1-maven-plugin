@@ -79,6 +79,7 @@ public abstract class AbstractArchivingMojo
 
             if ( !skip )
             {
+                getLog().debug( "Expanding '" + destFile.getAbsolutePath() + "'" );
                 switch ( entry.getType() )
                 {
                     case ArchiveEntry.DIRECTORY:

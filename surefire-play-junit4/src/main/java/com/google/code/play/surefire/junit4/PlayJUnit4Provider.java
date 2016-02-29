@@ -505,7 +505,6 @@ public class PlayJUnit4Provider
             Runner runner = request.getRunner();
             if ( countTestsInRunner( runner.getDescription() ) != 0 )
             {
-                // runner.run( notifier );
                 executeInPlayContext( runner, notifier );
             }
         }
@@ -520,7 +519,6 @@ public class PlayJUnit4Provider
             {
                 Class<?> methodClass = Class.forName( failedMethod.getClazz(), true, testClassLoader );
                 String methodName = failedMethod.getMethod();
-                // method( methodClass, methodName ).getRunner().run( notifier );
                 Runner runner = method( methodClass, methodName ).getRunner();
                 executeInPlayContext( runner, notifier );
             }

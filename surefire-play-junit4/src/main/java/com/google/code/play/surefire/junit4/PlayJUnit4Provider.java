@@ -49,8 +49,6 @@ import org.junit.runner.notification.RunNotifier;
 import org.junit.runner.notification.StoppedByUserException;
 
 import java.io.File;
-import java.lang.reflect.Constructor;
-//import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
@@ -593,28 +591,12 @@ public class PlayJUnit4Provider
     {
         try
         {
-            String invocationClassName = "com.google.code.play.surefire.junit4.TestInvocation";
-            if ( "1.2".compareTo( Play.version ) <= 0 )
-            {
-                invocationClassName = "com.google.code.play.surefire.junit4.Play12TestInvocation";
-            }
-            Invoker.DirectInvocation invocation = getInvocation( invocationClassName, runner, notifier );
-            Invoker.invokeInThread( invocation );
+            Invoker.invokeInThread( new TestInvocation( runner, notifier ) );
         }
         catch ( Throwable e )
         {
             throw new TestSetFailedException( e );
         }
-    }
-
-    private static Invoker.DirectInvocation getInvocation( String invocationClassName, Runner runner, RunNotifier notifier )
-        throws Throwable
-    {
-        Invoker.DirectInvocation invocation = null;
-        Class<?> cl = Class.forName( invocationClassName );
-        Constructor<?> c = cl.getConstructor( Runner.class, RunNotifier.class );
-        invocation = (Invoker.DirectInvocation) c.newInstance( runner, notifier );
-        return invocation;
     }
 
 }

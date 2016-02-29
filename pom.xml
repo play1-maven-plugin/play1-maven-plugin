@@ -81,7 +81,6 @@ limitations under the License.
         <module>play-maven-plugin</module>
         <module>play-selenium-junit4</module>
         <module>play-server-booter</module>
-        <module>play12-extensions</module>
         <module>surefire-play-junit4</module>
     </modules>
 

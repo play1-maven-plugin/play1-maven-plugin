@@ -79,16 +79,17 @@ public abstract class AbstractArchivingMojo
 
             if ( !skip )
             {
-                getLog().debug( "Expanding '" + destFile.getAbsolutePath() + "'" );
                 switch ( entry.getType() )
                 {
                     case ArchiveEntry.DIRECTORY:
-                        if ( !destFile.mkdirs() )
+                        getLog().info( "adding directory " + destFile.getAbsolutePath() );
+                        if ( !destFile.exists() && !destFile.mkdirs() )
                         {
                             throw new IOException( "Unable to create directory: " + destFile );
                         }
                         break;
                     case ArchiveEntry.FILE:
+                        getLog().info( "adding file " + destFile.getAbsolutePath() );
                         InputStream contents = resource.getContents();
                         RawInputStreamFacade facade = new RawInputStreamFacade( contents );
                         FileUtils.copyStreamToFile( facade, destFile );

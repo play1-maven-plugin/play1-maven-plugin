@@ -62,45 +62,40 @@ public abstract class AbstractArchivingMojo
             name = name.replace( File.separatorChar, '/' );
             File destFile = new File( destDirectory, name );
 
-            PlexusIoResource resource = entry.getResource();
-            boolean skip = false;
-            if ( destFile.exists() )
+            switch ( entry.getType() )
             {
-                long resLastModified = resource.getLastModified();
-                if ( resLastModified != PlexusIoResource.UNKNOWN_MODIFICATION_DATE )
-                {
-                    long destFileLastModified = destFile.lastModified();
-                    if ( resLastModified <= destFileLastModified )
+                case ArchiveEntry.DIRECTORY:
+                    getLog().debug( "adding directory " + destFile.getAbsolutePath() );
+                    if ( !destFile.exists() && !destFile.mkdirs() )
                     {
-                        skip = true;
+                        throw new IOException( "Unable to create directory: " + destFile );
                     }
-                }
-            }
-
-            if ( !skip )
-            {
-                switch ( entry.getType() )
-                {
-                    case ArchiveEntry.DIRECTORY:
-                        getLog().debug( "adding directory " + destFile.getAbsolutePath() );
-                        if ( destFile.exists() )
+                    break;
+                case ArchiveEntry.FILE:
+                    getLog().debug( "adding file " + destFile.getAbsolutePath() );
+                    PlexusIoResource resource = entry.getResource();
+                    boolean skip = false;
+                    if ( destFile.exists() )
+                    {
+                        long resLastModified = resource.getLastModified();
+                        if ( resLastModified != PlexusIoResource.UNKNOWN_MODIFICATION_DATE )
                         {
-                            getLog().warn( "directory already exists!!!" );
+                            long destFileLastModified = destFile.lastModified();
+                            if ( resLastModified <= destFileLastModified )
+                            {
+                                skip = true;
+                            }
                         }
-                        if ( !destFile.exists() && !destFile.mkdirs() )
-                        {
-                            throw new IOException( "Unable to create directory: " + destFile );
-                        }
-                        break;
-                    case ArchiveEntry.FILE:
-                        getLog().debug( "adding file " + destFile.getAbsolutePath() );
+                    }
+                    if ( !skip )
+                    {
                         InputStream contents = resource.getContents();
                         RawInputStreamFacade facade = new RawInputStreamFacade( contents );
                         FileUtils.copyStreamToFile( facade, destFile );
-                        break;
-                    default:
-                        throw new ArchiverException( "Unknown archive entry type: " + entry.getType() );
-                }
+                    }
+                    break;
+                default:
+                    throw new ArchiverException( "Unknown archive entry type: " + entry.getType() );
             }
         }
 

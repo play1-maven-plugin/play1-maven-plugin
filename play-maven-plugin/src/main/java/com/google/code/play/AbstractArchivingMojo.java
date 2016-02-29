@@ -65,17 +65,23 @@ public abstract class AbstractArchivingMojo
             switch ( entry.getType() )
             {
                 case ArchiveEntry.DIRECTORY:
-                    getLog().debug( "adding directory " + destFile.getAbsolutePath() );
-                    if ( !destFile.exists() && !destFile.mkdirs() )
+                    if ( !destFile.exists() )
                     {
-                        throw new IOException( "Unable to create directory: " + destFile );
+                        getLog().debug( "adding directory " + name + '/' );
+                        if ( !destFile.mkdirs() )
+                        {
+                            throw new IOException( "Unable to create directory: " + destFile );
+                        }
                     }
                     break;
                 case ArchiveEntry.FILE:
-                    getLog().debug( "adding file " + destFile.getAbsolutePath() );
                     PlexusIoResource resource = entry.getResource();
                     boolean skip = false;
-                    if ( destFile.exists() )
+                    if ( !destFile.exists() )
+                    {
+                        getLog().debug( "adding file " + name );
+                    }
+                    else
                     {
                         long resLastModified = resource.getLastModified();
                         if ( resLastModified != PlexusIoResource.UNKNOWN_MODIFICATION_DATE )
@@ -84,6 +90,10 @@ public abstract class AbstractArchivingMojo
                             if ( resLastModified <= destFileLastModified )
                             {
                                 skip = true;
+                            }
+                            else
+                            {
+                                getLog().debug( "updating file " + name );
                             }
                         }
                     }

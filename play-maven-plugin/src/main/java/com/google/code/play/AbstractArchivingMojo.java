@@ -83,6 +83,10 @@ public abstract class AbstractArchivingMojo
                 {
                     case ArchiveEntry.DIRECTORY:
                         getLog().debug( "adding directory " + destFile.getAbsolutePath() );
+                        if ( destFile.exists() )
+                        {
+                            getLog().warn( "directory already exists!!!" );
+                        }
                         if ( !destFile.exists() && !destFile.mkdirs() )
                         {
                             throw new IOException( "Unable to create directory: " + destFile );

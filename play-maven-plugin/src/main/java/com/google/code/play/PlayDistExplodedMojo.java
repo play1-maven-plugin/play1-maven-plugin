@@ -71,10 +71,16 @@ public class PlayDistExplodedMojo
             ConfigurationParser configParser = getConfiguration();
 
             ZipArchiver zipArchiver = prepareArchiver( configParser );
-
-            File distOutputDirectory = new File( project.getBuild().getDirectory(), "dist" );
-            getLog().info( "Building dist directory: " + distOutputDirectory.getAbsolutePath() );
-            expandArchive( zipArchiver, distOutputDirectory );
+            try
+            {
+                File distOutputDirectory = new File( project.getBuild().getDirectory(), "dist" );
+                getLog().info( "Building dist directory: " + distOutputDirectory.getAbsolutePath() );
+                expandArchive( zipArchiver, distOutputDirectory );
+            }
+            finally
+            {
+                cleanUpArchiver( zipArchiver );
+            }
         }
         catch ( ArchiverException e )
         {

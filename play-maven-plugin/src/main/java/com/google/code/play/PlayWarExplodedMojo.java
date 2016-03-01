@@ -92,10 +92,16 @@ public class PlayWarExplodedMojo
             ConfigurationParser configParser = getConfiguration();
 
             WarArchiver warArchiver = prepareArchiver( configParser, true );
-
-            File warOutputDirectory = new File( project.getBuild().getDirectory(), "war" );
-            getLog().info( "Building war directory: " + warOutputDirectory.getAbsolutePath() );
-            expandArchive( warArchiver, warOutputDirectory );
+            try
+            {
+                File warOutputDirectory = new File( project.getBuild().getDirectory(), "war" );
+                getLog().info( "Building war directory: " + warOutputDirectory.getAbsolutePath() );
+                expandArchive( warArchiver, warOutputDirectory );
+            }
+            finally
+            {
+                cleanUpArchiver( warArchiver );
+            }
         }
         catch ( ArchiverException e )
         {

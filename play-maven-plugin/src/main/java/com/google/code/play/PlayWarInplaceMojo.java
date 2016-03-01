@@ -72,9 +72,15 @@ public class PlayWarInplaceMojo
             ConfigurationParser configParser = getConfiguration();
 
             WarArchiver warArchiver = prepareArchiver( configParser, false );
-
-            getLog().info( "Building war directory: " + getWebappDirectory().getAbsolutePath() );
-            expandArchive( warArchiver, getWebappDirectory() );
+            try
+            {
+                getLog().info( "Building war directory: " + getWebappDirectory().getAbsolutePath() );
+                expandArchive( warArchiver, getWebappDirectory() );
+            }
+            finally
+            {
+                cleanUpArchiver( warArchiver );
+            }
         }
         catch ( ArchiverException e )
         {

@@ -108,19 +108,6 @@ public abstract class AbstractArchivingMojo
                     throw new ArchiverException( "Unknown archive entry type: " + entry.getType() );
             }
         }
-
-        // Ugly hack to close input streams (cleanUp() method is protected)
-        try
-        {
-            Method cleanUpMethod = AbstractArchiver.class.getDeclaredMethod( "cleanUp" );
-            cleanUpMethod.setAccessible( true );
-            cleanUpMethod.invoke( archiver );
-        }
-        catch ( Exception e )
-        {
-            getLog().info( "Error: " + e.getMessage() ); //FIXME
-            // ignore
-        }
     }
     
     protected ZipArchiver getZipArchiver() throws NoSuchArchiverException
@@ -150,4 +137,18 @@ public abstract class AbstractArchivingMojo
         }
     }
 
+    // Hack to close input streams (cleanUp() method is protected)
+    protected void cleanUpArchiver( AbstractArchiver archiver )
+    {
+        try
+        {
+            Method cleanUpMethod = AbstractArchiver.class.getDeclaredMethod( "cleanUp" );
+            cleanUpMethod.setAccessible( true );
+            cleanUpMethod.invoke( archiver );
+        }
+        catch ( Exception e )
+        {
+            getLog().warn( "Error \"" + e.getMessage() + "\" while invoking AbstractArchiver.cleanUp() using reflection. Ignoring." );
+        }
+    }
 }

@@ -60,7 +60,7 @@ public abstract class AbstractPlayStopServerMojo
         }
         catch ( InterruptedException e )
         {
-            throw new MojoExecutionException( "?", e );
+            throw new MojoExecutionException( "Thread interrupted", e );
         }
         
         PidFileDeleter.getInstance().remove( pidFile );

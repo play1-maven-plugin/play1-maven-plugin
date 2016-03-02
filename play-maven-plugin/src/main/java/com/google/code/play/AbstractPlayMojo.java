@@ -78,7 +78,7 @@ public abstract class AbstractPlayMojo
         }
         catch ( IOException e )
         {
-            throw new MojoExecutionException( "?", e );
+            throw new MojoExecutionException( e.getMessage(), e );
         }
     }
 

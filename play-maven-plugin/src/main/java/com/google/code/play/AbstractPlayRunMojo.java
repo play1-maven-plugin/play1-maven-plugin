@@ -94,12 +94,12 @@ public abstract class AbstractPlayRunMojo
         }
         catch ( InterruptedException e )
         {
-            throw new MojoExecutionException( "?", e );
+            throw new MojoExecutionException( "Thread interrupted", e );
         }
         Exception runException = runner.getException();
         if ( runException != null )
         {
-            throw new MojoExecutionException( "?", runException );
+            throw new MojoExecutionException( "Play! Server start error: " + runException.getMessage(), runException );
         }
         
         if ( !runFork )
@@ -112,7 +112,7 @@ public abstract class AbstractPlayRunMojo
                 }
                 catch ( InterruptedException e )
                 {
-                    throw new MojoExecutionException( "?", e );
+                    throw new MojoExecutionException( "Thread interrupted", e );
                 }
             }
         }

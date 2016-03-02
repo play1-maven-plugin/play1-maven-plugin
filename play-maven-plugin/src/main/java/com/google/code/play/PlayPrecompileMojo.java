@@ -223,12 +223,12 @@ public class PlayPrecompileMojo
         }
         catch ( InterruptedException e )
         {
-            throw new MojoExecutionException( "?", e );
+            throw new MojoExecutionException( "Precompilation interrupted", e );
         }
         Exception precompileException = runner.getException();
         if ( precompileException != null )
         {
-            throw new MojoExecutionException( "?", precompileException );
+            throw new MojoExecutionException( "Precompilation error: " + precompileException.getMessage(), precompileException );
         }
     }
 

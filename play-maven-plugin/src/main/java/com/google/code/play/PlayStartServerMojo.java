@@ -96,7 +96,7 @@ public class PlayStartServerMojo
         Exception startServerException = runner.getException();
         if ( startServerException != null )
         {
-            throw new MojoExecutionException( "?", startServerException );
+            throw new MojoExecutionException( "Play! Server start error: " + startServerException.getMessage(), startServerException );
         }
 
         getLog().info( "Play! Server started" );

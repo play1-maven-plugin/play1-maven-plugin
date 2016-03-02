@@ -340,17 +340,15 @@ public class PlayDependenciesMojo
         }
         catch ( ArchiverException e )
         {
-            // throw new MojoExecutionException( "Error unpacking file [" + file.getAbsolutePath() + "]" + "to ["
-            // + unpackDirectory.getAbsolutePath() + "]", e );
-            throw new MojoExecutionException( "?", e );
+            throw new MojoExecutionException( "Failed to process dependencies: " + e.getMessage(), e );
         }
         catch ( DependencyTreeBuilderException e )
         {
-            throw new MojoExecutionException( "?", e );
+            throw new MojoExecutionException( "Failed to process dependencies: " + e.getMessage(), e );
         }
         catch ( NoSuchArchiverException e )
         {
-            throw new MojoExecutionException( "?", e );
+            throw new MojoExecutionException( "Failed to process dependencies: " + e.getMessage(), e );
         }
     }
 

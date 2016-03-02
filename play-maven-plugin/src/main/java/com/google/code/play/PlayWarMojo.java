@@ -146,15 +146,15 @@ public class PlayWarMojo
         }
         catch ( ArchiverException e )
         {
-            throw new MojoExecutionException( "?", e );
+            throw new MojoExecutionException( "Failed to assemble WAR distribution archive: " + e.getMessage(), e );
         }
         catch ( DependencyTreeBuilderException e )
         {
-            throw new MojoExecutionException( "?", e );
+            throw new MojoExecutionException( "Failed to assemble WAR distribution archive: " + e.getMessage(), e );
         }
         catch ( NoSuchArchiverException e )
         {
-            throw new MojoExecutionException( "?", e );
+            throw new MojoExecutionException( "Failed to assemble WAR distribution archive: " + e.getMessage(), e );
         }
     }
 

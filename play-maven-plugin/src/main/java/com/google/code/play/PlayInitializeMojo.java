@@ -239,16 +239,16 @@ public class PlayInitializeMojo
             }
             catch ( ArchiverException e )
             {
-                throw new MojoExecutionException( "?", e );
+                throw new MojoExecutionException( "Failed to initialize Play! framework home directory: " + e.getMessage(), e );
             }
             catch ( NoSuchArchiverException e )
             {
-                throw new MojoExecutionException( "?", e );
+                throw new MojoExecutionException( "Failed to initialize Play! framework home directory: " + e.getMessage(), e );
             }
         }
         else
         {
-            throw new MojoExecutionException( "Missing Play! framework dependency." );
+            throw new MojoExecutionException( "Missing Play! framework dependency" );
         }
         return playTmpHomeDir;
     }

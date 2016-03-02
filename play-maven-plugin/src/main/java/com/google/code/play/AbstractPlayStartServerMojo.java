@@ -148,7 +148,7 @@ public abstract class AbstractPlayStartServerMojo
                 }
                 catch ( InterruptedException e )
                 {
-                    throw new MojoExecutionException( "?", e );
+                    throw new MojoExecutionException( "Thread interrupted", e );
                 }
             }
         }

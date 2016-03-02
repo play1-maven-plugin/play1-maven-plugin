@@ -152,12 +152,12 @@ public class PlayStartMojo
         }
         catch ( InterruptedException e )
         {
-            throw new MojoExecutionException( "?", e );
+            throw new MojoExecutionException( "Thread interrupted", e );
         }
         Exception startServerException = runner.getException();
         if ( startServerException != null )
         {
-            throw new MojoExecutionException( "?", startServerException );
+            throw new MojoExecutionException( "Play! Server start error: " + startServerException.getMessage(), startServerException );
         }
         
         if ( startSynchro )

@@ -148,7 +148,7 @@ public abstract class AbstractArchivingMojo
         }
         catch ( Exception e )
         {
-            getLog().warn( "Error \"" + e.getMessage() + "\" while invoking AbstractArchiver.cleanUp() using reflection. Ignoring." );
+            getLog().warn( "\"" + e.getMessage() + "\" exception while invoking AbstractArchiver.cleanUp() using reflection. Ignoring." );
         }
     }
 }

@@ -290,7 +290,7 @@ public abstract class PlaySeleniumTest
                     {
                         String innerCmd = verifyWhat.replace( "NotPresent", "Present" );
                         BooleanSeleniumCommand innerCommand =
-                            getInnerBooleanCommand( "is" + innerCmd, storedVars, param1 );
+                            getInnerBooleanCommand( innerCmd, storedVars, param1 );
                         cmd = new VerifyFalseStep( innerCommand );
                     }
                     else if ( verifyWhat.startsWith( "Not" ) )
@@ -315,7 +315,7 @@ public abstract class PlaySeleniumTest
                             if ( isBooleanCommand( innerCmd ) )
                             {
                                 BooleanSeleniumCommand innerCommand =
-                                    getInnerBooleanCommand( "is" + innerCmd, storedVars, param1 );
+                                    getInnerBooleanCommand( innerCmd, storedVars, param1 );
                                 cmd = new VerifyFalseStep( innerCommand );
                             }
                             else
@@ -359,7 +359,7 @@ public abstract class PlaySeleniumTest
                             if ( isBooleanCommand( innerCmd ) )
                             {
                                 BooleanSeleniumCommand innerCommand =
-                                    getInnerBooleanCommand( "is" + innerCmd, storedVars, param1 );
+                                    getInnerBooleanCommand( innerCmd, storedVars, param1 );
                                 cmd = new VerifyTrueStep( innerCommand );
                             }
                             else
@@ -376,7 +376,7 @@ public abstract class PlaySeleniumTest
                     String assertWhat = command.substring( "assert".length() );
                     if ( assertWhat.endsWith( "NotPresent" ) )
                     {
-                        String innerCmd = "is" + assertWhat.replace( "NotPresent", "Present" );
+                        String innerCmd = assertWhat.replace( "NotPresent", "Present" );
                         BooleanSeleniumCommand innerCommand =
                             getInnerBooleanCommand( innerCmd, storedVars, param1 );
                         cmd = new AssertFalseStep( innerCommand );
@@ -403,7 +403,7 @@ public abstract class PlaySeleniumTest
                             if ( isBooleanCommand( innerCmd ) )
                             {
                                 BooleanSeleniumCommand innerCommand =
-                                    getInnerBooleanCommand( "is" + innerCmd, storedVars, param1 );
+                                    getInnerBooleanCommand( innerCmd, storedVars, param1 );
                                 cmd = new AssertFalseStep( innerCommand );
                             }
                             else
@@ -447,7 +447,7 @@ public abstract class PlaySeleniumTest
                             if ( isBooleanCommand( innerCmd ) )
                             {
                                 BooleanSeleniumCommand innerCommand =
-                                    getInnerBooleanCommand( "is" + innerCmd, storedVars, param1 );
+                                    getInnerBooleanCommand( innerCmd, storedVars, param1 );
                                 cmd = new AssertTrueStep( innerCommand );
                             }
                             else
@@ -475,7 +475,7 @@ public abstract class PlaySeleniumTest
                         {
                             String innerCmd = waitForWhat.replace( "NotPresent", "Present" );
                             BooleanSeleniumCommand innerCommand =
-                                getInnerBooleanCommand( "is" + innerCmd, storedVars, param1 );
+                                getInnerBooleanCommand( innerCmd, storedVars, param1 );
                             cmd = new WaitForFalseStep( innerCommand, timeout );
                         }
                         else if ( waitForWhat.startsWith( "Not" ) )
@@ -489,7 +489,7 @@ public abstract class PlaySeleniumTest
                             if ( isBooleanCommand( innerCmd ) )
                             {
                                 BooleanSeleniumCommand innerCommand =
-                                    getInnerBooleanCommand( "is" + innerCmd, storedVars, param1 );
+                                    getInnerBooleanCommand( innerCmd, storedVars, param1 );
                                 cmd = new WaitForFalseStep( innerCommand, timeout );
                             }
                             else
@@ -510,7 +510,7 @@ public abstract class PlaySeleniumTest
                             if ( isBooleanCommand( innerCmd ) )
                             {
                                 BooleanSeleniumCommand innerCommand =
-                                    getInnerBooleanCommand( "is" + innerCmd, storedVars, param1 );
+                                    getInnerBooleanCommand( innerCmd, storedVars, param1 );
                                 cmd = new WaitForTrueStep( innerCommand, timeout );
                             }
                             else

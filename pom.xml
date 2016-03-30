@@ -27,7 +27,7 @@ limitations under the License.
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.google.code.maven-play-plugin</groupId>
     <artifactId>plugin</artifactId>
-    <version>1.0.0-beta8-SNAPSHOT</version>
+    <version>1.0.0-beta8</version>
     <packaging>pom</packaging>
 
     <name>Play! 1.x</name>
@@ -39,7 +39,7 @@ limitations under the License.
         <connection>scm:git:git://github.com/play1-maven-plugin/play1-maven-plugin.git</connection>
         <developerConnection>scm:git:git@github.com:play1-maven-plugin/play1-maven-plugin.git</developerConnection>
         <url>https://github.com/play1-maven-plugin/play1-maven-plugin/tree/${project.scm.tag}</url>
-        <tag>HEAD</tag>
+        <tag>plugin-1.0.0-beta8</tag>
     </scm>
 
     <ciManagement>

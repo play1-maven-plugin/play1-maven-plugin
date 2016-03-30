@@ -232,7 +232,7 @@ limitations under the License.
                         <attributes>
                             <playAppParentVersion>${project.version}</playAppParentVersion>
                             <play13AppParentVersion>${project.version}</play13AppParentVersion>
-                            <play13LatestVersion>1.3.2</play13LatestVersion>
+                            <play13LatestVersion>1.3.4</play13LatestVersion>
                         </attributes>
                     </configuration>
                     <dependencies>

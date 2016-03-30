@@ -22,6 +22,7 @@ import org.apache.commons.lang.StringEscapeUtils;
 public class OrderSafeProperties
     extends Properties
 {
+    private static final long serialVersionUID = 1L;
 
     // set used to preserve key order
     private final LinkedHashSet<Object> keys = new LinkedHashSet<Object>();

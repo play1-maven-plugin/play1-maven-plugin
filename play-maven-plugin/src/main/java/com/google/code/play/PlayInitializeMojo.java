@@ -183,6 +183,7 @@ public class PlayInitializeMojo
 
         File confPath = new File( baseDir, "conf" );
         boolean confResourceAlreadyAdded = false;
+        @SuppressWarnings( "unchecked" )
         List<Resource> projectResources = project.getResources();
         for ( Resource resource: projectResources )
         {

@@ -21,4 +21,4 @@ Complete Maven projects using this plugin are localed in separate [Play1 Maven T
 
 <hr>
 
-Many thanks to [<img src='http://maven-play-plugin.googlecode.com/svn/wiki/images/jprofiler.png' />](http://www.ej-technologies.com/products/jprofiler/overview.html)<a href=''></a>
+Many thanks to [<img src='http://assets-keycdn.ej-technologies.com/content/icon-app-jprofiler-9f3321cc39d0d17fb4238da06d836af1.png' />](http://www.ej-technologies.com/products/jprofiler/overview.html)<a href=''></a>
